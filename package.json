@@ -1,0 +1,24 @@
+{
+  "name": "ragate-cli",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ragate-inc/ragate-cli.git"
+  },
+  "keywords": [
+    "aws",
+    "serverless",
+    "ragate"
+  ],
+  "author": "Ragate inc.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ragate-inc/ragate-cli/issues"
+  },
+  "homepage": "https://github.com/ragate-inc/ragate-cli#readme"
+}
