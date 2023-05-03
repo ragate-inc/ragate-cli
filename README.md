@@ -6,13 +6,31 @@ This project will be managed by AWS serverless development engineers from around
 
 # Contents
 
+- [Quick Start](#quickstart)
 - [Concept](#concept)
   - [Mission](#mission)
   - [Vision](#vVision)
   - [Values](#values)
 - [Feature](#feature)
 - [Docs](#docs)
+- [Contributing](#contributing)
 - [Licensing](#licensing)
+
+# <a name="quickstart"></a> Quick Start
+
+Install ragate-cli module via NPM:
+
+```bash
+npm install -g ragate-cli
+```
+
+Creating a project
+
+```bash
+ragate-cli
+# or
+ragate
+```
 
 # <a name="concept"></a> Concept
 
@@ -44,6 +62,10 @@ We aim to be the favorite tool for AWS serverless developers around the world.
 # <a name="docs"></a> Docs
 
 Please click [here](./docs/index.md) to view the document.
+
+# <a name="contributing"></a> Contributing
+
+We love our contributors! Please read our [Contributing Document](./docs/contributing.md) to learn how you can start working on the Framework yourself.
 
 # <a name="contactus"></a> Contact Us
 
