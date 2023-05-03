@@ -6,6 +6,11 @@
     "node": "20.x"
   },
   "scripts": {},
+  "main": "./lib/app.ts",
+  "bin": {
+    "ragate-cli": "./bin/app.js",
+    "ragate": "./bin/app.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ragate-inc/ragate-cli.git"
@@ -22,5 +27,14 @@
   "bugs": {
     "url": "https://github.com/ragate-inc/ragate-cli/issues"
   },
-  "homepage": "https://github.com/ragate-inc/ragate-cli#readme"
+  "homepage": "https://github.com/ragate-inc/ragate-cli#readme",
+  "devDependencies": {
+    "@tsconfig/node20": "^1.0.0",
+    "@types/webpack": "^5.28.1",
+    "ts-loader": "^9.4.2",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.0.4",
+    "webpack": "^5.81.0",
+    "webpack-cli": "^5.0.2"
+  }
 }
