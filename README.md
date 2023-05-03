@@ -6,31 +6,31 @@ This project will be managed by AWS serverless development engineers from around
 
 # Contents
 
-- [Concept](#Concept)
-  - [Mission](#Mission)
-  - [Vision](#Vision)
-  - [Values](#Values)
-- [Feature](#Feature)
-- [Docs](#Docs)
-- [Licensing](#Licensing)
+- [Concept](#concept)
+  - [Mission](#mission)
+  - [Vision](#vVision)
+  - [Values](#values)
+- [Feature](#feature)
+- [Docs](#docs)
+- [Licensing](#licensing)
 
-# <a name="Concept"></a> Concept
+# <a name="concept"></a> Concept
 
-## <a name="Mission"></a> Mission
+## <a name="mission"></a> Mission
 
 Simplify the serverless development experience worldwide.
 
-## <a name="Vision"></a> Vision
+## <a name="vision"></a> Vision
 
 To create a better serverless development framework than AWS Amplify.
 
-## <a name="Values"></a> Values
+## <a name="values"></a> Values
 
 - Automatic generation of infinitely extensible and maintainable source code
 - Simple and easy to use command line interface
 - Streamline Graphql development
 
-## <a name="Feature"></a> Feature
+## <a name="feature"></a> Feature
 
 We aim to be the favorite tool for AWS serverless developers around the world.
 
@@ -41,11 +41,11 @@ We aim to be the favorite tool for AWS serverless developers around the world.
 - Auto-generate GraphqlAPI
 - Automatic generation of required AWS resources (CloudFormation)
 
-# <a name="Docs"></a> Docs
+# <a name="docs"></a> Docs
 
 Please click [here](./docs/index.md) to view the document.
 
-# <a name="Licensing"></a> Licensing
+# <a name="licensing"></a> Licensing
 
 ragate_cli is licensed under the [MIT License](./LICENSE.md).
 
