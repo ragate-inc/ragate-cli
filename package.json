@@ -1,11 +1,13 @@
 {
   "name": "ragate-cli",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.",
   "engines": {
-    "node": "20.x"
+    "node": ">=18.x"
   },
-  "scripts": {},
+  "scripts": {
+    "build": "webpack"
+  },
   "main": "./lib/app.ts",
   "bin": {
     "ragate-cli": "./bin/app.js",
@@ -20,7 +22,10 @@
     "serverless",
     "ragate",
     "cli",
-    "amplify"
+    "amplify",
+    "serverless",
+    "lambda",
+    "amazon"
   ],
   "author": "Ragate inc.",
   "license": "MIT",
@@ -29,7 +34,7 @@
   },
   "homepage": "https://github.com/ragate-inc/ragate-cli#readme",
   "devDependencies": {
-    "@tsconfig/node20": "^1.0.0",
+    "@tsconfig/node-lts": "^18.12.1",
     "@types/webpack": "^5.28.1",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",

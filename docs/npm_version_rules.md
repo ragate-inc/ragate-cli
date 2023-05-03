@@ -1,4 +1,4 @@
-# semantic versioning
+# Semantic Versioning
 
 | Version       | Upgrade Cases                       |
 | ------------- | ----------------------------------- |

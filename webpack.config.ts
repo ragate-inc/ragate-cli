@@ -17,6 +17,9 @@ const config: webpack.Configuration = {
       },
     ],
   } as webpack.ModuleOptions,
+  plugins: [
+    new webpack.BannerPlugin({ banner: "#!/usr/bin/env node", raw: true }),
+  ],
 };
 
 export default config;
