@@ -53,7 +53,11 @@
   "homepage": "https://github.com/ragate-inc/ragate-cli#readme",
   "devDependencies": {
     "@tsconfig/node-lts": "^18.12.1",
+    "@types/lodash": "^4.14.194",
+    "@types/node": "^18.16.3",
     "@types/webpack": "^5.28.1",
+    "@types/webpack-node-externals": "^3.0.0",
+    "@types/yargs": "^17.0.24",
     "@typescript-eslint/eslint-plugin": "^5.59.2",
     "@typescript-eslint/parser": "^5.59.2",
     "eslint": "^8.39.0",
@@ -64,8 +68,16 @@
     "prettier": "2.8.8",
     "ts-loader": "^9.4.2",
     "ts-node": "^10.9.1",
+    "tsconfig-paths-webpack-plugin": "^4.0.1",
     "typescript": "^5.0.4",
     "webpack": "^5.81.0",
-    "webpack-cli": "^5.0.2"
+    "webpack-cli": "^5.0.2",
+    "webpack-node-externals": "^3.0.0"
+  },
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "pino": "^8.12.1",
+    "pino-pretty": "^10.0.0",
+    "yargs": "^17.1.1-candidate.0"
   }
 }
