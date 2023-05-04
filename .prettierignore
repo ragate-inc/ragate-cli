@@ -1,0 +1,3 @@
+.gitignore
+.serverless
+node_modules
