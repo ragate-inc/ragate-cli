@@ -2,6 +2,14 @@ import { LogLevel, getLogger } from 'utils/logger';
 import yargs from 'yargs/yargs';
 import { getLocaleLang } from 'locale/index';
 import { Locale } from 'types/index';
+import yargonaut from 'yargonaut';
+
+yargonaut.font('SansSerif').helpStyle('grey').errorsStyle('red');
+
+const chalk = yargonaut.chalk();
+
+// ouput yargonaut fonts
+// console.log(JSON.stringify(yargonaut.listFonts(), null, 2));
 
 /**
  * yargs typescript : https://github.com/yargs/yargs/blob/main/docs/typescript.md
@@ -14,8 +22,9 @@ void (() => {
 
   const argv = yargs(process.argv.slice(2))
     .scriptName('ragate')
-    .usage([`${lang.usage}:`, 'ragate-cli <command> <options>', ' ragate <command> <options>'].join('\n'))
-    .options('log', {
+    .usage(['', chalk.grey(`${lang.usage}:`), 'ragate-cli <command> <options>', ' ragate <command> <options>'].join('\n'))
+    .option('log', {
+      alias: 'l',
       describe: lang.describe.logLevel,
       choices: ['fatal', 'error', 'warn', 'info', 'debug', 'trace'] as LogLevel[],
       default: 'debug',
