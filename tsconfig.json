@@ -7,7 +7,7 @@
       "exceptions/*": ["./lib/exceptions/*"],
       "utils/*": ["./lib/utils/*"],
       "types/*": ["lib/types/*"],
-      "config/*": ["lib/config/*"]
+      "locale/*": ["lib/locale/*"]
     }
   },
   "include": ["lib/*.ts", "lib/**/*.ts", "webpack.config.ts"]

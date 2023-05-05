@@ -1,5 +1,7 @@
 import { LogLevel, getLogger } from 'utils/logger';
 import yargs from 'yargs/yargs';
+import { getLocaleLang } from 'locale/index';
+import { Locale } from 'types/index';
 
 /**
  * yargs typescript : https://github.com/yargs/yargs/blob/main/docs/typescript.md
@@ -7,30 +9,58 @@ import yargs from 'yargs/yargs';
  */
 
 void (() => {
+  const locale = (process.env.LOCALE ?? 'en') as Locale;
+  const lang = getLocaleLang(locale);
+
   const argv = yargs(process.argv.slice(2))
     .scriptName('ragate')
-    .options({
-      loglevel: {
-        alias: 'l',
-        describe: 'choose a log level',
-        choices: ['fatal', 'error', 'warn', 'info', 'debug', 'trace'] as LogLevel[],
-        default: 'debug',
-        type: 'string',
-      },
+    .usage([`${lang.usage}:`, 'ragate-cli <command> <options>', ' ragate <command> <options>'].join('\n'))
+    .options('log', {
+      describe: lang.describe.logLevel,
+      choices: ['fatal', 'error', 'warn', 'info', 'debug', 'trace'] as LogLevel[],
+      default: 'debug',
+      type: 'string',
     })
-    .command('sing', 'a classic yargs command without prompting', () => {
-      console.log('🎵 Oy oy oy');
-    })
-    .example('sing', 'count the lines in the given file')
-    .version()
-    .alias('v', 'version')
     .help()
     .alias('h', 'help')
+    .version()
+    .alias('v', 'version')
+    .command('$0', 'create project', (yargs) => {
+      return yargs
+        .option('template', {
+          alias: 't',
+          type: 'string',
+          choices: ['aws-node-appsync'],
+          default: 'aws-node-appsync',
+          describe: lang.describe.template,
+        })
+        .version(false);
+    })
+    .command('add', 'Add file contents to the index', (yargs) => {
+      return yargs
+        .usage(`${lang.usage}: $0 add <options>`)
+        .option('A', {
+          alias: 'all',
+          type: 'boolean',
+          describe: 'Update the index not only where the working tree',
+        })
+        .version(false);
+    })
+    .locale(locale)
     .parseSync();
 
-  const logger = getLogger({ logLevel: argv.loglevel as LogLevel });
+  const logger = getLogger({ logLevel: argv.log as LogLevel });
 
-  logger.info(argv);
+  logger.debug(argv);
 
-  // TODO: process here
+  switch (argv._[0]) {
+    case 'add':
+      logger.debug('command: add!');
+      break;
+    case 'commit':
+      logger.debug('command: commit!');
+      break;
+    default:
+      logger.debug('command: default!');
+  }
 })();

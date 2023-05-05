@@ -32,6 +32,12 @@ ragate-cli
 ragate
 ```
 
+ChangeChange of language should be done via environment variables.
+
+```bash
+LOCALE=en
+```
+
 # <a name="concept"></a> Concept
 
 ## <a name="mission"></a> Mission
