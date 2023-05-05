@@ -1,3 +1,9 @@
+type YargonautChalk = {
+  grey(str: string): string;
+  green(str: string): string;
+  red(str: string): string;
+};
+
 declare module 'yargonaut' {
   export interface Yargonaut {
     style(str: string): Yargonaut;
@@ -16,9 +22,5 @@ declare module 'yargonaut' {
   function errorsStyle(str: string): Yargonaut;
 
   function listFonts(): string[];
-  function chalk(): {
-    grey(str: string): string;
-    green(str: string): string;
-    red(str: string): string;
-  };
+  function chalk(): YargonautChalk;
 }

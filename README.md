@@ -27,8 +27,6 @@ npm install -g ragate-cli
 Creating a project
 
 ```bash
-ragate-cli
-# or
 ragate
 ```
 

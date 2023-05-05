@@ -20,7 +20,6 @@
   ],
   "main": "./lib/app.ts",
   "bin": {
-    "ragate-cli": "./bin/app.js",
     "ragate": "./bin/app.js"
   },
   "repository": {
