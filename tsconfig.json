@@ -2,13 +2,15 @@
   "extends": "@tsconfig/node-lts/tsconfig.json",
   "compilerOptions": {
     "sourceMap": true,
+    "resolveJsonModule": true,
     "baseUrl": "./",
     "paths": {
       "exceptions/*": ["./lib/exceptions/*"],
       "utils/*": ["./lib/utils/*"],
-      "types/*": ["lib/types/*"],
-      "config/*": ["lib/config/*"]
+      "types/*": ["./lib/types/*"],
+      "locale/*": ["./lib/locale/*"],
+      "package.json": ["./package.json"]
     }
   },
-  "include": ["lib/*.ts", "lib/**/*.ts", "webpack.config.ts"]
+  "include": ["lib/*.ts", "lib/**/*.ts", "webpack.config.ts", "package.json"]
 }

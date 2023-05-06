@@ -27,7 +27,7 @@ const config: webpack.Configuration = {
   } as webpack.ModuleOptions,
   plugins: [new webpack.BannerPlugin({ banner: '#!/usr/bin/env node', raw: true })],
   resolve: {
-    extensions: ['.cjs', '.mjs', '.js', '.ts'],
+    extensions: ['.cjs', '.mjs', '.js', '.ts', '.json'],
     plugins: [
       new TsconfigPathsPlugin({
         configFile: './tsconfig.json',

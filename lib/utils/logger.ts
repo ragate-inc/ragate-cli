@@ -1,15 +1,23 @@
 import pino from 'pino';
+import pretty from 'pino-pretty';
 
-export type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
+const stream = pretty({
+  colorize: true,
+});
 
-export const getLogger = (args: { logLevel: LogLevel }) => {
-  return pino({
-    level: args.logLevel,
-    transport: {
-      target: 'pino-pretty',
-      options: {
-        colorize: true,
-      },
+type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
+
+export default (args: { logLevel: LogLevel }) => {
+  return pino(
+    {
+      level: args.logLevel,
+      // transport: {
+      //   target: 'pino-pretty',
+      //   options: {
+      //     colorize: true,
+      //   },
+      // },
     },
-  });
+    stream
+  );
 };

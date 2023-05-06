@@ -27,9 +27,13 @@ npm install -g ragate-cli
 Creating a project
 
 ```bash
-ragate-cli
-# or
 ragate
+```
+
+ChangeChange of language should be done via environment variables.
+
+```bash
+LOCALE=en
 ```
 
 # <a name="concept"></a> Concept
