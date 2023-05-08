@@ -2,6 +2,7 @@
 node_modules
 jspm_packages
 yarn-error.log
+tmp/
 
 # Serverless directories
 .serverless

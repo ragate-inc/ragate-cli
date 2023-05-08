@@ -1,8 +1,16 @@
 import { Locale } from 'features/create/types/index';
 
 const locale: Locale = {
+  error: {
+    alreadyExistsDirectory: 'already exists directory',
+  },
   inquirer: {
-    choiceTemplate: 'Choose a project template',
+    template: {
+      choiceTemplate: 'Choose a project template',
+      autocomplete: {
+        emptyText: 'No result',
+      },
+    },
   },
 };
 

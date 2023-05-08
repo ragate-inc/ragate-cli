@@ -1,5 +1,13 @@
 export type Locale = {
+  error: {
+    alreadyExistsDirectory: string;
+  };
   inquirer: {
-    choiceTemplate: string;
+    template: {
+      choiceTemplate: string;
+      autocomplete: {
+        emptyText: string;
+      };
+    };
   };
 };
