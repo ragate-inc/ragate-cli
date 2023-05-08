@@ -46,7 +46,7 @@ export default class App {
       .hide('processed')
       .options({
         verbose: {
-          describe: chalk.grey(lang.describe.verbose),
+          describe: chalk.grey(lang.options.describe.verbose),
           default: false,
           type: 'boolean',
         },
@@ -73,7 +73,7 @@ export default class App {
       )
       .command(
         'add',
-        chalk.grey(lang.command.description.create),
+        chalk.grey(lang.command.description.add),
         (yargs) => addFeature.builder(yargs),
         (argv) =>
           addFeature

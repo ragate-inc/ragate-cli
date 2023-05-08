@@ -9,9 +9,10 @@ export type Locale = {
       add: string;
     };
   };
-  describe: {
-    verbose: string;
-    template: string;
+  options: {
+    describe: {
+      verbose: string;
+    };
   };
   unProcessed: {
     required: string;
