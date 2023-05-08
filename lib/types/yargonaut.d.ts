@@ -20,7 +20,6 @@ declare module 'yargonaut' {
   function helpStyle(str: string): Yargonaut;
   function errors(str: string): Yargonaut;
   function errorsStyle(str: string): Yargonaut;
-
   function listFonts(): string[];
   function chalk(): YargonautChalk;
 }
