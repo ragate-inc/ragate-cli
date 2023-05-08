@@ -1,6 +1,6 @@
-import { LocaleLang } from 'types/index';
+import { Locale } from 'lib/entry/types/index';
 
-const locale: LocaleLang = {
+const locale: Locale = {
   usage: 'Usage',
   help: 'Show help',
   version: 'Show version',
@@ -20,4 +20,5 @@ const locale: LocaleLang = {
     notFound: 'The command entered does not exist. Run "ragate help" for a list of all available commands.',
   },
 };
+
 export default locale;

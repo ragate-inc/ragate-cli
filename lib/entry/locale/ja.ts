@@ -1,6 +1,6 @@
-import { LocaleLang } from 'types/index';
+import { Locale } from 'lib/entry/types/index';
 
-const locale: LocaleLang = {
+const locale: Locale = {
   usage: '使い方',
   help: 'ヘルプを表示',
   version: 'バージョンを表示',
@@ -20,4 +20,5 @@ const locale: LocaleLang = {
     notFound: '入力されたコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
   },
 };
+
 export default locale;
