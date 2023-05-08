@@ -74,7 +74,6 @@ export default class App {
           createFeature
             .handler({
               argv: argv,
-              logger: this.logger,
             })
             .finally(() => (argv.processed = true))
       )
@@ -86,13 +85,12 @@ export default class App {
           addFeature
             .handler({
               argv: argv,
-              logger: this.logger,
             })
             .finally(() => (argv.processed = true))
       )
       .wrap(Math.max(yargs().terminalWidth() - 5, 60))
-      .locale(locale)
-      .fail((msg, err, yargs) => process.exit(1));
+      .locale(locale);
+    // .fail((msg, err, yargs) => process.exit(1));
   }
 
   public async run() {

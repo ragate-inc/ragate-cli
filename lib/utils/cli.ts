@@ -8,11 +8,6 @@ export const processCurrent = path.resolve();
 const execFilePath = path.dirname(process.argv[1]);
 export const tmpPath = `${execFilePath}/../tmp`;
 
-console.log({
-  tmpPath,
-  processCurrent,
-});
-
 export function gitClone(repositoryUrl: string, destinationPath: string): void {
   const logger = Logger.getLogger();
   try {

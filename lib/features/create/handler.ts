@@ -1,5 +1,5 @@
 import inquirer from 'inquirer';
-import { Logger } from 'pino';
+import Logger from 'utils/logger';
 import config from 'config';
 import { getLocaleLang } from 'features/create/utils/getLocale';
 import _ from 'lodash';
@@ -8,8 +8,10 @@ import { cleanUpTmpDirectory, gitClone, isExistsDirectory, copyDirectory, proces
 
 inquirer.registerPrompt('autocomplete', inquirerPrompt as inquirer.prompts.PromptConstructor);
 
-export default async (args: { argv: Record<string, unknown>; logger: Logger }): Promise<void> => {
-  const { argv, logger } = args;
+export default async (args: { argv: Record<string, unknown> }): Promise<void> => {
+  const { argv } = args;
+  const logger = Logger.getLogger();
+  console.log('test');
   logger.debug('create hander : ', argv);
   const locale = getLocaleLang(config.lang);
   const res = (await inquirer
