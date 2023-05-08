@@ -1,4 +1,4 @@
-import Entry from './entry/handler';
+import Entry from 'entry/handler';
 
 void (async () => {
   const entry = new Entry();

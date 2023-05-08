@@ -1,4 +1,4 @@
-import { Locale } from 'lib/entry/types/index';
+import { Locale } from 'entry/types/index';
 
 const locale: Locale = {
   usage: '使い方',
