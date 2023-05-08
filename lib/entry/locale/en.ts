@@ -1,4 +1,4 @@
-import { Locale } from 'lib/entry/types/index';
+import { Locale } from 'entry/types/index';
 
 const locale: Locale = {
   usage: 'Usage',
@@ -11,9 +11,10 @@ const locale: Locale = {
       add: 'Add aws resouces',
     },
   },
-  describe: {
-    verbose: 'Show verbose logs',
-    template: 'Choose a project template',
+  options: {
+    describe: {
+      verbose: 'Show verbose logs',
+    },
   },
   unProcessed: {
     required: 'please input a command. Run "ragate help" for a list of all available commands.',

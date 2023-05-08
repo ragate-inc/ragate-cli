@@ -7,11 +7,34 @@ const stream = pretty({
 
 type LogLevel = 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace';
 
-export default (args: { logLevel: LogLevel }) => {
-  return pino(
-    {
-      level: args.logLevel,
-    },
-    stream
-  );
-};
+export default class {
+  private constructor() {
+    throw new Error('singleton cannot be instantiated');
+  }
+
+  private static logger: pino.Logger;
+
+  public static getLogger(logLevel: LogLevel = 'error'): pino.Logger {
+    if (logLevel) {
+      this.logger = pino(
+        {
+          level: logLevel,
+        },
+        stream
+      );
+      return this.logger;
+    }
+
+    if (this.logger) {
+      return this.logger;
+    }
+
+    this.logger = pino(
+      {
+        level: logLevel,
+      },
+      stream
+    );
+    return this.logger;
+  }
+}

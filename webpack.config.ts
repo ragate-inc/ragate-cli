@@ -5,7 +5,7 @@ import nodeExternals from 'webpack-node-externals';
 
 const config: webpack.Configuration = {
   entry: './lib/app.ts',
-  mode: 'development', // production | development
+  mode: process.env.ENV as 'production' | 'development',
   target: 'node',
   output: {
     filename: 'app.js',

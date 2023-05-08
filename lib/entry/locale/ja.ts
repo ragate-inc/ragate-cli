@@ -1,4 +1,4 @@
-import { Locale } from 'lib/entry/types/index';
+import { Locale } from 'entry/types/index';
 
 const locale: Locale = {
   usage: '使い方',
@@ -11,9 +11,10 @@ const locale: Locale = {
       add: 'AWSリソースの追加',
     },
   },
-  describe: {
-    verbose: '詳細なログを出力',
-    template: 'プロジェクトの雛形',
+  options: {
+    describe: {
+      verbose: '詳細なログを出力',
+    },
   },
   unProcessed: {
     required: 'コマンドを入力してください。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',

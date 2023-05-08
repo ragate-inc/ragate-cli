@@ -6,9 +6,17 @@ export class BaseClass extends Error {
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }
+
 export class EnvironmentError extends BaseClass {
   constructor(message?: string) {
     super(message);
     this.name = 'EnvironmentError';
+  }
+}
+
+export class CLIError extends BaseClass {
+  constructor(message?: string) {
+    super(message);
+    this.name = 'CLIError';
   }
 }

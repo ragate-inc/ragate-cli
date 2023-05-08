@@ -10,6 +10,7 @@
       "types/*": ["./lib/types/*"],
       "locale/*": ["./lib/locale/*"],
       "features/*": ["./lib/features/*"],
+      "entry/*": ["./lib/entry/*"],
       "config": ["./lib/config.ts"],
       "package.json": ["./package.json"]
     }
