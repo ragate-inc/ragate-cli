@@ -11,12 +11,6 @@ export default (args: { logLevel: LogLevel }) => {
   return pino(
     {
       level: args.logLevel,
-      // transport: {
-      //   target: 'pino-pretty',
-      //   options: {
-      //     colorize: true,
-      //   },
-      // },
     },
     stream
   );
