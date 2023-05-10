@@ -1,7 +1,6 @@
 import Logger from 'utils/logger';
 import yargs from 'yargs/yargs';
 import { init as yargonautInit, chalk } from 'utils/yargonaut';
-import _ from 'lodash';
 import config from 'config';
 import { getLocaleLang } from 'entry/utils/getLocale';
 import { Locale } from 'entry/types';
@@ -15,7 +14,7 @@ import addFeature from 'features/add/index';
  * Inquirer : https://github.com/SBoudrias/Inquirer.js/tree/master
  */
 
-export default class App {
+export default class {
   constructor() {
     yargonautInit();
     this.chalk = chalk;
@@ -37,13 +36,6 @@ export default class App {
   private get logger() {
     return Logger.getLogger(this.verbose ? 'debug' : 'info');
   }
-
-  private outputResultError = (messages: string[]) => {
-    messages.forEach((msg) => {
-      this.logger.error(` ${msg}`);
-    });
-    // this.cli.showHelp();
-  };
 
   private cli() {
     const { lang, version, chalk, locale: locale } = this;
@@ -113,28 +105,24 @@ export default class App {
           new createFeature.handler({
             argv: argv,
             logger: this.logger,
-          })
-            .run()
-            .finally(() => (argv.processed = true))
+          }).run()
       )
       .command('add', chalk.grey(locale.command.description.add), (yargs) => new addFeature.builder().build({ yargs, logger: this.logger }))
+      .demandCommand(1, chalk.red('You need at least one command before moving on'))
+      .command(
+        '*',
+        '',
+        () => ({}),
+        (argv) => {
+          if (argv._.length === 0) this.logger.error(chalk.red(this.locale.unProcessed.required));
+          else this.logger.error(chalk.red(this.locale.unProcessed.notFound));
+        }
+      )
       .wrap(Math.max(yargs().terminalWidth() - 5, 60))
       .locale(lang);
   }
 
   public async run() {
-    try {
-      const argv = await this.cli().parseAsync();
-      if (!argv.processed) {
-        if (_.isEmpty(argv._)) {
-          this.outputResultError([this.locale.unProcessed.required]);
-        } else {
-          this.outputResultError([this.locale.unProcessed.notFound, `${this.locale.yourInput}: ${argv._.join(' ')}`]);
-        }
-      }
-    } catch (error) {
-      const err = error as Error;
-      this.outputResultError([err.message]);
-    }
+    await this.cli().parseAsync();
   }
 }
