@@ -57,6 +57,45 @@ export default class App {
           default: false,
           type: 'boolean',
         },
+        region: {
+          alias: 'r',
+          describe: chalk.grey(lang.options.describe.region),
+          default: 'ap-northeast-1',
+          type: 'string',
+          choices: [
+            'ap-northeast-1',
+            'us-east-2',
+            'us-east-1',
+            'us-west-1',
+            'us-west-2',
+            'af-south-1',
+            'ap-east-1',
+            'ap-south-2',
+            'ap-southeast-3',
+            'ap-southeast-3',
+            'ap-southeast-4',
+            'ap-south-1',
+            'ap-northeast-3',
+            'ap-northeast-2',
+            'ap-southeast-1',
+            'ap-southeast-2',
+            'ap-northeast-1',
+            'ca-central-1',
+            'eu-central-1',
+            'eu-west-1',
+            'eu-west-2',
+            'eu-south-1',
+            'eu-west-3',
+            'eu-south-2',
+            'eu-north-1',
+            'eu-central-2',
+            'me-south-1',
+            'me-central-1',
+            'sa-east-1',
+            'us-gov-east-1',
+            'us-gov-west-1',
+          ],
+        },
       })
       .middleware((argv) => {
         this.verbose = argv.verbose || false;
@@ -78,18 +117,7 @@ export default class App {
             .run()
             .finally(() => (argv.processed = true))
       )
-      .command(
-        'add',
-        chalk.grey(lang.command.description.add),
-        (yargs) => addFeature.builder.build(yargs, this.logger),
-        (argv) =>
-          new addFeature.handler({
-            argv: argv,
-            logger: this.logger,
-          })
-            .run()
-            .finally(() => (argv.processed = true))
-      )
+      .command('add', chalk.grey(lang.command.description.add), (yargs) => addFeature.builder.build(yargs, this.logger))
       .wrap(Math.max(yargs().terminalWidth() - 5, 60))
       .locale(locale);
   }

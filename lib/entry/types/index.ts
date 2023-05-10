@@ -12,6 +12,7 @@ export type Locale = {
   options: {
     describe: {
       verbose: string;
+      region: string;
     };
   };
   unProcessed: {
