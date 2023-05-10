@@ -1,44 +1,34 @@
 import config from 'config';
 import yargs from 'yargs';
-import { Logger } from 'pino';
-import { getLocaleLang } from 'entry/utils/getLocale';
 import { chalk } from 'utils/yargonaut';
 
-export type Lang = 'ja' | 'en';
-
 export abstract class FeatureHandlerAbstract {
-  private readonly _argv: Record<string, unknown>;
-  private readonly _logger: Logger;
-  protected constructor(args: { argv: Record<string, unknown>; logger: Logger }) {
-    const { argv, logger } = args;
+  private readonly _argv: yargs.ArgumentsCamelCase;
+  private readonly _lang: string;
+  protected constructor(argv: yargs.ArgumentsCamelCase) {
     this._argv = argv;
-    this._logger = logger;
+    this._lang = argv.lang as string;
   }
-  protected get argv(): Record<string, unknown> {
+  protected get argv(): yargs.ArgumentsCamelCase {
     return this._argv;
   }
-  protected get logger(): Logger {
-    return this._logger;
+  protected get lang(): string {
+    return this._lang;
   }
   public abstract run(): Promise<void>;
 }
 
 export abstract class FeatureBuilderAbstract {
-  private readonly _lang;
-  private readonly _locale;
-  private readonly _npmVersion;
-  private readonly _chalk;
-  protected constructor() {
+  private readonly _lang: string;
+  private readonly _npmVersion: string;
+  private readonly _chalk: typeof chalk;
+  protected constructor(args?: { lang: string }) {
     this._chalk = chalk;
-    this._lang = config.lang;
-    this._locale = getLocaleLang(this.lang);
+    this._lang = args?.lang as string;
     this._npmVersion = config.npmVersion;
   }
   protected get lang() {
     return this._lang;
-  }
-  protected get locale() {
-    return this._locale;
   }
   protected get npmVersion() {
     return this._npmVersion;
@@ -46,7 +36,7 @@ export abstract class FeatureBuilderAbstract {
   protected get chalk() {
     return this._chalk;
   }
-  public abstract build(args: { yargs: yargs.Argv; logger: Logger }): yargs.Argv;
+  public abstract build(yargs: yargs.Argv): yargs.Argv;
 }
 
 export type AWS_REGION =

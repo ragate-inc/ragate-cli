@@ -33,7 +33,7 @@ ragate
 ChangeChange of language should be done via environment variables.
 
 ```bash
-LOCALE=en
+LANG=ja ragate <command>
 ```
 
 # <a name="concept"></a> Concept

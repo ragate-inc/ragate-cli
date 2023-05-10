@@ -7,9 +7,6 @@ export default class extends FeatureBuilderAbstract {
     super(args);
   }
   public build(yargs: yargs.Argv): yargs.Argv {
-    return yargs
-      .version(false)
-      .usage('Usage: create')
-      .fail((msg, err) => Logger.handleFaildLog({ msg, err }));
+    return yargs.version(false).fail((msg, err) => Logger.handleFaildLog({ msg, err }));
   }
 }

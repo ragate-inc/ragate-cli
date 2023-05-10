@@ -2,29 +2,29 @@
 (() => {
   'use strict';
   var e = {
-      712: function (e, t, r) {
+      4712: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = s(r(278));
+        const o = s(r(9026));
         (async () => {
           const e = new o.default();
           await e.run();
         })();
       },
-      322: function (e, t, r) {
+      2322: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = s(r(147)),
-          n = s(r(517)),
-          i = {
+        const o = s(r(4147)),
+          n = s(r(6517)),
+          a = {
             npmVersion: o.default.version,
             repositoyUrl: 'https://github.com/ragate-inc/serverless-starter',
             templates: n.default
@@ -32,56 +32,60 @@
               .sortBy('category')
               .map((e) => ({ name: `${e.category} - ${e.name}`, value: e.value }))
               .value(),
-            lang: process.env.LOCALE ?? 'en',
           };
-        t.default = i;
+        t.default = a;
       },
-      278: function (e, t, r) {
+      9026: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = s(r(444)),
-          n = s(r(32)),
-          i = r(870),
-          a = s(r(517)),
-          l = s(r(322)),
-          u = r(14),
-          c = s(r(798)),
-          p = s(r(72));
+        const o = s(r(6444)),
+          n = s(r(9267)),
+          a = r(6870),
+          i = s(r(2322)),
+          l = r(8014),
+          u = s(r(8798)),
+          c = s(r(8072));
         t.default = class {
           constructor() {
-            (0, i.init)(), (this.chalk = i.chalk), (this.lang = l.default.lang), (this.locale = (0, u.getLocaleLang)(this.lang)), (this.npmVersion = l.default.npmVersion);
+            (0, a.init)(), (this.chalk = a.chalk);
+            const e = (0, n.default)(process.argv.slice(2))
+              .options({ lang: { default: this.langRef.default, type: this.langRef.type }, verbose: { default: this.verboseRef.default, type: this.verboseRef.type } })
+              .help(!1)
+              .version(!1)
+              .parseSync();
+            (this.lang = e.lang),
+              (this.verbose = e.verbose),
+              (this.locale = (0, l.getLocaleLang)(e.lang)),
+              (this.logger = o.default.getLogger(this.verbose ? 'debug' : 'info')),
+              (this.npmVersion = i.default.npmVersion);
           }
           chalk;
-          lang;
+          logger;
           locale;
+          lang;
+          langRef = { default: process.env.LANG ?? 'en', type: 'string' };
+          verbose;
+          verboseRef = { default: !1, type: 'string' };
           npmVersion;
-          verbose = !1;
           get version() {
             return `ragate-cli v${this.npmVersion}`;
           }
-          get logger() {
-            return o.default.getLogger(this.verbose ? 'debug' : 'info');
-          }
-          outputResultError = (e) => {
-            e.forEach((e) => {
-              this.logger.error(` ${e}`);
-            });
-          };
           cli() {
-            const { lang: e, version: t, chalk: r, locale: s } = this;
+            const { version: e, chalk: t, locale: r, lang: s } = this;
             return (0, n.default)(process.argv.slice(2))
               .scriptName('')
               .default('processed', !1)
               .hide('processed')
               .options({
-                verbose: { describe: r.grey(s.options.describe.verbose), default: !1, type: 'boolean' },
+                verbose: { describe: t.grey(r.options.describe.verbose), default: this.verboseRef.default, type: this.verboseRef.type },
+                lang: { describe: t.grey(r.options.describe.lang), default: this.langRef.default, type: this.langRef.type },
                 region: {
                   alias: 'r',
-                  describe: r.grey(s.options.describe.region),
+                  describe: t.grey(r.options.describe.region),
                   default: 'ap-northeast-1',
                   type: 'string',
                   choices: [
@@ -119,39 +123,35 @@
                   ],
                 },
               })
-              .middleware((e) => {
-                this.verbose = e.verbose || !1;
-              })
-              .usage(t)
-              .help('help', r.grey(s.help))
+              .usage(e)
+              .help('help', t.grey(r.help))
               .alias('h', 'help')
-              .version('version', r.grey(s.version), t)
+              .version('version', t.grey(r.version), e)
               .alias('v', 'version')
               .command(
                 'create',
-                r.grey(s.command.description.create),
-                (e) => new c.default.builder().build({ yargs: e, logger: this.logger }),
-                (e) => new c.default.handler({ argv: e, logger: this.logger }).run().finally(() => (e.processed = !0))
+                t.grey(r.command.description.create),
+                (e) => new u.default.builder({ lang: this.lang }).build(e),
+                (e) => new u.default.handler(e).run()
               )
-              .command('add', r.grey(s.command.description.add), (e) => new p.default.builder().build({ yargs: e, logger: this.logger }))
+              .command('add', t.grey(r.command.description.add), (e) => new c.default.builder({ lang: this.lang }).build(e))
+              .command(
+                '*',
+                '',
+                () => ({}),
+                (e) => {
+                  0 === e._.length ? this.logger.error(t.red(this.locale.unProcessed.required)) : this.logger.error(t.red(this.locale.unProcessed.notFound));
+                }
+              )
               .wrap(Math.max((0, n.default)().terminalWidth() - 5, 60))
-              .locale(e);
+              .locale(s);
           }
           async run() {
-            try {
-              const e = await this.cli().parseAsync();
-              e.processed ||
-                (a.default.isEmpty(e._)
-                  ? this.outputResultError([this.locale.unProcessed.required])
-                  : this.outputResultError([this.locale.unProcessed.notFound, `${this.locale.yourInput}: ${e._.join(' ')}`]));
-            } catch (e) {
-              const t = e;
-              this.outputResultError([t.message]);
-            }
+            await this.cli().parseAsync();
           }
         };
       },
-      843: (e, t) => {
+      1843: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = {
             usage: 'Usage',
@@ -159,14 +159,14 @@
             version: 'Show version',
             yourInput: 'your input',
             command: { description: { create: 'Create a new project', add: 'Add aws resouces' } },
-            options: { describe: { verbose: 'Show verbose logs', region: 'Aws region' } },
+            options: { describe: { verbose: 'Show verbose logs', region: 'Aws region', lang: 'Display language' } },
             unProcessed: {
               required: 'please input a command. Run "ragate help" for a list of all available commands.',
               notFound: 'The command entered does not exist. Run "ragate help" for a list of all available commands.',
             },
           });
       },
-      471: (e, t) => {
+      6471: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = {
             usage: '使い方',
@@ -174,35 +174,25 @@
             version: 'バージョンを表示',
             yourInput: '入力されたコマンド',
             command: { description: { create: 'プロジェクトを作成', add: 'AWSリソースの追加' } },
-            options: { describe: { verbose: '詳細なログを出力', region: 'AWSリージョン' } },
+            options: { describe: { verbose: '詳細なログを出力', region: 'AWSリージョン', lang: '表示言語' } },
             unProcessed: {
-              required: 'コマンドを入力してください。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
+              required: '指定のコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
               notFound: '入力されたコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
             },
           });
       },
-      14: function (e, t, r) {
+      8014: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
-        const o = s(r(471)),
-          n = s(r(843)),
-          i = r(33);
-        t.getLocaleLang = (e) => {
-          switch (e) {
-            case 'ja':
-              return o.default;
-            case 'en':
-              return n.default;
-            default:
-              throw new i.EnvironmentError('An invalid environment variable is specified. : LOCALE');
-          }
-        };
+        const o = s(r(6471)),
+          n = s(r(1843));
+        t.getLocaleLang = (e) => ('ja' === e ? o.default : n.default);
       },
-      33: (e, t) => {
+      5033: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }), (t.CLIError = t.EnvironmentError = t.BaseClass = void 0);
         class r extends Error {
           constructor(e) {
@@ -221,53 +211,207 @@
             }
           });
       },
-      40: function (e, t, r) {
+      6040: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = r(702),
-          n = s(r(444));
-        class i extends o.FeatureBuilderAbstract {
-          constructor() {
-            super();
+        const o = r(6702),
+          n = s(r(6444)),
+          a = s(r(9211)),
+          i = s(r(592)),
+          l = r(6870),
+          u = r(7264);
+        class c extends o.FeatureBuilderAbstract {
+          constructor(e) {
+            super(e);
           }
           build(e) {
-            return e.yargs.version(!1).fail((e, t) => n.default.handleFaildLog({ msg: e, err: t }));
+            const t = (0, u.getLocaleLang)(this.lang),
+              r = n.default.getLogger();
+            return e
+              .version(!1)
+              .usage('Usage: add <command> <options>')
+              .command(
+                'sns',
+                l.chalk.grey(t.command.description.sns),
+                (e) => new a.default.builder({ lang: this.lang }).build(e),
+                (e) => new a.default.handler(e).run()
+              )
+              .command(
+                'sqs',
+                l.chalk.grey(t.command.description.sns),
+                (e) => new i.default.builder({ lang: this.lang }).build(e),
+                (e) => new i.default.handler(e).run()
+              )
+              .command(
+                '*',
+                l.chalk.grey('<command> <options>'),
+                () => ({}),
+                () => {
+                  r.error(l.chalk.red(t.unProcessed));
+                }
+              );
           }
         }
-        t.default = i;
+        t.default = c;
       },
-      72: function (e, t, r) {
+      6433: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = s(r(40));
+        const o = r(6702),
+          n = s(r(6444));
+        class a extends o.FeatureBuilderAbstract {
+          constructor(e) {
+            super(e);
+          }
+          build(e) {
+            return e.version(!1).fail((e, t) => n.default.handleFaildLog({ msg: e, err: t }));
+          }
+        }
+        t.default = a;
+      },
+      2917: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(6444)),
+          n = r(6702);
+        class a extends n.FeatureHandlerAbstract {
+          constructor(e) {
+            super(e);
+          }
+          async run() {
+            o.default.getLogger().info('Coming soon'), await new Promise((e) => setTimeout(e, 0));
+          }
+        }
+        t.default = a;
+      },
+      9211: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(6433)),
+          n = s(r(2917));
+        t.default = { builder: o.default, handler: n.default };
+      },
+      6621: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = r(6702),
+          n = s(r(6444));
+        class a extends o.FeatureBuilderAbstract {
+          constructor(e) {
+            super(e);
+          }
+          build(e) {
+            return e.version(!1).fail((e, t) => n.default.handleFaildLog({ msg: e, err: t }));
+          }
+        }
+        t.default = a;
+      },
+      4267: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(6444)),
+          n = r(6702);
+        class a extends n.FeatureHandlerAbstract {
+          constructor(e) {
+            super(e);
+          }
+          async run() {
+            o.default.getLogger().info('Coming soon'), await new Promise((e) => setTimeout(e, 0));
+          }
+        }
+        t.default = a;
+      },
+      592: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(6621)),
+          n = s(r(4267));
+        t.default = { builder: o.default, handler: n.default };
+      },
+      8072: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(6040));
         t.default = { builder: o.default };
       },
-      818: function (e, t, r) {
+      4005: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            command: { description: { sns: 'add AWS SQS', sqs: 'add AWS SQS' } },
+            unProcessed: 'The command entered does not exist. Run "ragate add help" for a list of all available commands.',
+          });
+      },
+      5699: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            command: { description: { sns: 'AWS SQSを追加', sqs: 'AWS SQSを追加' } },
+            unProcessed: '入力されたコマンドは存在しません。「ragate add help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
+          });
+      },
+      7264: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
+        const o = s(r(5699)),
+          n = s(r(4005));
+        t.getLocaleLang = (e) => ('ja' === e ? o.default : n.default);
+      },
+      3818: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = r(702),
-          n = s(r(444));
-        class i extends o.FeatureBuilderAbstract {
-          constructor() {
-            super();
+        const o = r(6702),
+          n = s(r(6444));
+        class a extends o.FeatureBuilderAbstract {
+          constructor(e) {
+            super(e);
           }
           build(e) {
-            return e.yargs.version(!1).fail((e, t) => n.default.handleFaildLog({ msg: e, err: t }));
+            return e
+              .version(!1)
+              .usage('Usage: create')
+              .fail((e, t) => n.default.handleFaildLog({ msg: e, err: t }));
           }
         }
-        t.default = i;
+        t.default = a;
       },
       975: function (e, t, r) {
         var s =
@@ -276,21 +420,23 @@
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = s(r(290)),
-          n = s(r(322)),
-          i = r(868),
-          a = s(r(517)),
+        const o = s(r(3290)),
+          n = s(r(2322)),
+          a = r(2868),
+          i = s(r(6517)),
           l = s(r(169)),
-          u = r(762),
-          c = r(702);
-        class p extends c.FeatureHandlerAbstract {
+          u = r(2762),
+          c = s(r(6444)),
+          d = r(6702);
+        class p extends d.FeatureHandlerAbstract {
           constructor(e) {
             super(e), o.default.registerPrompt('autocomplete', l.default);
           }
           async run() {
-            const { argv: e, logger: t } = this;
+            const { argv: e } = this,
+              t = c.default.getLogger();
             t.debug('create hander : ', e);
-            const r = (0, i.getLocaleLang)(n.default.lang),
+            const r = (0, a.getLocaleLang)(this.lang),
               s = await o.default
                 .prompt([
                   {
@@ -298,111 +444,95 @@
                     name: 'template',
                     emptyText: r.inquirer.template.autocomplete.emptyText,
                     message: r.inquirer.template.choiceTemplate,
-                    source: (e, t) => (a.default.isEmpty(t) ? n.default.templates : n.default.templates.filter((e) => e.name.includes(t))),
+                    source: (e, t) => (i.default.isEmpty(t) ? n.default.templates : n.default.templates.filter((e) => e.name.includes(t))),
                   },
                   {
                     type: 'input',
                     name: 'projectName',
                     message: 'input a project name',
                     default: (e) => e.template,
-                    validate: (e) => !a.default.isEmpty(e) || 'required input a project name',
+                    validate: (e) => !i.default.isEmpty(e) || 'required input a project name',
                   },
                 ])
                 .then((e) => e);
             t.debug(`input values : ${JSON.stringify(s)}}`);
-            const { template: l, projectName: c } = s;
-            if ((t.info(`template : ${l}`), t.info(`projectName : ${c}`), (0, u.isExistsDirectory)(`${u.processCurrent}/${c}`)))
-              throw new Error(`${r.error.alreadyExistsDirectory} : ${u.processCurrent}/${c}`);
+            const { template: l, projectName: d } = s;
+            if ((t.info(`template : ${l}`), t.info(`projectName : ${d}`), (0, u.isExistsDirectory)(`${u.processCurrent}/${d}`)))
+              throw new Error(`${r.error.alreadyExistsDirectory} : ${u.processCurrent}/${d}`);
             (0, u.isExistsDirectory)(u.tmpPath) && (0, u.cleanUpTmpDirectory)(),
               (0, u.gitClone)(n.default.repositoyUrl, u.tmpPath),
-              (0, u.copyDirectory)(`${u.tmpPath}/${l}`, `${u.processCurrent}/${c}`);
+              (0, u.copyDirectory)(`${u.tmpPath}/${l}`, `${u.processCurrent}/${d}`);
           }
         }
         t.default = p;
       },
-      798: function (e, t, r) {
+      8798: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = s(r(818)),
+        const o = s(r(3818)),
           n = s(r(975));
         t.default = { builder: o.default, handler: n.default };
       },
-      544: (e, t) => {
+      7544: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = {
             error: { alreadyExistsDirectory: 'already exists directory' },
             inquirer: { template: { choiceTemplate: 'Choose a project template', autocomplete: { emptyText: 'No result' } } },
           });
       },
-      16: (e, t) => {
+      7016: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = {
             error: { alreadyExistsDirectory: '既にディレクトリが存在します' },
             inquirer: { template: { choiceTemplate: 'プロジェクトの雛形を選択してください。', autocomplete: { emptyText: '該当するテンプレートが見つかりません' } } },
           });
       },
-      868: function (e, t, r) {
+      2868: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
-        const o = s(r(16)),
-          n = s(r(544)),
-          i = r(33);
-        t.getLocaleLang = (e) => {
-          switch (e) {
-            case 'ja':
-              return o.default;
-            case 'en':
-              return n.default;
-            default:
-              throw new i.EnvironmentError('An invalid environment variable is specified. : LOCALE');
-          }
-        };
+        const o = s(r(7016)),
+          n = s(r(7544));
+        t.getLocaleLang = (e) => ('ja' === e ? o.default : n.default);
       },
-      702: function (e, t, r) {
+      6702: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 }), (t.FeatureBuilderAbstract = t.FeatureHandlerAbstract = void 0);
-        const o = s(r(322)),
-          n = r(14),
-          i = r(870);
+        const o = s(r(2322)),
+          n = r(6870);
         (t.FeatureHandlerAbstract = class {
           _argv;
-          _logger;
+          _lang;
           constructor(e) {
-            const { argv: t, logger: r } = e;
-            (this._argv = t), (this._logger = r);
+            (this._argv = e), (this._lang = e.lang);
           }
           get argv() {
             return this._argv;
           }
-          get logger() {
-            return this._logger;
+          get lang() {
+            return this._lang;
           }
         }),
           (t.FeatureBuilderAbstract = class {
             _lang;
-            _locale;
             _npmVersion;
             _chalk;
-            constructor() {
-              (this._chalk = i.chalk), (this._lang = o.default.lang), (this._locale = (0, n.getLocaleLang)(this.lang)), (this._npmVersion = o.default.npmVersion);
+            constructor(e) {
+              (this._chalk = n.chalk), (this._lang = e?.lang), (this._npmVersion = o.default.npmVersion);
             }
             get lang() {
               return this._lang;
-            }
-            get locale() {
-              return this._locale;
             }
             get npmVersion() {
               return this._npmVersion;
@@ -412,22 +542,22 @@
             }
           });
       },
-      762: function (e, t, r) {
+      2762: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 }), (t.isExistsDirectory = t.cleanUpTmpDirectory = t.copyDirectory = t.gitClone = t.tmpPath = t.processCurrent = void 0);
-        const o = r(81),
-          n = r(33),
-          i = s(r(444)),
-          a = s(r(17));
-        t.processCurrent = a.default.resolve();
-        const l = a.default.dirname(process.argv[1]);
+        const o = r(2081),
+          n = r(5033),
+          a = s(r(6444)),
+          i = s(r(1017));
+        t.processCurrent = i.default.resolve();
+        const l = i.default.dirname(process.argv[1]);
         (t.tmpPath = `${l}/../tmp`),
           (t.gitClone = function (e, t) {
-            const r = i.default.getLogger();
+            const r = a.default.getLogger();
             try {
               r.debug((0, o.execSync)(`git clone ${e} ${t}`).toString());
             } catch (e) {
@@ -436,7 +566,7 @@
             }
           }),
           (t.copyDirectory = function (e, t) {
-            const r = i.default.getLogger();
+            const r = a.default.getLogger();
             try {
               r.debug((0, o.execSync)(`cp -r ${e} ${t}`).toString());
             } catch (e) {
@@ -445,7 +575,7 @@
             }
           }),
           (t.cleanUpTmpDirectory = function () {
-            const e = i.default.getLogger();
+            const e = a.default.getLogger();
             try {
               e.debug((0, o.execSync)(`rm -rf ${t.tmpPath}`).toString()), e.debug((0, o.execSync)(`mkdir ${t.tmpPath}`).toString());
             } catch (e) {
@@ -454,7 +584,7 @@
             }
           }),
           (t.isExistsDirectory = function (e) {
-            const t = i.default.getLogger();
+            const t = a.default.getLogger();
             try {
               return t.debug((0, o.execSync)(`test -d ${e}`).toString()), !0;
             } catch (e) {
@@ -462,128 +592,128 @@
             }
           });
       },
-      444: function (e, t, r) {
+      6444: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = s(r(545)),
-          n = s(r(233)),
-          i = r(870),
-          a = (0, n.default)({ colorize: !0 });
+        const o = s(r(8545)),
+          n = s(r(4233)),
+          a = r(6870),
+          i = (0, n.default)({ colorize: !0 });
         t.default = class {
           constructor() {
             throw new Error('singleton cannot be instantiated');
           }
           static logger;
           static getLogger(e = 'info') {
-            return e ? ((this.logger = (0, o.default)({ level: e }, a)), this.logger) : (this.logger || (this.logger = (0, o.default)({ level: e }, a)), this.logger);
+            return e ? ((this.logger = (0, o.default)({ level: e }, i)), this.logger) : (this.logger || (this.logger = (0, o.default)({ level: e }, i)), this.logger);
           }
           static handleFaildLog(e) {
             const { msg: t, err: r } = e,
               s = this.getLogger();
-            t && s.error(i.chalk.red(t)), r && (r.stack ? s.error(i.chalk.red(r.stack)) : s.error(i.chalk.red(r.message))), process.exit(1);
+            t && s.error(a.chalk.red(t)), r && (r.stack ? s.error(a.chalk.red(r.stack)) : s.error(a.chalk.red(r.message))), process.exit(1);
           }
         };
       },
-      870: function (e, t, r) {
+      6870: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 }), (t.chalk = t.init = void 0);
-        const o = s(r(347));
+        const o = s(r(7347));
         (t.init = () => o.default.font('SansSerif').helpStyle('grey').errorsStyle('red')), (t.chalk = o.default.chalk());
       },
-      387: (e) => {
+      8387: (e) => {
         e.exports = require('colorette');
       },
-      612: (e) => {
+      4612: (e) => {
         e.exports = require('dateformat');
       },
-      563: (e) => {
+      4563: (e) => {
         e.exports = require('fast-copy');
       },
-      376: (e) => {
+      5376: (e) => {
         e.exports = require('fast-safe-stringify');
       },
-      290: (e) => {
+      3290: (e) => {
         e.exports = require('inquirer');
       },
       169: (e) => {
         e.exports = require('inquirer-autocomplete-prompt');
       },
-      517: (e) => {
+      6517: (e) => {
         e.exports = require('lodash');
       },
-      67: (e) => {
+      2067: (e) => {
         e.exports = require('on-exit-leak-free');
       },
-      545: (e) => {
+      8545: (e) => {
         e.exports = require('pino');
       },
       454: (e) => {
         e.exports = require('pino-abstract-transport');
       },
-      304: (e) => {
+      7304: (e) => {
         e.exports = require('pump');
       },
-      248: (e) => {
+      3248: (e) => {
         e.exports = require('readable-stream');
       },
-      915: (e) => {
+      7915: (e) => {
         e.exports = require('secure-json-parse');
       },
-      246: (e) => {
+      5246: (e) => {
         e.exports = require('sonic-boom');
       },
-      347: (e) => {
+      7347: (e) => {
         e.exports = require('yargonaut');
       },
-      32: (e) => {
+      9267: (e) => {
         e.exports = require('yargs/yargs');
       },
-      81: (e) => {
+      2081: (e) => {
         e.exports = require('child_process');
       },
-      17: (e) => {
+      1017: (e) => {
         e.exports = require('path');
       },
-      267: (e) => {
+      1267: (e) => {
         e.exports = require('worker_threads');
       },
-      233: (e, t, r) => {
-        const { isColorSupported: s } = r(387),
-          o = r(304),
-          { Transform: n } = r(248),
-          i = r(454),
-          a = r(915),
+      4233: (e, t, r) => {
+        const { isColorSupported: s } = r(8387),
+          o = r(7304),
+          { Transform: n } = r(3248),
+          a = r(454),
+          i = r(7915),
           l = r(903),
-          { ERROR_LIKE_KEYS: u, MESSAGE_KEY: c, TIMESTAMP_KEY: p, LEVEL_KEY: d, LEVEL_NAMES: g } = r(318),
+          { ERROR_LIKE_KEYS: u, MESSAGE_KEY: c, TIMESTAMP_KEY: d, LEVEL_KEY: p, LEVEL_NAMES: f } = r(7318),
           {
-            isObject: f,
+            isObject: g,
             prettifyErrorLog: m,
             prettifyLevel: y,
             prettifyMessage: h,
             prettifyMetadata: v,
-            prettifyObject: b,
-            prettifyTime: _,
+            prettifyObject: _,
+            prettifyTime: b,
             buildSafeSonicBoom: L,
             filterLog: E,
-            handleCustomlevelsOpts: O,
-            handleCustomlevelNamesOpts: j,
+            handleCustomlevelsOpts: M,
+            handleCustomlevelNamesOpts: O,
           } = r(385),
-          w = (e) => {
+          j = (e) => {
             try {
-              return { value: a.parse(e, { protoAction: 'remove' }) };
+              return { value: i.parse(e, { protoAction: 'remove' }) };
             } catch (e) {
               return { err: e };
             }
           },
-          M = {
+          S = {
             colorize: s,
             colorizeObjects: !0,
             crlf: !1,
@@ -595,7 +725,7 @@
             levelFirst: !1,
             messageKey: c,
             messageFormat: !1,
-            timestampKey: p,
+            timestampKey: d,
             translateTime: !0,
             useMetadata: !1,
             outputStream: process.stdout,
@@ -605,79 +735,79 @@
             include: void 0,
             singleLine: !1,
           };
-        function x(e) {
-          const t = Object.assign({}, M, e),
+        function w(e) {
+          const t = Object.assign({}, S, e),
             r = t.crlf ? '\r\n' : '\n',
             s = '    ',
             o = t.messageKey,
             n = t.levelKey,
-            i = t.levelLabel,
-            a = t.minimumLevel,
+            a = t.levelLabel,
+            i = t.minimumLevel,
             u = t.messageFormat,
             c = t.timestampKey,
-            p = t.errorLikeObjectKeys,
+            d = t.errorLikeObjectKeys,
             L = t.errorProps.split(','),
-            x = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
-            S = O(t.customLevels),
-            $ = j(t.customLevels),
-            P = t.customColors
+            w = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
+            x = M(t.customLevels),
+            P = O(t.customLevels),
+            $ = t.customColors
               ? t.customColors.split(',').reduce((e, r) => {
                   const [s, o] = r.split(':'),
-                    n = (x ? t.customLevels : void 0 !== $[s]) ? $[s] : g[s],
-                    i = void 0 !== n ? n : s;
-                  return e.push([i, o]), e;
+                    n = (w ? t.customLevels : void 0 !== P[s]) ? P[s] : f[s],
+                    a = void 0 !== n ? n : s;
+                  return e.push([a, o]), e;
                 }, [])
               : void 0,
-            k = { customLevels: S, customLevelNames: $ };
-          x && !t.customLevels && ((k.customLevels = void 0), (k.customLevelNames = void 0));
-          const C = t.customPrettifiers,
-            A = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
-            K = !A && t.ignore ? new Set(t.ignore.split(',')) : void 0,
-            T = t.hideObject,
-            D = t.singleLine,
-            q = l(t.colorize, P, x),
-            R = t.colorizeObjects ? q : l(!1, [], !1);
+            k = { customLevels: x, customLevelNames: P };
+          w && !t.customLevels && ((k.customLevels = void 0), (k.customLevelNames = void 0));
+          const A = t.customPrettifiers,
+            C = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
+            D = !C && t.ignore ? new Set(t.ignore.split(',')) : void 0,
+            K = t.hideObject,
+            T = t.singleLine,
+            R = l(t.colorize, $, w),
+            q = t.colorizeObjects ? R : l(!1, [], !1);
           return function (e) {
             let l;
-            if (f(e)) l = e;
+            if (g(e)) l = e;
             else {
-              const t = w(e);
-              if (t.err || !f(t.value)) return e + r;
+              const t = j(e);
+              if (t.err || !g(t.value)) return e + r;
               l = t.value;
             }
-            if (a) {
-              const e = ((x ? t.customLevels : void 0 !== $[a]) ? $[a] : g[a]) || Number(a);
-              if (l[void 0 === n ? d : n] < e) return;
+            if (i) {
+              const e = ((w ? t.customLevels : void 0 !== P[i]) ? P[i] : f[i]) || Number(i);
+              if (l[void 0 === n ? p : n] < e) return;
             }
-            const O = h({ log: l, messageKey: o, colorizer: q, messageFormat: u, levelLabel: i, ...k, useOnlyCustomProps: x });
-            (K || A) && (l = E({ log: l, ignoreKeys: K, includeKeys: A }));
-            const j = y({ log: l, colorizer: q, levelKey: n, prettifier: C.level, ...k }),
-              M = v({ log: l, prettifiers: C }),
-              S = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: C.time });
-            let P = '';
+            const M = h({ log: l, messageKey: o, colorizer: R, messageFormat: u, levelLabel: a, ...k, useOnlyCustomProps: w });
+            (D || C) && (l = E({ log: l, ignoreKeys: D, includeKeys: C }));
+            const O = y({ log: l, colorizer: R, levelKey: n, prettifier: A.level, ...k }),
+              S = v({ log: l, prettifiers: A }),
+              x = b({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: A.time });
+            let $ = '';
             if (
-              (t.levelFirst && j && (P = `${j}`),
-              S && '' === P ? (P = `${S}`) : S && (P = `${P} ${S}`),
-              !t.levelFirst && j && (P = P.length > 0 ? `${P} ${j}` : j),
-              M && (P = P.length > 0 ? `${P} ${M}:` : M),
-              !1 === P.endsWith(':') && '' !== P && (P += ':'),
-              O && (P = P.length > 0 ? `${P} ${O}` : O),
-              P.length > 0 && !D && (P += r),
+              (t.levelFirst && O && ($ = `${O}`),
+              x && '' === $ ? ($ = `${x}`) : x && ($ = `${$} ${x}`),
+              !t.levelFirst && O && ($ = $.length > 0 ? `${$} ${O}` : O),
+              S && ($ = $.length > 0 ? `${$} ${S}:` : S),
+              !1 === $.endsWith(':') && '' !== $ && ($ += ':'),
+              M && ($ = $.length > 0 ? `${$} ${M}` : M),
+              $.length > 0 && !T && ($ += r),
               'Error' === l.type && l.stack)
             ) {
-              const e = m({ log: l, errorLikeKeys: p, errorProperties: L, ident: s, eol: r });
-              D && (P += r), (P += e);
-            } else if (!T) {
+              const e = m({ log: l, errorLikeKeys: d, errorProperties: L, ident: s, eol: r });
+              T && ($ += r), ($ += e);
+            } else if (!K) {
               const e = [o, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = b({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: p, eol: r, ident: s, singleLine: D, colorizer: R });
-              D && !/^\s$/.test(t) && (P += ' '), (P += t);
+                t = _({ input: l, skipKeys: e, customPrettifiers: A, errorLikeKeys: d, eol: r, ident: s, singleLine: T, colorizer: q });
+              T && !/^\s$/.test(t) && ($ += ' '), ($ += t);
             }
-            return P;
+            return $;
           };
         }
-        function S(e = {}) {
-          const t = x(e);
-          return i(
+        function x(e = {}) {
+          const t = w(e);
+          return a(
             function (r) {
               const s = new n({
                 objectMode: !0,
@@ -686,39 +816,39 @@
                   s(null, t(e));
                 },
               });
-              let i;
+              let a;
               return (
-                (i =
+                (a =
                   'object' == typeof e.destination && 'function' == typeof e.destination.write
                     ? e.destination
                     : L({ dest: e.destination || 1, append: e.append, mkdir: e.mkdir, sync: e.sync })),
                 r.on('unknown', function (e) {
-                  i.write(e + '\n');
+                  a.write(e + '\n');
                 }),
-                o(r, s, i),
+                o(r, s, a),
                 s
               );
             },
             { parse: 'lines' }
           );
         }
-        (e.exports = S), (e.exports.prettyFactory = x), (e.exports.colorizerFactory = l), (e.exports.default = S);
+        (e.exports = x), (e.exports.prettyFactory = w), (e.exports.colorizerFactory = l), (e.exports.default = x);
       },
       903: (e, t, r) => {
-        const { LEVELS: s, LEVEL_NAMES: o } = r(318),
+        const { LEVELS: s, LEVEL_NAMES: o } = r(7318),
           n = (e) => e,
-          i = { default: n, 60: n, 50: n, 40: n, 30: n, 20: n, 10: n, message: n, greyMessage: n },
-          { createColors: a } = r(387),
-          l = a({ useColor: !0 }),
-          { white: u, bgRed: c, red: p, yellow: d, green: g, blue: f, gray: m, cyan: y } = l,
-          h = { default: u, 60: c, 50: p, 40: d, 30: g, 20: f, 10: m, message: y, greyMessage: m };
+          a = { default: n, 60: n, 50: n, 40: n, 30: n, 20: n, 10: n, message: n, greyMessage: n },
+          { createColors: i } = r(8387),
+          l = i({ useColor: !0 }),
+          { white: u, bgRed: c, red: d, yellow: p, green: f, blue: g, gray: m, cyan: y } = l,
+          h = { default: u, 60: c, 50: d, 40: p, 30: f, 20: g, 10: m, message: y, greyMessage: m };
         function v(e) {
-          return function (t, r, { customLevels: n, customLevelNames: i } = {}) {
-            const a = e ? n || s : Object.assign({}, s, n),
-              l = e ? i || o : Object.assign({}, o, i);
+          return function (t, r, { customLevels: n, customLevelNames: a } = {}) {
+            const i = e ? n || s : Object.assign({}, s, n),
+              l = e ? a || o : Object.assign({}, o, a);
             let u = 'default';
-            u = Number.isInteger(+t) ? (Object.prototype.hasOwnProperty.call(a, t) ? t : u) : Object.prototype.hasOwnProperty.call(l, t.toLowerCase()) ? l[t.toLowerCase()] : u;
-            const c = a[u];
+            u = Number.isInteger(+t) ? (Object.prototype.hasOwnProperty.call(i, t) ? t : u) : Object.prototype.hasOwnProperty.call(l, t.toLowerCase()) ? l[t.toLowerCase()] : u;
+            const c = i[u];
             return Object.prototype.hasOwnProperty.call(r, u) ? r[u](c) : r.default(c);
           };
         }
@@ -751,13 +881,13 @@
             : (function (e) {
                 const t = v(e),
                   r = function (e, r) {
-                    return t(e, i, r);
+                    return t(e, a, r);
                   };
-                return (r.message = i.message), (r.greyMessage = i.greyMessage), r;
+                return (r.message = a.message), (r.greyMessage = a.greyMessage), r;
               })(r);
         };
       },
-      318: (e) => {
+      7318: (e) => {
         e.exports = {
           DATE_FORMAT: 'yyyy-mm-dd HH:MM:ss.l o',
           DATE_FORMAT_SIMPLE: 'HH:MM:ss.l',
@@ -772,17 +902,17 @@
         };
       },
       385: (e, t, r) => {
-        const { createCopier: s } = r(563),
-          o = r(612),
-          n = r(246),
-          i = r(376),
-          { isMainThread: a } = r(267),
+        const { createCopier: s } = r(4563),
+          o = r(4612),
+          n = r(5246),
+          a = r(5376),
+          { isMainThread: i } = r(1267),
           l = r(903)(),
-          { DATE_FORMAT: u, ERROR_LIKE_KEYS: c, MESSAGE_KEY: p, LEVEL_KEY: d, LEVEL_LABEL: g, TIMESTAMP_KEY: f, LOGGER_KEYS: m, LEVELS: y, DATE_FORMAT_SIMPLE: h } = r(318),
+          { DATE_FORMAT: u, ERROR_LIKE_KEYS: c, MESSAGE_KEY: d, LEVEL_KEY: p, LEVEL_LABEL: f, TIMESTAMP_KEY: g, LOGGER_KEYS: m, LEVELS: y, DATE_FORMAT_SIMPLE: h } = r(7318),
           v = s({});
-        function b(e, t = !1) {
+        function _(e, t = !1) {
           if (!1 === t) return e;
-          const r = _(e);
+          const r = b(e);
           if (!L(r)) return e;
           if (!0 === t) return o(r, h);
           const s = t.toUpperCase();
@@ -790,7 +920,7 @@
           const n = s.substr(0, 4);
           return o(r, 'SYS:' === n || 'UTC:' === n ? ('UTC:' === n ? t : t.slice(4)) : `UTC:${t}`);
         }
-        function _(e) {
+        function b(e) {
           let t = new Date(e);
           return L(t) || (t = new Date(+e)), t;
         }
@@ -800,30 +930,30 @@
         function E(e) {
           return '[object Object]' === Object.prototype.toString.apply(e);
         }
-        function O({ input: e, ident: t = '    ', eol: r = '\n' }) {
+        function M({ input: e, ident: t = '    ', eol: r = '\n' }) {
           const s = e.split(/\r?\n/);
           for (let e = 1; e < s.length; e += 1) s[e] = t + s[e];
           return s.join(r);
         }
-        function j({
+        function O({
           input: e,
           ident: t = '    ',
           eol: r = '\n',
           skipKeys: s = [],
           customPrettifiers: o = {},
           errorLikeKeys: n = c,
-          excludeLoggerKeys: a = !0,
+          excludeLoggerKeys: i = !0,
           singleLine: u = !1,
-          colorizer: p = l,
+          colorizer: d = l,
         }) {
-          const d = [].concat(s);
-          !0 === a && Array.prototype.push.apply(d, m);
-          let g = '';
-          const { plain: f, errors: y } = Object.entries(e).reduce(
-            ({ plain: t, errors: r }, [s, i]) => {
-              if (!1 === d.includes(s)) {
-                const a = 'function' == typeof o[s] ? o[s](i, s, e) : i;
-                n.includes(s) ? (r[s] = a) : (t[s] = a);
+          const p = [].concat(s);
+          !0 === i && Array.prototype.push.apply(p, m);
+          let f = '';
+          const { plain: g, errors: y } = Object.entries(e).reduce(
+            ({ plain: t, errors: r }, [s, a]) => {
+              if (!1 === p.includes(s)) {
+                const i = 'function' == typeof o[s] ? o[s](a, s, e) : a;
+                n.includes(s) ? (r[s] = i) : (t[s] = i);
               }
               return { plain: t, errors: r };
             },
@@ -831,24 +961,24 @@
           );
           return (
             u
-              ? (Object.keys(f).length > 0 && (g += p.greyMessage(i(f))), (g += r), (g = g.replace(/\\\\/gi, '\\')))
-              : Object.entries(f).forEach(([e, s]) => {
-                  let n = 'function' == typeof o[e] ? s : i(s, null, 2);
+              ? (Object.keys(g).length > 0 && (f += d.greyMessage(a(g))), (f += r), (f = f.replace(/\\\\/gi, '\\')))
+              : Object.entries(g).forEach(([e, s]) => {
+                  let n = 'function' == typeof o[e] ? s : a(s, null, 2);
                   if (void 0 === n) return;
                   n = n.replace(/\\\\/gi, '\\');
-                  const a = O({ input: n, ident: t, eol: r });
-                  g += `${t}${e}:${a.startsWith(r) ? '' : ' '}${a}${r}`;
+                  const i = M({ input: n, ident: t, eol: r });
+                  f += `${t}${e}:${i.startsWith(r) ? '' : ' '}${i}${r}`;
                 }),
             Object.entries(y).forEach(([e, s]) => {
-              const n = 'function' == typeof o[e] ? s : i(s, null, 2);
-              void 0 !== n && (g += w({ keyName: e, lines: n, eol: r, ident: t }));
+              const n = 'function' == typeof o[e] ? s : a(s, null, 2);
+              void 0 !== n && (f += j({ keyName: e, lines: n, eol: r, ident: t }));
             }),
-            g
+            f
           );
         }
-        function w({ keyName: e, lines: t, eol: r, ident: s }) {
+        function j({ keyName: e, lines: t, eol: r, ident: s }) {
           let o = '';
-          const n = `${s}${e}: ${O({ input: t, ident: s, eol: r })}${r}`.split(r);
+          const n = `${s}${e}: ${M({ input: t, ident: s, eol: r })}${r}`.split(r);
           for (let e = 0; e < n.length; e += 1) {
             0 !== e && (o += r);
             const t = n[e];
@@ -857,14 +987,14 @@
               if (e && 3 === e.length) {
                 const s = /^\s*/.exec(t)[0].length + 4,
                   n = ' '.repeat(s),
-                  i = e[2];
-                o += e[1] + r + n + JSON.parse(i).replace(/\n/g, r + n);
+                  a = e[2];
+                o += e[1] + r + n + JSON.parse(a).replace(/\n/g, r + n);
               } else o += t;
             } else o += t;
           }
           return o;
         }
-        function M(e) {
+        function S(e) {
           const t = [];
           let r = !1,
             s = '';
@@ -874,21 +1004,21 @@
           }
           return s.length && t.push(s), t;
         }
-        function x(e, t) {
-          const r = Array.isArray(t) ? t : M(t);
+        function w(e, t) {
+          const r = Array.isArray(t) ? t : S(t);
           for (const t of r) {
             if (!Object.prototype.hasOwnProperty.call(e, t)) return;
             e = e[t];
           }
           return e;
         }
-        function S(e, t) {
-          const r = M(t),
+        function x(e, t) {
+          const r = S(t),
             s = r.pop();
-          null !== (e = x(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, s) && delete e[s];
+          null !== (e = w(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, s) && delete e[s];
         }
-        function $() {}
-        function P(e, t) {
+        function P() {}
+        function $(e, t) {
           e.destroyed ||
             ('beforeExit' === t
               ? (e.flush(),
@@ -899,38 +1029,38 @@
         }
         (e.exports = {
           isObject: E,
-          prettifyErrorLog: function ({ log: e, messageKey: t = p, ident: r = '    ', eol: s = '\n', errorLikeKeys: o = c, errorProperties: n = [] }) {
-            let i = `${r}${O({ input: e.stack, ident: r, eol: s })}${s}`;
+          prettifyErrorLog: function ({ log: e, messageKey: t = d, ident: r = '    ', eol: s = '\n', errorLikeKeys: o = c, errorProperties: n = [] }) {
+            let a = `${r}${M({ input: e.stack, ident: r, eol: s })}${s}`;
             if (n.length > 0) {
-              const a = m.concat(t, 'type', 'stack');
+              const i = m.concat(t, 'type', 'stack');
               let l;
-              l = '*' === n[0] ? Object.keys(e).filter((e) => !1 === a.includes(e)) : n.filter((e) => !1 === a.includes(e));
+              l = '*' === n[0] ? Object.keys(e).filter((e) => !1 === i.includes(e)) : n.filter((e) => !1 === i.includes(e));
               for (let t = 0; t < l.length; t += 1) {
                 const n = l[t];
                 n in e != 0 &&
-                  (i = E(e[n]) ? `${i}${r}${n}: {${s}${j({ input: e[n], errorLikeKeys: o, excludeLoggerKeys: !1, eol: s, ident: r + r })}${r}}${s}` : `${i}${r}${n}: ${e[n]}${s}`);
+                  (a = E(e[n]) ? `${a}${r}${n}: {${s}${O({ input: e[n], errorLikeKeys: o, excludeLoggerKeys: !1, eol: s, ident: r + r })}${r}}${s}` : `${a}${r}${n}: ${e[n]}${s}`);
               }
             }
-            return i;
+            return a;
           },
-          prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: r = d, prettifier: s, customLevels: o, customLevelNames: n }) {
-            const i = x(e, r);
-            return void 0 === i ? void 0 : s ? s(i) : t(i, { customLevels: o, customLevelNames: n });
+          prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: r = p, prettifier: s, customLevels: o, customLevelNames: n }) {
+            const a = w(e, r);
+            return void 0 === a ? void 0 : s ? s(a) : t(a, { customLevels: o, customLevelNames: n });
           },
           prettifyMessage: function ({
             log: e,
             messageFormat: t,
-            messageKey: r = p,
+            messageKey: r = d,
             colorizer: s = l,
-            levelLabel: o = g,
-            levelKey: n = d,
-            customLevels: i,
-            useOnlyCustomProps: a,
+            levelLabel: o = f,
+            levelKey: n = p,
+            customLevels: a,
+            useOnlyCustomProps: i,
           }) {
             if (t && 'string' == typeof t) {
               const r = String(t).replace(/{([^{}]+)}/g, function (t, r) {
                 let s;
-                return r === o && void 0 !== (s = x(e, n)) ? ((a ? void 0 === i : void 0 === i[s]) ? y[s] : i[s]) : x(e, r) || '';
+                return r === o && void 0 !== (s = w(e, n)) ? ((i ? void 0 === a : void 0 === a[s]) ? y[s] : a[s]) : w(e, r) || '';
               });
               return s.message(r);
             }
@@ -951,26 +1081,26 @@
             }
             return e.caller && (r += `${'' === r ? '' : ' '}<${t.caller ? t.caller(e.caller) : e.caller}>`), '' === r ? void 0 : r;
           },
-          prettifyObject: j,
-          prettifyTime: function ({ log: e, timestampKey: t = f, translateFormat: r, prettifier: s }) {
+          prettifyObject: O,
+          prettifyTime: function ({ log: e, timestampKey: t = g, translateFormat: r, prettifier: s }) {
             let o = null;
             if ((t in e ? (o = e[t]) : 'timestamp' in e && (o = e.timestamp), null === o)) return;
-            const n = r ? b(o, r) : o;
+            const n = r ? _(o, r) : o;
             return s ? s(n) : `[${n}]`;
           },
           buildSafeSonicBoom: function (e) {
             const t = new n(e);
             return (
               t.on('error', function e(r) {
-                if ('EPIPE' === r.code) return (t.write = $), (t.end = $), (t.flushSync = $), void (t.destroy = $);
+                if ('EPIPE' === r.code) return (t.write = P), (t.end = P), (t.flushSync = P), void (t.destroy = P);
                 t.removeListener('error', e);
               }),
               !e.sync &&
-                a &&
+                i &&
                 (function (e) {
                   if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
-                    const t = r(67);
-                    t.register(e, P),
+                    const t = r(2067);
+                    t.register(e, $),
                       e.on('close', function () {
                         t.unregister(e);
                       });
@@ -992,7 +1122,7 @@
             }
             return (
               t.forEach((e) => {
-                S(s, e);
+                x(s, e);
               }),
               s
             );
@@ -1026,17 +1156,17 @@
           },
         }),
           (e.exports.internals = {
-            formatTime: b,
-            joinLinesWithIndentation: O,
-            prettifyError: w,
-            getPropertyValue: x,
-            deleteLogProperty: S,
-            splitPropertyKey: M,
-            createDate: _,
+            formatTime: _,
+            joinLinesWithIndentation: M,
+            prettifyError: j,
+            getPropertyValue: w,
+            deleteLogProperty: x,
+            splitPropertyKey: S,
+            createDate: b,
             isValidDate: L,
           });
       },
-      147: (e) => {
+      4147: (e) => {
         e.exports = JSON.parse(
           '{"name":"ragate-cli","version":"0.1.0","description":"Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.","engines":{"node":">=18.x"},"scripts":{"test":"echo \'Sorry, test code is in preparation.\\n\'","build:dev":"ENV=development webpack","build:prd":"ENV=production webpack","lint":"eslint . --fix","format":"prettier . --write","prepare":"husky install"},"eslintIgnore":["!/.github",".serverless","bin","tmp","webpack.config.js"],"main":"./lib/app.ts","bin":{"ragate":"./bin/app.js"},"repository":{"type":"git","url":"git+https://github.com/ragate-inc/ragate-cli.git"},"lint-staged":{"*.{ts,js}":["eslint"],"*.{css,html,js,json,md,yaml,yml,ts,js}":["prettier . --write"]},"keywords":["aws","serverless","ragate","cli","amplify","serverless","lambda","amazon"],"author":"Ragate inc.","license":"MIT","bugs":{"url":"https://github.com/ragate-inc/ragate-cli/issues"},"homepage":"https://github.com/ragate-inc/ragate-cli#readme","devDependencies":{"@tsconfig/node-lts":"^18.12.1","@types/figlet":"^1.5.6","@types/inquirer":"^9.0.3","@types/inquirer-autocomplete-prompt":"^3.0.0","@types/lodash":"^4.14.194","@types/node":"^18.16.3","@types/webpack":"^5.28.1","@types/webpack-node-externals":"^3.0.0","@types/yargs":"^17.0.24","@typescript-eslint/eslint-plugin":"^5.59.2","@typescript-eslint/parser":"^5.59.2","eslint":"^8.39.0","eslint-config-prettier":"^8.8.0","eslint-config-standard-with-typescript":"^34.0.1","husky":"^6.0.0","lint-staged":"^13.2.2","prettier":"2.8.8","ts-loader":"^9.4.2","ts-node":"^10.9.1","tsconfig-paths-webpack-plugin":"^4.0.1","typescript":"^5.0.4","webpack":"^5.81.0","webpack-cli":"^5.0.2","webpack-node-externals":"^3.0.0"},"dependencies":{"figlet":"^1.6.0","inquirer":"^8.0.0","inquirer-autocomplete-prompt":"^2.0.0","lodash":"^4.17.21","parent-require":"^1.0.0","pino":"^8.12.1","pino-pretty":"^10.0.0","yargonaut":"^1.1.4","yargs":"^17.1.1-candidate.0"}}'
         );
@@ -1048,5 +1178,5 @@
     if (void 0 !== o) return o.exports;
     var n = (t[s] = { exports: {} });
     return e[s].call(n.exports, n, n.exports, r), n.exports;
-  })(712);
+  })(4712);
 })();

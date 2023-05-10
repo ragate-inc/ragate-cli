@@ -1,5 +1,13 @@
 import { Locale } from 'features/add/types/index';
 
-const locale: Locale = {};
+const locale: Locale = {
+  command: {
+    description: {
+      sns: 'AWS SQSを追加',
+      sqs: 'AWS SQSを追加',
+    },
+  },
+  unProcessed: '入力されたコマンドは存在しません。「ragate add help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
+};
 
 export default locale;

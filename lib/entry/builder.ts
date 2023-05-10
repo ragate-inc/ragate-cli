@@ -1,10 +1,10 @@
 import Logger from 'utils/logger';
+import pino from 'pino';
 import yargs from 'yargs/yargs';
 import { init as yargonautInit, chalk } from 'utils/yargonaut';
 import config from 'config';
 import { getLocaleLang } from 'entry/utils/getLocale';
 import { Locale } from 'entry/types';
-import { Lang } from 'types/index';
 import createFeature from 'features/create/index';
 import addFeature from 'features/add/index';
 
@@ -18,27 +18,50 @@ export default class {
   constructor() {
     yargonautInit();
     this.chalk = chalk;
-    this.lang = config.lang;
-    this.locale = getLocaleLang(this.lang);
+    const argv = yargs(process.argv.slice(2))
+      .options({
+        lang: {
+          default: this.langRef.default,
+          type: this.langRef.type,
+        },
+        verbose: {
+          default: this.verboseRef.default,
+          type: this.verboseRef.type,
+        },
+      })
+      .help(false)
+      .version(false)
+      .parseSync();
+    this.lang = argv.lang;
+    this.verbose = argv.verbose;
+    this.locale = getLocaleLang(argv.lang);
+    this.logger = Logger.getLogger(this.verbose ? 'debug' : 'info');
     this.npmVersion = config.npmVersion;
   }
 
-  private chalk: YargonautChalk;
-  private lang: Lang;
-  private locale: Locale;
-  private npmVersion: string;
-  private verbose = false;
+  private readonly chalk: YargonautChalk;
+  private readonly logger: pino.Logger;
+  private readonly locale: Locale;
 
+  private readonly lang: string;
+  private readonly langRef = {
+    default: process.env.LANG ?? 'en',
+    type: 'string' as 'boolean' | 'string' | 'array' | 'count' | undefined,
+  };
+
+  private readonly verbose: boolean;
+  private readonly verboseRef = {
+    default: false,
+    type: 'string' as 'boolean' | 'string' | 'array' | 'count' | undefined,
+  };
+
+  private readonly npmVersion: string;
   private get version(): string {
     return `ragate-cli v${this.npmVersion}`;
   }
 
-  private get logger() {
-    return Logger.getLogger(this.verbose ? 'debug' : 'info');
-  }
-
   private cli() {
-    const { lang, version, chalk, locale: locale } = this;
+    const { version, chalk, locale, lang } = this;
     return yargs(process.argv.slice(2))
       .scriptName('')
       .default('processed', false)
@@ -46,8 +69,13 @@ export default class {
       .options({
         verbose: {
           describe: chalk.grey(locale.options.describe.verbose),
-          default: false,
-          type: 'boolean',
+          default: this.verboseRef.default,
+          type: this.verboseRef.type,
+        },
+        lang: {
+          describe: chalk.grey(locale.options.describe.lang),
+          default: this.langRef.default,
+          type: this.langRef.type,
         },
         region: {
           alias: 'r',
@@ -89,9 +117,6 @@ export default class {
           ],
         },
       })
-      .middleware((argv) => {
-        this.verbose = argv.verbose || false;
-      })
       .usage(version)
       .help('help', chalk.grey(locale.help))
       .alias('h', 'help')
@@ -100,15 +125,13 @@ export default class {
       .command(
         'create',
         chalk.grey(locale.command.description.create),
-        (yargs) => new createFeature.builder().build({ yargs, logger: this.logger }),
-        (argv) =>
-          new createFeature.handler({
-            argv: argv,
-            logger: this.logger,
-          }).run()
+        (_yargs) =>
+          new createFeature.builder({
+            lang: this.lang,
+          }).build(_yargs),
+        (argv) => new createFeature.handler(argv).run()
       )
-      .command('add', chalk.grey(locale.command.description.add), (yargs) => new addFeature.builder().build({ yargs, logger: this.logger }))
-      .demandCommand(1, chalk.red('You need at least one command before moving on'))
+      .command('add', chalk.grey(locale.command.description.add), (_yargs) => new addFeature.builder({ lang: this.lang }).build(_yargs))
       .command(
         '*',
         '',

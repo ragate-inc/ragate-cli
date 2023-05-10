@@ -15,10 +15,11 @@ const locale: Locale = {
     describe: {
       verbose: '詳細なログを出力',
       region: 'AWSリージョン',
+      lang: '表示言語',
     },
   },
   unProcessed: {
-    required: 'コマンドを入力してください。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
+    required: '指定のコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
     notFound: '入力されたコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
   },
 };
