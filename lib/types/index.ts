@@ -2,14 +2,16 @@ import config from 'config';
 import yargs from 'yargs';
 import { chalk } from 'utils/yargonaut';
 
+export type FeatureHandlerAbstractArgs = yargs.ArgumentsCamelCase<{ region: string }>;
+
 export abstract class FeatureHandlerAbstract {
-  private readonly _argv: yargs.ArgumentsCamelCase;
+  private readonly _argv: FeatureHandlerAbstractArgs;
   private readonly _lang: string;
-  protected constructor(argv: yargs.ArgumentsCamelCase) {
+  protected constructor(argv: FeatureHandlerAbstractArgs) {
     this._argv = argv;
     this._lang = argv.lang as string;
   }
-  protected get argv(): yargs.ArgumentsCamelCase {
+  protected get argv(): FeatureHandlerAbstractArgs {
     return this._argv;
   }
   protected get lang(): string {

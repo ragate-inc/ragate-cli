@@ -11,5 +11,9 @@
     "browser": true,
     "node": true,
     "es6": true
+  },
+  "rules": {
+    "require-await": "off",
+    "@typescript-eslint/require-await": "off"
   }
 }

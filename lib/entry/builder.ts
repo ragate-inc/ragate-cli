@@ -7,7 +7,7 @@ import { getLocaleLang } from 'entry/utils/getLocale';
 import { Locale } from 'entry/types';
 import createFeature from 'features/create/index';
 import addFeature from 'features/add/index';
-import { FeatureBuilderAbstractArgs, awsRegions } from 'types/index';
+import { FeatureBuilderAbstractArgs, FeatureHandlerAbstractArgs, awsRegions } from 'types/index';
 
 /**
  * yargs typescript : https://github.com/yargs/yargs/blob/main/docs/typescript.md
@@ -107,7 +107,7 @@ export default class {
           const args: FeatureBuilderAbstractArgs = { lang: this.lang, region: this.region };
           return new createFeature.builder(args).build(_yargs);
         },
-        (argv) => new createFeature.handler(argv).run()
+        (argv) => new createFeature.handler(argv as FeatureHandlerAbstractArgs).run()
       )
       .command('add', chalk.grey(locale.command.description.add), (_yargs) => {
         const args: FeatureBuilderAbstractArgs = { lang: this.lang, region: this.region };

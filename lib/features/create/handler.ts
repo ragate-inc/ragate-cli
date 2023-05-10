@@ -5,11 +5,10 @@ import _ from 'lodash';
 import inquirerPrompt from 'inquirer-autocomplete-prompt';
 import { cleanUpTmpDirectory, gitClone, isExistsDirectory, copyDirectory, processCurrent, tmpPath } from 'utils/cli';
 import Logger from 'utils/logger';
-import { FeatureHandlerAbstract } from 'types/index';
-import yargs from 'yargs';
+import { FeatureHandlerAbstract, FeatureHandlerAbstractArgs } from 'types/index';
 
 export default class extends FeatureHandlerAbstract {
-  constructor(argv: yargs.ArgumentsCamelCase) {
+  constructor(argv: FeatureHandlerAbstractArgs) {
     super(argv);
     inquirer.registerPrompt('autocomplete', inquirerPrompt as inquirer.prompts.PromptConstructor);
   }

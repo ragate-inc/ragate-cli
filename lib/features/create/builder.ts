@@ -1,4 +1,4 @@
-import { FeatureBuilderAbstract, FeatureBuilderAbstractArgs } from 'types/index';
+import { FeatureBuilderAbstract, FeatureBuilderAbstractArgs, FeatureHandlerAbstractArgs } from 'types/index';
 import yargs from 'yargs';
 import Logger from 'utils/logger';
 import { chalk } from 'utils/yargonaut';
@@ -21,7 +21,7 @@ export default class extends FeatureBuilderAbstract {
         chalk.grey('<command> <options>'),
         () => ({}),
         (argv) => {
-          if (argv._.length === 1) return new createFeature.handler(argv).run();
+          if (argv._.length === 1) return new createFeature.handler(argv as FeatureHandlerAbstractArgs).run();
           logger.error(chalk.red(locale.error.unProcessed));
         }
       );

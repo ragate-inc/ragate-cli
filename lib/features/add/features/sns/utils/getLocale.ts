@@ -1,6 +1,6 @@
-import ja from 'features/add/locale/ja';
-import en from 'features/add/locale/en';
-import { Locale } from 'features/add/types/index';
+import ja from 'features/add/features/sns/locale/ja';
+import en from 'features/add/features/sns/locale/en';
+import { Locale } from 'features/add/features/sns/types/index';
 
 export const getLocaleLang = (locale: string): Locale => {
   switch (locale) {
