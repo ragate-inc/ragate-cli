@@ -69,7 +69,7 @@ export default class App {
       .command(
         'create',
         chalk.grey(lang.command.description.create),
-        (yargs) => createFeature.builder.build(yargs),
+        (yargs) => createFeature.builder.build(yargs, this.logger),
         (argv) =>
           new createFeature.handler({
             argv: argv,
@@ -81,7 +81,7 @@ export default class App {
       .command(
         'add',
         chalk.grey(lang.command.description.add),
-        (yargs) => addFeature.builder.build(yargs),
+        (yargs) => addFeature.builder.build(yargs, this.logger),
         (argv) =>
           new addFeature.handler({
             argv: argv,

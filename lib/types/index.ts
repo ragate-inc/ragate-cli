@@ -14,5 +14,5 @@ export abstract class FeatureHandlerAbstract {
 }
 
 export abstract class FeatureBuilderAbstract {
-  public static readonly build: (yargs: yargs.Argv) => yargs.Argv;
+  public static readonly build: (yargs: yargs.Argv, logger: Logger) => yargs.Argv;
 }
