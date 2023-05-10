@@ -17,6 +17,7 @@
     "!/.github",
     ".serverless",
     "bin",
+    "tmp",
     "webpack.config.js"
   ],
   "main": "./lib/app.ts",

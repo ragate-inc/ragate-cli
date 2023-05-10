@@ -1,20 +1,52 @@
+import config from 'config';
 import yargs from 'yargs';
 import { Logger } from 'pino';
+import { getLocaleLang } from 'entry/utils/getLocale';
+import { chalk } from 'utils/yargonaut';
+
 export type Lang = 'ja' | 'en';
 
 export abstract class FeatureHandlerAbstract {
-  protected readonly argv: Record<string, unknown>;
-  protected readonly logger: Logger;
+  private readonly _argv: Record<string, unknown>;
+  private readonly _logger: Logger;
   protected constructor(args: { argv: Record<string, unknown>; logger: Logger }) {
     const { argv, logger } = args;
-    this.argv = argv;
-    this.logger = logger;
+    this._argv = argv;
+    this._logger = logger;
+  }
+  protected get argv(): Record<string, unknown> {
+    return this._argv;
+  }
+  protected get logger(): Logger {
+    return this._logger;
   }
   public abstract run(): Promise<void>;
 }
 
 export abstract class FeatureBuilderAbstract {
-  public static readonly build: (yargs: yargs.Argv, logger: Logger) => yargs.Argv;
+  private readonly _lang;
+  private readonly _locale;
+  private readonly _npmVersion;
+  private readonly _chalk;
+  protected constructor() {
+    this._chalk = chalk;
+    this._lang = config.lang;
+    this._locale = getLocaleLang(this.lang);
+    this._npmVersion = config.npmVersion;
+  }
+  protected get lang() {
+    return this._lang;
+  }
+  protected get locale() {
+    return this._locale;
+  }
+  protected get npmVersion() {
+    return this._npmVersion;
+  }
+  protected get chalk() {
+    return this._chalk;
+  }
+  public abstract build(args: { yargs: yargs.Argv; logger: Logger }): yargs.Argv;
 }
 
 export type AWS_REGION =

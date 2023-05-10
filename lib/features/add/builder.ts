@@ -1,10 +1,13 @@
 import { FeatureBuilderAbstract } from 'types/index';
 import yargs from 'yargs';
-import pino from 'pino';
-import Logger from 'utils/logger';
+import { Logger } from 'pino';
+import logger from 'utils/logger';
 
 export default class extends FeatureBuilderAbstract {
-  public static build(yargs: yargs.Argv, logger: pino.Logger): yargs.Argv {
-    return yargs.version(false).fail((msg, err) => Logger.handleFaildLog({ msg, err }));
+  constructor() {
+    super();
+  }
+  public build(args: { yargs: yargs.Argv; logger: Logger }): yargs.Argv {
+    return args.yargs.version(false).fail((msg, err) => logger.handleFaildLog({ msg, err }));
   }
 }

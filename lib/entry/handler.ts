@@ -19,14 +19,14 @@ export default class App {
   constructor() {
     yargonautInit();
     this.chalk = chalk;
-    this.locale = config.lang;
-    this.lang = getLocaleLang(this.locale);
+    this.lang = config.lang;
+    this.locale = getLocaleLang(this.lang);
     this.npmVersion = config.npmVersion;
   }
 
   private chalk: YargonautChalk;
-  private locale: Lang;
-  private lang: Locale;
+  private lang: Lang;
+  private locale: Locale;
   private npmVersion: string;
   private verbose = false;
 
@@ -46,20 +46,20 @@ export default class App {
   };
 
   private cli() {
-    const { lang, version, chalk, locale } = this;
+    const { lang, version, chalk, locale: locale } = this;
     return yargs(process.argv.slice(2))
       .scriptName('')
       .default('processed', false)
       .hide('processed')
       .options({
         verbose: {
-          describe: chalk.grey(lang.options.describe.verbose),
+          describe: chalk.grey(locale.options.describe.verbose),
           default: false,
           type: 'boolean',
         },
         region: {
           alias: 'r',
-          describe: chalk.grey(lang.options.describe.region),
+          describe: chalk.grey(locale.options.describe.region),
           default: 'ap-northeast-1',
           type: 'string',
           choices: [
@@ -101,14 +101,14 @@ export default class App {
         this.verbose = argv.verbose || false;
       })
       .usage(version)
-      .help('help', chalk.grey(lang.help))
+      .help('help', chalk.grey(locale.help))
       .alias('h', 'help')
-      .version('version', chalk.grey(lang.version), version)
+      .version('version', chalk.grey(locale.version), version)
       .alias('v', 'version')
       .command(
         'create',
-        chalk.grey(lang.command.description.create),
-        (yargs) => createFeature.builder.build(yargs, this.logger),
+        chalk.grey(locale.command.description.create),
+        (yargs) => new createFeature.builder().build({ yargs, logger: this.logger }),
         (argv) =>
           new createFeature.handler({
             argv: argv,
@@ -117,9 +117,9 @@ export default class App {
             .run()
             .finally(() => (argv.processed = true))
       )
-      .command('add', chalk.grey(lang.command.description.add), (yargs) => addFeature.builder.build(yargs, this.logger))
+      .command('add', chalk.grey(locale.command.description.add), (yargs) => new addFeature.builder().build({ yargs, logger: this.logger }))
       .wrap(Math.max(yargs().terminalWidth() - 5, 60))
-      .locale(locale);
+      .locale(lang);
   }
 
   public async run() {
@@ -127,9 +127,9 @@ export default class App {
       const argv = await this.cli().parseAsync();
       if (!argv.processed) {
         if (_.isEmpty(argv._)) {
-          this.outputResultError([this.lang.unProcessed.required]);
+          this.outputResultError([this.locale.unProcessed.required]);
         } else {
-          this.outputResultError([this.lang.unProcessed.notFound, `${this.lang.yourInput}: ${argv._.join(' ')}`]);
+          this.outputResultError([this.locale.unProcessed.notFound, `${this.locale.yourInput}: ${argv._.join(' ')}`]);
         }
       }
     } catch (error) {
