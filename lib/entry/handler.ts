@@ -92,7 +92,6 @@ export default class App {
       )
       .wrap(Math.max(yargs().terminalWidth() - 5, 60))
       .locale(locale);
-    // .fail((msg, err, yargs) => process.exit(1));
   }
 
   public async run() {

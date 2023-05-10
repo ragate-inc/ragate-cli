@@ -9,8 +9,6 @@ export default class extends FeatureHandlerAbstract {
   public async run(): Promise<void> {
     const { argv, logger } = this;
     logger.info('Coming soon');
-    // logger.info('in progress...');
     await new Promise((resolve) => setTimeout(resolve, 0));
-    // logger.info('done.');
   }
 }

@@ -39,18 +39,13 @@ export default class extends FeatureHandlerAbstract {
       ])
       .then((answers) => {
         return answers as Record<string, unknown>;
-      })
-      .catch((error) => {
-        logger.error(error);
       })) as Record<string, string>;
     logger.debug(`input values : ${JSON.stringify(res)}}`);
     const { template, projectName } = res;
     logger.info(`template : ${template}`);
     logger.info(`projectName : ${projectName}`);
-    logger.info('in progress...');
 
     if (isExistsDirectory(`${processCurrent}/${projectName}`)) {
-      logger.error(`${locale.error.alreadyExistsDirectory} : ${processCurrent}/${projectName}`);
       throw new Error(`${locale.error.alreadyExistsDirectory} : ${processCurrent}/${projectName}`);
     }
 
@@ -60,6 +55,5 @@ export default class extends FeatureHandlerAbstract {
 
     gitClone(config.repositoyUrl, tmpPath);
     copyDirectory(`${tmpPath}/${template}`, `${processCurrent}/${projectName}`);
-    logger.info('done.');
   }
 }
