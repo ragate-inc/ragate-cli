@@ -89,14 +89,14 @@
               .command(
                 'create',
                 r.grey(e.command.description.create),
-                (e) => u.default.builder(e),
-                (e) => u.default.handler({ argv: e }).finally(() => (e.processed = !0))
+                (e) => u.default.builder.build(e),
+                (e) => new u.default.handler({ argv: e, logger: this.logger }).run().finally(() => (e.processed = !0))
               )
               .command(
                 'add',
                 r.grey(e.command.description.add),
-                (e) => p.default.builder(e),
-                (e) => p.default.handler({ argv: e }).finally(() => (e.processed = !0))
+                (e) => p.default.builder.build(e),
+                (e) => new p.default.handler({ argv: e, logger: this.logger }).run().finally(() => (e.processed = !0))
               )
               .wrap(Math.max((0, n.default)().terminalWidth() - 5, 60))
               .locale(o);
@@ -185,21 +185,29 @@
             }
           });
       },
-      40: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.default = (e) => e.version(!1));
-      },
-      588: function (e, t, r) {
-        var o =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
+      40: (e, t, r) => {
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = o(r(444));
-        t.default = async (e) => {
-          const { argv: t } = e;
-          s.default.getLogger().info('Coming soon'), await new Promise((e) => setTimeout(e, 0));
-        };
+        const o = r(702);
+        class s extends o.FeatureBuilderAbstract {
+          static build(e) {
+            return e.version(!1);
+          }
+        }
+        t.default = s;
+      },
+      588: (e, t, r) => {
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = r(702);
+        class s extends o.FeatureHandlerAbstract {
+          constructor(e) {
+            super(e);
+          }
+          async run() {
+            const { argv: e, logger: t } = this;
+            t.info('Coming soon'), await new Promise((e) => setTimeout(e, 0));
+          }
+        }
+        t.default = s;
       },
       72: function (e, t, r) {
         var o =
@@ -212,8 +220,15 @@
           n = o(r(588));
         t.default = { builder: s.default, handler: n.default };
       },
-      818: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.default = (e) => e.version(!1));
+      818: (e, t, r) => {
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = r(702);
+        class s extends o.FeatureBuilderAbstract {
+          static build(e) {
+            return e.version(!1);
+          }
+        }
+        t.default = s;
       },
       975: function (e, t, r) {
         var o =
@@ -223,48 +238,52 @@
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = o(r(290)),
-          n = o(r(444)),
-          i = o(r(322)),
-          a = r(868),
-          l = o(r(517)),
-          c = o(r(169)),
-          u = r(762);
-        s.default.registerPrompt('autocomplete', c.default),
-          (t.default = async (e) => {
-            const { argv: t } = e,
-              r = n.default.getLogger();
-            console.log('test'), r.debug('create hander : ', t);
-            const o = (0, a.getLocaleLang)(i.default.lang),
-              c = await s.default
+          n = o(r(322)),
+          i = r(868),
+          a = o(r(517)),
+          l = o(r(169)),
+          c = r(762),
+          u = r(702);
+        class p extends u.FeatureHandlerAbstract {
+          constructor(e) {
+            super(e), s.default.registerPrompt('autocomplete', l.default);
+          }
+          async run() {
+            const { argv: e, logger: t } = this;
+            t.debug('create hander : ', e);
+            const r = (0, i.getLocaleLang)(n.default.lang),
+              o = await s.default
                 .prompt([
                   {
                     type: 'autocomplete',
                     name: 'template',
-                    emptyText: o.inquirer.template.autocomplete.emptyText,
-                    message: o.inquirer.template.choiceTemplate,
-                    source: (e, t) => (l.default.isEmpty(t) ? i.default.templates : i.default.templates.filter((e) => e.name.includes(t))),
+                    emptyText: r.inquirer.template.autocomplete.emptyText,
+                    message: r.inquirer.template.choiceTemplate,
+                    source: (e, t) => (a.default.isEmpty(t) ? n.default.templates : n.default.templates.filter((e) => e.name.includes(t))),
                   },
                   {
                     type: 'input',
                     name: 'projectName',
                     message: 'input a project name',
                     default: (e) => e.template,
-                    validate: (e) => !l.default.isEmpty(e) || 'required input a project name',
+                    validate: (e) => !a.default.isEmpty(e) || 'required input a project name',
                   },
                 ])
                 .then((e) => e)
                 .catch((e) => {
-                  r.error(e);
+                  t.error(e);
                 });
-            r.debug(`input values : ${JSON.stringify(c)}}`);
-            const { template: p, projectName: d } = c;
-            if ((r.info(`template : ${p}`), r.info(`projectName : ${d}`), r.info('in progress...'), (0, u.isExistsDirectory)(`${u.processCurrent}/${d}`)))
-              throw (r.error(`${o.error.alreadyExistsDirectory} : ${u.processCurrent}/${d}`), new Error(`${o.error.alreadyExistsDirectory} : ${u.processCurrent}/${d}`));
-            (0, u.isExistsDirectory)(u.tmpPath) && (0, u.cleanUpTmpDirectory)(),
-              (0, u.gitClone)(i.default.repositoyUrl, u.tmpPath),
-              (0, u.copyDirectory)(`${u.tmpPath}/${p}`, `${u.processCurrent}/${d}`),
-              r.info('done.');
-          });
+            t.debug(`input values : ${JSON.stringify(o)}}`);
+            const { template: l, projectName: u } = o;
+            if ((t.info(`template : ${l}`), t.info(`projectName : ${u}`), t.info('in progress...'), (0, c.isExistsDirectory)(`${c.processCurrent}/${u}`)))
+              throw (t.error(`${r.error.alreadyExistsDirectory} : ${c.processCurrent}/${u}`), new Error(`${r.error.alreadyExistsDirectory} : ${c.processCurrent}/${u}`));
+            (0, c.isExistsDirectory)(c.tmpPath) && (0, c.cleanUpTmpDirectory)(),
+              (0, c.gitClone)(n.default.repositoyUrl, c.tmpPath),
+              (0, c.copyDirectory)(`${c.tmpPath}/${l}`, `${c.processCurrent}/${u}`),
+              t.info('done.');
+          }
+        }
+        t.default = p;
       },
       798: function (e, t, r) {
         var o =
@@ -311,6 +330,21 @@
               throw new i.EnvironmentError('An invalid environment variable is specified. : LOCALE');
           }
         };
+      },
+      702: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.FeatureBuilderAbstract = t.FeatureHandlerAbstract = void 0),
+          (t.FeatureHandlerAbstract = class {
+            argv;
+            logger;
+            constructor(e) {
+              const { argv: t, logger: r } = e;
+              (this.argv = t), (this.logger = r);
+            }
+          }),
+          (t.FeatureBuilderAbstract = class {
+            static build;
+          });
       },
       762: function (e, t, r) {
         var o =
@@ -376,7 +410,7 @@
             throw new Error('singleton cannot be instantiated');
           }
           static logger;
-          static getLogger(e = 'error') {
+          static getLogger(e = 'info') {
             return e ? ((this.logger = (0, s.default)({ level: e }, n)), this.logger) : (this.logger || (this.logger = (0, s.default)({ level: e }, n)), this.logger);
           }
         };
@@ -457,8 +491,8 @@
           l = r(903),
           { ERROR_LIKE_KEYS: c, MESSAGE_KEY: u, TIMESTAMP_KEY: p, LEVEL_KEY: d, LEVEL_NAMES: f } = r(318),
           {
-            isObject: m,
-            prettifyErrorLog: g,
+            isObject: g,
+            prettifyErrorLog: m,
             prettifyLevel: y,
             prettifyMessage: h,
             prettifyMetadata: v,
@@ -476,7 +510,7 @@
               return { err: e };
             }
           },
-          $ = {
+          w = {
             colorize: o,
             colorizeObjects: !0,
             crlf: !1,
@@ -498,8 +532,8 @@
             include: void 0,
             singleLine: !1,
           };
-        function w(e) {
-          const t = Object.assign({}, $, e),
+        function x(e) {
+          const t = Object.assign({}, w, e),
             r = t.crlf ? '\r\n' : '\n',
             o = '    ',
             s = t.messageKey,
@@ -510,66 +544,66 @@
             u = t.timestampKey,
             p = t.errorLikeObjectKeys,
             L = t.errorProps.split(','),
-            w = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
-            x = O(t.customLevels),
-            S = j(t.customLevels),
-            P = t.customColors
+            x = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
+            $ = O(t.customLevels),
+            P = j(t.customLevels),
+            S = t.customColors
               ? t.customColors.split(',').reduce((e, r) => {
                   const [o, s] = r.split(':'),
-                    n = (w ? t.customLevels : void 0 !== S[o]) ? S[o] : f[o],
+                    n = (x ? t.customLevels : void 0 !== P[o]) ? P[o] : f[o],
                     i = void 0 !== n ? n : o;
                   return e.push([i, s]), e;
                 }, [])
               : void 0,
-            C = { customLevels: x, customLevelNames: S };
-          w && !t.customLevels && ((C.customLevels = void 0), (C.customLevelNames = void 0));
+            C = { customLevels: $, customLevelNames: P };
+          x && !t.customLevels && ((C.customLevels = void 0), (C.customLevelNames = void 0));
           const k = t.customPrettifiers,
-            K = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
-            T = !K && t.ignore ? new Set(t.ignore.split(',')) : void 0,
-            D = t.hideObject,
-            A = t.singleLine,
-            q = l(t.colorize, P, w),
+            A = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
+            K = !A && t.ignore ? new Set(t.ignore.split(',')) : void 0,
+            T = t.hideObject,
+            D = t.singleLine,
+            q = l(t.colorize, S, x),
             R = t.colorizeObjects ? q : l(!1, [], !1);
           return function (e) {
             let l;
-            if (m(e)) l = e;
+            if (g(e)) l = e;
             else {
               const t = M(e);
-              if (t.err || !m(t.value)) return e + r;
+              if (t.err || !g(t.value)) return e + r;
               l = t.value;
             }
             if (a) {
-              const e = ((w ? t.customLevels : void 0 !== S[a]) ? S[a] : f[a]) || Number(a);
+              const e = ((x ? t.customLevels : void 0 !== P[a]) ? P[a] : f[a]) || Number(a);
               if (l[void 0 === n ? d : n] < e) return;
             }
-            const O = h({ log: l, messageKey: s, colorizer: q, messageFormat: c, levelLabel: i, ...C, useOnlyCustomProps: w });
-            (T || K) && (l = _({ log: l, ignoreKeys: T, includeKeys: K }));
+            const O = h({ log: l, messageKey: s, colorizer: q, messageFormat: c, levelLabel: i, ...C, useOnlyCustomProps: x });
+            (K || A) && (l = _({ log: l, ignoreKeys: K, includeKeys: A }));
             const j = y({ log: l, colorizer: q, levelKey: n, prettifier: k.level, ...C }),
-              $ = v({ log: l, prettifiers: k }),
-              x = E({ log: l, translateFormat: t.translateTime, timestampKey: u, prettifier: k.time });
-            let P = '';
+              w = v({ log: l, prettifiers: k }),
+              $ = E({ log: l, translateFormat: t.translateTime, timestampKey: u, prettifier: k.time });
+            let S = '';
             if (
-              (t.levelFirst && j && (P = `${j}`),
-              x && '' === P ? (P = `${x}`) : x && (P = `${P} ${x}`),
-              !t.levelFirst && j && (P = P.length > 0 ? `${P} ${j}` : j),
-              $ && (P = P.length > 0 ? `${P} ${$}:` : $),
-              !1 === P.endsWith(':') && '' !== P && (P += ':'),
-              O && (P = P.length > 0 ? `${P} ${O}` : O),
-              P.length > 0 && !A && (P += r),
+              (t.levelFirst && j && (S = `${j}`),
+              $ && '' === S ? (S = `${$}`) : $ && (S = `${S} ${$}`),
+              !t.levelFirst && j && (S = S.length > 0 ? `${S} ${j}` : j),
+              w && (S = S.length > 0 ? `${S} ${w}:` : w),
+              !1 === S.endsWith(':') && '' !== S && (S += ':'),
+              O && (S = S.length > 0 ? `${S} ${O}` : O),
+              S.length > 0 && !D && (S += r),
               'Error' === l.type && l.stack)
             ) {
-              const e = g({ log: l, errorLikeKeys: p, errorProperties: L, ident: o, eol: r });
-              A && (P += r), (P += e);
-            } else if (!D) {
+              const e = m({ log: l, errorLikeKeys: p, errorProperties: L, ident: o, eol: r });
+              D && (S += r), (S += e);
+            } else if (!T) {
               const e = [s, n, u].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = b({ input: l, skipKeys: e, customPrettifiers: k, errorLikeKeys: p, eol: r, ident: o, singleLine: A, colorizer: R });
-              A && !/^\s$/.test(t) && (P += ' '), (P += t);
+                t = b({ input: l, skipKeys: e, customPrettifiers: k, errorLikeKeys: p, eol: r, ident: o, singleLine: D, colorizer: R });
+              D && !/^\s$/.test(t) && (S += ' '), (S += t);
             }
-            return P;
+            return S;
           };
         }
-        function x(e = {}) {
-          const t = w(e);
+        function $(e = {}) {
+          const t = x(e);
           return i(
             function (r) {
               const o = new n({
@@ -595,7 +629,7 @@
             { parse: 'lines' }
           );
         }
-        (e.exports = x), (e.exports.prettyFactory = w), (e.exports.colorizerFactory = l), (e.exports.default = x);
+        (e.exports = $), (e.exports.prettyFactory = x), (e.exports.colorizerFactory = l), (e.exports.default = $);
       },
       903: (e, t, r) => {
         const { LEVELS: o, LEVEL_NAMES: s } = r(318),
@@ -603,8 +637,8 @@
           i = { default: n, 60: n, 50: n, 40: n, 30: n, 20: n, 10: n, message: n, greyMessage: n },
           { createColors: a } = r(387),
           l = a({ useColor: !0 }),
-          { white: c, bgRed: u, red: p, yellow: d, green: f, blue: m, gray: g, cyan: y } = l,
-          h = { default: c, 60: u, 50: p, 40: d, 30: f, 20: m, 10: g, message: y, greyMessage: g };
+          { white: c, bgRed: u, red: p, yellow: d, green: f, blue: g, gray: m, cyan: y } = l,
+          h = { default: c, 60: u, 50: p, 40: d, 30: f, 20: g, 10: m, message: y, greyMessage: m };
         function v(e) {
           return function (t, r, { customLevels: n, customLevelNames: i } = {}) {
             const a = e ? n || o : Object.assign({}, o, n),
@@ -623,7 +657,7 @@
                       function (e, [t, r]) {
                         return (e[t] = 'function' == typeof l[r] ? l[r] : c), e;
                       },
-                      { default: c, message: y, greyMessage: g }
+                      { default: c, message: y, greyMessage: m }
                     );
                   })(e),
                   o = t ? r : Object.assign({}, h, r),
@@ -671,7 +705,7 @@
           i = r(376),
           { isMainThread: a } = r(267),
           l = r(903)(),
-          { DATE_FORMAT: c, ERROR_LIKE_KEYS: u, MESSAGE_KEY: p, LEVEL_KEY: d, LEVEL_LABEL: f, TIMESTAMP_KEY: m, LOGGER_KEYS: g, LEVELS: y, DATE_FORMAT_SIMPLE: h } = r(318),
+          { DATE_FORMAT: c, ERROR_LIKE_KEYS: u, MESSAGE_KEY: p, LEVEL_KEY: d, LEVEL_LABEL: f, TIMESTAMP_KEY: g, LOGGER_KEYS: m, LEVELS: y, DATE_FORMAT_SIMPLE: h } = r(318),
           v = o({});
         function b(e, t = !1) {
           if (!1 === t) return e;
@@ -710,9 +744,9 @@
           colorizer: p = l,
         }) {
           const d = [].concat(o);
-          !0 === a && Array.prototype.push.apply(d, g);
+          !0 === a && Array.prototype.push.apply(d, m);
           let f = '';
-          const { plain: m, errors: y } = Object.entries(e).reduce(
+          const { plain: g, errors: y } = Object.entries(e).reduce(
             ({ plain: t, errors: r }, [o, i]) => {
               if (!1 === d.includes(o)) {
                 const a = 'function' == typeof s[o] ? s[o](i, o, e) : i;
@@ -724,8 +758,8 @@
           );
           return (
             c
-              ? (Object.keys(m).length > 0 && (f += p.greyMessage(i(m))), (f += r), (f = f.replace(/\\\\/gi, '\\')))
-              : Object.entries(m).forEach(([e, o]) => {
+              ? (Object.keys(g).length > 0 && (f += p.greyMessage(i(g))), (f += r), (f = f.replace(/\\\\/gi, '\\')))
+              : Object.entries(g).forEach(([e, o]) => {
                   let n = 'function' == typeof s[e] ? o : i(o, null, 2);
                   if (void 0 === n) return;
                   n = n.replace(/\\\\/gi, '\\');
@@ -757,7 +791,7 @@
           }
           return s;
         }
-        function $(e) {
+        function w(e) {
           const t = [];
           let r = !1,
             o = '';
@@ -767,21 +801,21 @@
           }
           return o.length && t.push(o), t;
         }
-        function w(e, t) {
-          const r = Array.isArray(t) ? t : $(t);
+        function x(e, t) {
+          const r = Array.isArray(t) ? t : w(t);
           for (const t of r) {
             if (!Object.prototype.hasOwnProperty.call(e, t)) return;
             e = e[t];
           }
           return e;
         }
-        function x(e, t) {
-          const r = $(t),
+        function $(e, t) {
+          const r = w(t),
             o = r.pop();
-          null !== (e = w(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, o) && delete e[o];
+          null !== (e = x(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, o) && delete e[o];
         }
-        function S() {}
-        function P(e, t) {
+        function P() {}
+        function S(e, t) {
           e.destroyed ||
             ('beforeExit' === t
               ? (e.flush(),
@@ -795,7 +829,7 @@
           prettifyErrorLog: function ({ log: e, messageKey: t = p, ident: r = '    ', eol: o = '\n', errorLikeKeys: s = u, errorProperties: n = [] }) {
             let i = `${r}${O({ input: e.stack, ident: r, eol: o })}${o}`;
             if (n.length > 0) {
-              const a = g.concat(t, 'type', 'stack');
+              const a = m.concat(t, 'type', 'stack');
               let l;
               l = '*' === n[0] ? Object.keys(e).filter((e) => !1 === a.includes(e)) : n.filter((e) => !1 === a.includes(e));
               for (let t = 0; t < l.length; t += 1) {
@@ -807,7 +841,7 @@
             return i;
           },
           prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: r = d, prettifier: o, customLevels: s, customLevelNames: n }) {
-            const i = w(e, r);
+            const i = x(e, r);
             return void 0 === i ? void 0 : o ? o(i) : t(i, { customLevels: s, customLevelNames: n });
           },
           prettifyMessage: function ({
@@ -823,7 +857,7 @@
             if (t && 'string' == typeof t) {
               const r = String(t).replace(/{([^{}]+)}/g, function (t, r) {
                 let o;
-                return r === s && void 0 !== (o = w(e, n)) ? ((a ? void 0 === i : void 0 === i[o]) ? y[o] : i[o]) : w(e, r) || '';
+                return r === s && void 0 !== (o = x(e, n)) ? ((a ? void 0 === i : void 0 === i[o]) ? y[o] : i[o]) : x(e, r) || '';
               });
               return o.message(r);
             }
@@ -845,7 +879,7 @@
             return e.caller && (r += `${'' === r ? '' : ' '}<${t.caller ? t.caller(e.caller) : e.caller}>`), '' === r ? void 0 : r;
           },
           prettifyObject: j,
-          prettifyTime: function ({ log: e, timestampKey: t = m, translateFormat: r, prettifier: o }) {
+          prettifyTime: function ({ log: e, timestampKey: t = g, translateFormat: r, prettifier: o }) {
             let s = null;
             if ((t in e ? (s = e[t]) : 'timestamp' in e && (s = e.timestamp), null === s)) return;
             const n = r ? b(s, r) : s;
@@ -855,7 +889,7 @@
             const t = new n(e);
             return (
               t.on('error', function e(r) {
-                if ('EPIPE' === r.code) return (t.write = S), (t.end = S), (t.flushSync = S), void (t.destroy = S);
+                if ('EPIPE' === r.code) return (t.write = P), (t.end = P), (t.flushSync = P), void (t.destroy = P);
                 t.removeListener('error', e);
               }),
               !e.sync &&
@@ -863,7 +897,7 @@
                 (function (e) {
                   if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
                     const t = r(67);
-                    t.register(e, P),
+                    t.register(e, S),
                       e.on('close', function () {
                         t.unregister(e);
                       });
@@ -885,7 +919,7 @@
             }
             return (
               t.forEach((e) => {
-                x(o, e);
+                $(o, e);
               }),
               o
             );
@@ -922,16 +956,16 @@
             formatTime: b,
             joinLinesWithIndentation: O,
             prettifyError: M,
-            getPropertyValue: w,
-            deleteLogProperty: x,
-            splitPropertyKey: $,
+            getPropertyValue: x,
+            deleteLogProperty: $,
+            splitPropertyKey: w,
             createDate: E,
             isValidDate: L,
           });
       },
       147: (e) => {
         e.exports = JSON.parse(
-          '{"name":"ragate-cli","version":"0.0.7","description":"Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.","engines":{"node":">=18.x"},"scripts":{"test":"echo \'Sorry, test code is in preparation.\\n\'","build:dev":"ENV=development webpack","build:prd":"ENV=production webpack","lint":"eslint . --fix","format":"prettier . --write","prepare":"husky install"},"eslintIgnore":["!/.github",".serverless","bin","webpack.config.js"],"main":"./lib/app.ts","bin":{"ragate":"./bin/app.js"},"repository":{"type":"git","url":"git+https://github.com/ragate-inc/ragate-cli.git"},"lint-staged":{"*.{ts,js}":["eslint"],"*.{css,html,js,json,md,yaml,yml,ts,js}":["prettier . --write"]},"keywords":["aws","serverless","ragate","cli","amplify","serverless","lambda","amazon"],"author":"Ragate inc.","license":"MIT","bugs":{"url":"https://github.com/ragate-inc/ragate-cli/issues"},"homepage":"https://github.com/ragate-inc/ragate-cli#readme","devDependencies":{"@tsconfig/node-lts":"^18.12.1","@types/figlet":"^1.5.6","@types/inquirer":"^9.0.3","@types/inquirer-autocomplete-prompt":"^3.0.0","@types/lodash":"^4.14.194","@types/node":"^18.16.3","@types/webpack":"^5.28.1","@types/webpack-node-externals":"^3.0.0","@types/yargs":"^17.0.24","@typescript-eslint/eslint-plugin":"^5.59.2","@typescript-eslint/parser":"^5.59.2","eslint":"^8.39.0","eslint-config-prettier":"^8.8.0","eslint-config-standard-with-typescript":"^34.0.1","husky":"^6.0.0","lint-staged":"^13.2.2","prettier":"2.8.8","ts-loader":"^9.4.2","ts-node":"^10.9.1","tsconfig-paths-webpack-plugin":"^4.0.1","typescript":"^5.0.4","webpack":"^5.81.0","webpack-cli":"^5.0.2","webpack-node-externals":"^3.0.0"},"dependencies":{"figlet":"^1.6.0","inquirer":"^8.0.0","inquirer-autocomplete-prompt":"^2.0.0","lodash":"^4.17.21","parent-require":"^1.0.0","pino":"^8.12.1","pino-pretty":"^10.0.0","yargonaut":"^1.1.4","yargs":"^17.1.1-candidate.0"}}'
+          '{"name":"ragate-cli","version":"0.0.8","description":"Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.","engines":{"node":">=18.x"},"scripts":{"test":"echo \'Sorry, test code is in preparation.\\n\'","build:dev":"ENV=development webpack","build:prd":"ENV=production webpack","lint":"eslint . --fix","format":"prettier . --write","prepare":"husky install"},"eslintIgnore":["!/.github",".serverless","bin","webpack.config.js"],"main":"./lib/app.ts","bin":{"ragate":"./bin/app.js"},"repository":{"type":"git","url":"git+https://github.com/ragate-inc/ragate-cli.git"},"lint-staged":{"*.{ts,js}":["eslint"],"*.{css,html,js,json,md,yaml,yml,ts,js}":["prettier . --write"]},"keywords":["aws","serverless","ragate","cli","amplify","serverless","lambda","amazon"],"author":"Ragate inc.","license":"MIT","bugs":{"url":"https://github.com/ragate-inc/ragate-cli/issues"},"homepage":"https://github.com/ragate-inc/ragate-cli#readme","devDependencies":{"@tsconfig/node-lts":"^18.12.1","@types/figlet":"^1.5.6","@types/inquirer":"^9.0.3","@types/inquirer-autocomplete-prompt":"^3.0.0","@types/lodash":"^4.14.194","@types/node":"^18.16.3","@types/webpack":"^5.28.1","@types/webpack-node-externals":"^3.0.0","@types/yargs":"^17.0.24","@typescript-eslint/eslint-plugin":"^5.59.2","@typescript-eslint/parser":"^5.59.2","eslint":"^8.39.0","eslint-config-prettier":"^8.8.0","eslint-config-standard-with-typescript":"^34.0.1","husky":"^6.0.0","lint-staged":"^13.2.2","prettier":"2.8.8","ts-loader":"^9.4.2","ts-node":"^10.9.1","tsconfig-paths-webpack-plugin":"^4.0.1","typescript":"^5.0.4","webpack":"^5.81.0","webpack-cli":"^5.0.2","webpack-node-externals":"^3.0.0"},"dependencies":{"figlet":"^1.6.0","inquirer":"^8.0.0","inquirer-autocomplete-prompt":"^2.0.0","lodash":"^4.17.21","parent-require":"^1.0.0","pino":"^8.12.1","pino-pretty":"^10.0.0","yargonaut":"^1.1.4","yargs":"^17.1.1-candidate.0"}}'
         );
       },
     },

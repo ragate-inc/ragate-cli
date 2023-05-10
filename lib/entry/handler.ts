@@ -69,23 +69,25 @@ export default class App {
       .command(
         'create',
         chalk.grey(lang.command.description.create),
-        (yargs) => createFeature.builder(yargs),
+        (yargs) => createFeature.builder.build(yargs),
         (argv) =>
-          createFeature
-            .handler({
-              argv: argv,
-            })
+          new createFeature.handler({
+            argv: argv,
+            logger: this.logger,
+          })
+            .run()
             .finally(() => (argv.processed = true))
       )
       .command(
         'add',
         chalk.grey(lang.command.description.add),
-        (yargs) => addFeature.builder(yargs),
+        (yargs) => addFeature.builder.build(yargs),
         (argv) =>
-          addFeature
-            .handler({
-              argv: argv,
-            })
+          new addFeature.handler({
+            argv: argv,
+            logger: this.logger,
+          })
+            .run()
             .finally(() => (argv.processed = true))
       )
       .wrap(Math.max(yargs().terminalWidth() - 5, 60))

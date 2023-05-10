@@ -1,16 +1,16 @@
-import Logger from 'utils/logger';
-// import inquirer from 'inquirer';
-// import config from 'config';
-// import { getLocaleLang } from 'features/create/utils/getLocale';
-// import _ from 'lodash';
-// import inquirerPrompt from 'inquirer-autocomplete-prompt';
-// import { cleanUpTmpDirectory, gitClone, isExistsDirectory, copyDirectory, processCurrent, tmpPath } from 'utils/cli';
+import { Logger } from 'pino';
+import { FeatureHandlerAbstract } from 'types/index';
 
-export default async (args: { argv: Record<string, unknown> }): Promise<void> => {
-  const { argv } = args;
-  const logger = Logger.getLogger();
-  logger.info('Coming soon');
-  await new Promise((resolve) => setTimeout(resolve, 0));
-  // logger.info('in progress...');
-  // logger.info('done.');
-};
+export default class extends FeatureHandlerAbstract {
+  constructor(args: { argv: Record<string, unknown>; logger: Logger }) {
+    super(args);
+  }
+
+  public async run(): Promise<void> {
+    const { argv, logger } = this;
+    logger.info('Coming soon');
+    // logger.info('in progress...');
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    // logger.info('done.');
+  }
+}

@@ -14,7 +14,7 @@ export default class {
 
   private static logger: pino.Logger;
 
-  public static getLogger(logLevel: LogLevel = 'error'): pino.Logger {
+  public static getLogger(logLevel: LogLevel = 'info'): pino.Logger {
     if (logLevel) {
       this.logger = pino(
         {
