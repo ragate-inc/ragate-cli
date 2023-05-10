@@ -1,5 +1,4 @@
 export type Locale = {
-  usage: string;
   help: string;
   version: string;
   yourInput: string;

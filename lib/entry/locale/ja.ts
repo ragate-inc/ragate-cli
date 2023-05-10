@@ -1,7 +1,6 @@
 import { Locale } from 'entry/types/index';
 
 const locale: Locale = {
-  usage: '使い方',
   help: 'ヘルプを表示',
   version: 'バージョンを表示',
   yourInput: '入力されたコマンド',

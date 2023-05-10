@@ -1,7 +1,6 @@
 import { Locale } from 'entry/types/index';
 
 const locale: Locale = {
-  usage: 'Usage',
   help: 'Show help',
   version: 'Show version',
   yourInput: 'your input',

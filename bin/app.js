@@ -48,17 +48,23 @@
           i = s(r(2322)),
           l = r(8014),
           u = s(r(8798)),
-          c = s(r(8072));
+          c = s(r(8072)),
+          d = r(6702);
         t.default = class {
           constructor() {
             (0, a.init)(), (this.chalk = a.chalk);
             const e = (0, n.default)(process.argv.slice(2))
-              .options({ lang: { default: this.langRef.default, type: this.langRef.type }, verbose: { default: this.verboseRef.default, type: this.verboseRef.type } })
+              .options({
+                lang: { default: this.langRef.default, type: this.langRef.type },
+                verbose: { default: this.verboseRef.default, type: this.verboseRef.type },
+                region: { default: this.regionRef.default, type: this.regionRef.type },
+              })
               .help(!1)
               .version(!1)
               .parseSync();
             (this.lang = e.lang),
               (this.verbose = e.verbose),
+              (this.region = e.region),
               (this.locale = (0, l.getLocaleLang)(e.lang)),
               (this.logger = o.default.getLogger(this.verbose ? 'debug' : 'info')),
               (this.npmVersion = i.default.npmVersion);
@@ -74,54 +80,16 @@
           get version() {
             return `ragate-cli v${this.npmVersion}`;
           }
+          region;
+          regionRef = { default: 'ap-northeast-1', type: 'string' };
           cli() {
             const { version: e, chalk: t, locale: r, lang: s } = this;
             return (0, n.default)(process.argv.slice(2))
               .scriptName('')
-              .default('processed', !1)
-              .hide('processed')
               .options({
                 verbose: { describe: t.grey(r.options.describe.verbose), default: this.verboseRef.default, type: this.verboseRef.type },
                 lang: { describe: t.grey(r.options.describe.lang), default: this.langRef.default, type: this.langRef.type },
-                region: {
-                  alias: 'r',
-                  describe: t.grey(r.options.describe.region),
-                  default: 'ap-northeast-1',
-                  type: 'string',
-                  choices: [
-                    'ap-northeast-1',
-                    'us-east-2',
-                    'us-east-1',
-                    'us-west-1',
-                    'us-west-2',
-                    'af-south-1',
-                    'ap-east-1',
-                    'ap-south-2',
-                    'ap-southeast-3',
-                    'ap-southeast-3',
-                    'ap-southeast-4',
-                    'ap-south-1',
-                    'ap-northeast-3',
-                    'ap-northeast-2',
-                    'ap-southeast-1',
-                    'ap-southeast-2',
-                    'ap-northeast-1',
-                    'ca-central-1',
-                    'eu-central-1',
-                    'eu-west-1',
-                    'eu-west-2',
-                    'eu-south-1',
-                    'eu-west-3',
-                    'eu-south-2',
-                    'eu-north-1',
-                    'eu-central-2',
-                    'me-south-1',
-                    'me-central-1',
-                    'sa-east-1',
-                    'us-gov-east-1',
-                    'us-gov-west-1',
-                  ],
-                },
+                region: { alias: 'r', describe: t.grey(r.options.describe.region), default: this.regionRef.default, type: this.regionRef.type, choices: d.awsRegions },
               })
               .usage(e)
               .help('help', t.grey(r.help))
@@ -131,10 +99,16 @@
               .command(
                 'create',
                 t.grey(r.command.description.create),
-                (e) => new u.default.builder({ lang: this.lang }).build(e),
+                (e) => {
+                  const t = { lang: this.lang, region: this.region };
+                  return new u.default.builder(t).build(e);
+                },
                 (e) => new u.default.handler(e).run()
               )
-              .command('add', t.grey(r.command.description.add), (e) => new c.default.builder({ lang: this.lang }).build(e))
+              .command('add', t.grey(r.command.description.add), (e) => {
+                const t = { lang: this.lang, region: this.region };
+                return new c.default.builder(t).build(e);
+              })
               .command(
                 '*',
                 '',
@@ -154,7 +128,6 @@
       1843: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = {
-            usage: 'Usage',
             help: 'Show help',
             version: 'Show version',
             yourInput: 'your input',
@@ -169,7 +142,6 @@
       6471: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = {
-            usage: '使い方',
             help: 'ヘルプを表示',
             version: 'バージョンを表示',
             yourInput: '入力されたコマンド',
@@ -229,21 +201,22 @@
             super(e);
           }
           build(e) {
-            const t = (0, u.getLocaleLang)(this.lang),
-              r = n.default.getLogger();
+            const t = this.args.lang,
+              r = (0, u.getLocaleLang)(t),
+              s = n.default.getLogger();
             return e
               .version(!1)
               .usage('Usage: add <command> <options>')
               .command(
                 'sns',
-                l.chalk.grey(t.command.description.sns),
-                (e) => new a.default.builder({ lang: this.lang }).build(e),
+                l.chalk.grey(r.command.description.sns),
+                (e) => new a.default.builder(this.args).build(e),
                 (e) => new a.default.handler(e).run()
               )
               .command(
                 'sqs',
-                l.chalk.grey(t.command.description.sns),
-                (e) => new i.default.builder({ lang: this.lang }).build(e),
+                l.chalk.grey(r.command.description.sns),
+                (e) => new i.default.builder(this.args).build(e),
                 (e) => new i.default.handler(e).run()
               )
               .command(
@@ -251,7 +224,7 @@
                 l.chalk.grey('<command> <options>'),
                 () => ({}),
                 () => {
-                  r.error(l.chalk.red(t.unProcessed));
+                  s.error(l.chalk.red(r.unProcessed));
                 }
               );
           }
@@ -272,7 +245,10 @@
             super(e);
           }
           build(e) {
-            return e.version(!1).fail((e, t) => n.default.handleFaildLog({ msg: e, err: t }));
+            return e
+              .version(!1)
+              .usage('Usage: $0 sns <options>')
+              .fail((e, t) => n.default.handleFaildLog({ msg: e, err: t }));
           }
         }
         t.default = a;
@@ -321,7 +297,10 @@
             super(e);
           }
           build(e) {
-            return e.version(!1).fail((e, t) => n.default.handleFaildLog({ msg: e, err: t }));
+            return e
+              .version(!1)
+              .usage('Usage: $0 sqs <options>')
+              .fail((e, t) => n.default.handleFaildLog({ msg: e, err: t }));
           }
         }
         t.default = a;
@@ -399,19 +378,33 @@
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
         const o = r(6702),
-          n = s(r(6444));
-        class a extends o.FeatureBuilderAbstract {
+          n = s(r(6444)),
+          a = r(6870),
+          i = r(2868),
+          l = s(r(8798));
+        class u extends o.FeatureBuilderAbstract {
           constructor(e) {
             super(e);
           }
           build(e) {
+            const t = this.args.lang,
+              r = (0, i.getLocaleLang)(t),
+              s = n.default.getLogger();
             return e
               .version(!1)
-              .usage('Usage: create')
-              .fail((e, t) => n.default.handleFaildLog({ msg: e, err: t }));
+              .usage('Usage: create <options>')
+              .command(
+                '*',
+                a.chalk.grey('<command> <options>'),
+                () => ({}),
+                (e) => {
+                  if (1 === e._.length) return new l.default.handler(e).run();
+                  s.error(a.chalk.red(r.error.unProcessed));
+                }
+              );
           }
         }
-        t.default = a;
+        t.default = u;
       },
       975: function (e, t, r) {
         var s =
@@ -480,14 +473,20 @@
       7544: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = {
-            error: { alreadyExistsDirectory: 'already exists directory' },
+            error: {
+              alreadyExistsDirectory: 'already exists directory',
+              unProcessed: 'The command entered does not exist. Run "ragate create help" for a list of all available commands.',
+            },
             inquirer: { template: { choiceTemplate: 'Choose a project template', autocomplete: { emptyText: 'No result' } } },
           });
       },
       7016: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = {
-            error: { alreadyExistsDirectory: '既にディレクトリが存在します' },
+            error: {
+              alreadyExistsDirectory: '既にディレクトリが存在します',
+              unProcessed: '入力されたコマンドは存在しません。「ragate create help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
+            },
             inquirer: { template: { choiceTemplate: 'プロジェクトの雛形を選択してください。', autocomplete: { emptyText: '該当するテンプレートが見つかりません' } } },
           });
       },
@@ -508,7 +507,7 @@
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.FeatureBuilderAbstract = t.FeatureHandlerAbstract = void 0);
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.awsRegions = t.FeatureBuilderAbstract = t.FeatureHandlerAbstract = void 0);
         const o = s(r(2322)),
           n = r(6870);
         (t.FeatureHandlerAbstract = class {
@@ -525,14 +524,14 @@
           }
         }),
           (t.FeatureBuilderAbstract = class {
-            _lang;
+            _args;
             _npmVersion;
             _chalk;
             constructor(e) {
-              (this._chalk = n.chalk), (this._lang = e?.lang), (this._npmVersion = o.default.npmVersion);
+              (this._chalk = n.chalk), (this._args = e), (this._npmVersion = o.default.npmVersion);
             }
-            get lang() {
-              return this._lang;
+            get args() {
+              return this._args;
             }
             get npmVersion() {
               return this._npmVersion;
@@ -540,7 +539,38 @@
             get chalk() {
               return this._chalk;
             }
-          });
+          }),
+          (t.awsRegions = [
+            'us-east-2',
+            'us-east-1',
+            'us-west-1',
+            'us-west-2',
+            'af-south-1',
+            'ap-east-1',
+            'ap-south-2',
+            'ap-southeast-3',
+            'ap-southeast-4',
+            'ap-south-1',
+            'ap-northeast-3',
+            'ap-northeast-2',
+            'ap-southeast-1',
+            'ap-southeast-2',
+            'ap-northeast-1',
+            'ca-central-1',
+            'eu-central-1',
+            'eu-west-1',
+            'eu-west-2',
+            'eu-south-1',
+            'eu-west-3',
+            'eu-south-2',
+            'eu-north-1',
+            'eu-central-2',
+            'me-south-1',
+            'me-central-1',
+            'sa-east-1',
+            'us-gov-east-1',
+            'us-gov-west-1',
+          ]);
       },
       2762: function (e, t, r) {
         var s =
@@ -713,7 +743,7 @@
               return { err: e };
             }
           },
-          S = {
+          w = {
             colorize: s,
             colorizeObjects: !0,
             crlf: !1,
@@ -735,8 +765,8 @@
             include: void 0,
             singleLine: !1,
           };
-        function w(e) {
-          const t = Object.assign({}, S, e),
+        function S(e) {
+          const t = Object.assign({}, w, e),
             r = t.crlf ? '\r\n' : '\n',
             s = '    ',
             o = t.messageKey,
@@ -747,26 +777,26 @@
             c = t.timestampKey,
             d = t.errorLikeObjectKeys,
             L = t.errorProps.split(','),
-            w = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
-            x = M(t.customLevels),
-            P = O(t.customLevels),
+            S = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
+            P = M(t.customLevels),
+            x = O(t.customLevels),
             $ = t.customColors
               ? t.customColors.split(',').reduce((e, r) => {
                   const [s, o] = r.split(':'),
-                    n = (w ? t.customLevels : void 0 !== P[s]) ? P[s] : f[s],
+                    n = (S ? t.customLevels : void 0 !== x[s]) ? x[s] : f[s],
                     a = void 0 !== n ? n : s;
                   return e.push([a, o]), e;
                 }, [])
               : void 0,
-            k = { customLevels: x, customLevelNames: P };
-          w && !t.customLevels && ((k.customLevels = void 0), (k.customLevelNames = void 0));
+            k = { customLevels: P, customLevelNames: x };
+          S && !t.customLevels && ((k.customLevels = void 0), (k.customLevelNames = void 0));
           const A = t.customPrettifiers,
-            C = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
-            D = !C && t.ignore ? new Set(t.ignore.split(',')) : void 0,
-            K = t.hideObject,
-            T = t.singleLine,
-            R = l(t.colorize, $, w),
-            q = t.colorizeObjects ? R : l(!1, [], !1);
+            R = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
+            C = !R && t.ignore ? new Set(t.ignore.split(',')) : void 0,
+            D = t.hideObject,
+            K = t.singleLine,
+            T = l(t.colorize, $, S),
+            q = t.colorizeObjects ? T : l(!1, [], !1);
           return function (e) {
             let l;
             if (g(e)) l = e;
@@ -776,37 +806,37 @@
               l = t.value;
             }
             if (i) {
-              const e = ((w ? t.customLevels : void 0 !== P[i]) ? P[i] : f[i]) || Number(i);
+              const e = ((S ? t.customLevels : void 0 !== x[i]) ? x[i] : f[i]) || Number(i);
               if (l[void 0 === n ? p : n] < e) return;
             }
-            const M = h({ log: l, messageKey: o, colorizer: R, messageFormat: u, levelLabel: a, ...k, useOnlyCustomProps: w });
-            (D || C) && (l = E({ log: l, ignoreKeys: D, includeKeys: C }));
-            const O = y({ log: l, colorizer: R, levelKey: n, prettifier: A.level, ...k }),
-              S = v({ log: l, prettifiers: A }),
-              x = b({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: A.time });
+            const M = h({ log: l, messageKey: o, colorizer: T, messageFormat: u, levelLabel: a, ...k, useOnlyCustomProps: S });
+            (C || R) && (l = E({ log: l, ignoreKeys: C, includeKeys: R }));
+            const O = y({ log: l, colorizer: T, levelKey: n, prettifier: A.level, ...k }),
+              w = v({ log: l, prettifiers: A }),
+              P = b({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: A.time });
             let $ = '';
             if (
               (t.levelFirst && O && ($ = `${O}`),
-              x && '' === $ ? ($ = `${x}`) : x && ($ = `${$} ${x}`),
+              P && '' === $ ? ($ = `${P}`) : P && ($ = `${$} ${P}`),
               !t.levelFirst && O && ($ = $.length > 0 ? `${$} ${O}` : O),
-              S && ($ = $.length > 0 ? `${$} ${S}:` : S),
+              w && ($ = $.length > 0 ? `${$} ${w}:` : w),
               !1 === $.endsWith(':') && '' !== $ && ($ += ':'),
               M && ($ = $.length > 0 ? `${$} ${M}` : M),
-              $.length > 0 && !T && ($ += r),
+              $.length > 0 && !K && ($ += r),
               'Error' === l.type && l.stack)
             ) {
               const e = m({ log: l, errorLikeKeys: d, errorProperties: L, ident: s, eol: r });
-              T && ($ += r), ($ += e);
-            } else if (!K) {
+              K && ($ += r), ($ += e);
+            } else if (!D) {
               const e = [o, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = _({ input: l, skipKeys: e, customPrettifiers: A, errorLikeKeys: d, eol: r, ident: s, singleLine: T, colorizer: q });
-              T && !/^\s$/.test(t) && ($ += ' '), ($ += t);
+                t = _({ input: l, skipKeys: e, customPrettifiers: A, errorLikeKeys: d, eol: r, ident: s, singleLine: K, colorizer: q });
+              K && !/^\s$/.test(t) && ($ += ' '), ($ += t);
             }
             return $;
           };
         }
-        function x(e = {}) {
-          const t = w(e);
+        function P(e = {}) {
+          const t = S(e);
           return a(
             function (r) {
               const s = new n({
@@ -832,7 +862,7 @@
             { parse: 'lines' }
           );
         }
-        (e.exports = x), (e.exports.prettyFactory = w), (e.exports.colorizerFactory = l), (e.exports.default = x);
+        (e.exports = P), (e.exports.prettyFactory = S), (e.exports.colorizerFactory = l), (e.exports.default = P);
       },
       903: (e, t, r) => {
         const { LEVELS: s, LEVEL_NAMES: o } = r(7318),
@@ -994,7 +1024,7 @@
           }
           return o;
         }
-        function S(e) {
+        function w(e) {
           const t = [];
           let r = !1,
             s = '';
@@ -1004,20 +1034,20 @@
           }
           return s.length && t.push(s), t;
         }
-        function w(e, t) {
-          const r = Array.isArray(t) ? t : S(t);
+        function S(e, t) {
+          const r = Array.isArray(t) ? t : w(t);
           for (const t of r) {
             if (!Object.prototype.hasOwnProperty.call(e, t)) return;
             e = e[t];
           }
           return e;
         }
-        function x(e, t) {
-          const r = S(t),
+        function P(e, t) {
+          const r = w(t),
             s = r.pop();
-          null !== (e = w(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, s) && delete e[s];
+          null !== (e = S(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, s) && delete e[s];
         }
-        function P() {}
+        function x() {}
         function $(e, t) {
           e.destroyed ||
             ('beforeExit' === t
@@ -1044,7 +1074,7 @@
             return a;
           },
           prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: r = p, prettifier: s, customLevels: o, customLevelNames: n }) {
-            const a = w(e, r);
+            const a = S(e, r);
             return void 0 === a ? void 0 : s ? s(a) : t(a, { customLevels: o, customLevelNames: n });
           },
           prettifyMessage: function ({
@@ -1060,7 +1090,7 @@
             if (t && 'string' == typeof t) {
               const r = String(t).replace(/{([^{}]+)}/g, function (t, r) {
                 let s;
-                return r === o && void 0 !== (s = w(e, n)) ? ((i ? void 0 === a : void 0 === a[s]) ? y[s] : a[s]) : w(e, r) || '';
+                return r === o && void 0 !== (s = S(e, n)) ? ((i ? void 0 === a : void 0 === a[s]) ? y[s] : a[s]) : S(e, r) || '';
               });
               return s.message(r);
             }
@@ -1092,7 +1122,7 @@
             const t = new n(e);
             return (
               t.on('error', function e(r) {
-                if ('EPIPE' === r.code) return (t.write = P), (t.end = P), (t.flushSync = P), void (t.destroy = P);
+                if ('EPIPE' === r.code) return (t.write = x), (t.end = x), (t.flushSync = x), void (t.destroy = x);
                 t.removeListener('error', e);
               }),
               !e.sync &&
@@ -1122,7 +1152,7 @@
             }
             return (
               t.forEach((e) => {
-                x(s, e);
+                P(s, e);
               }),
               s
             );
@@ -1159,9 +1189,9 @@
             formatTime: _,
             joinLinesWithIndentation: M,
             prettifyError: j,
-            getPropertyValue: w,
-            deleteLogProperty: x,
-            splitPropertyKey: S,
+            getPropertyValue: S,
+            deleteLogProperty: P,
+            splitPropertyKey: w,
             createDate: b,
             isValidDate: L,
           });

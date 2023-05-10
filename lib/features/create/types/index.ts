@@ -1,6 +1,7 @@
 export type Locale = {
   error: {
     alreadyExistsDirectory: string;
+    unProcessed: string;
   };
   inquirer: {
     template: {
