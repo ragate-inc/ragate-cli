@@ -696,14 +696,37 @@
         const o = s(r(8545)),
           n = s(r(4233)),
           a = r(6870),
-          i = (0, n.default)({ colorize: !0 });
+          i = s(r(6517)),
+          l = (0, n.default)({
+            colorize: !0,
+            messageFormat: (e, t) => {
+              const r = (t) => (e.level <= 30 ? a.chalk.grey(t) : 40 === e.level ? a.chalk.yellow(t) : e.level >= 50 ? a.chalk.red(t) : t),
+                s = e[t];
+              return i.default.isEmpty(s)
+                ? i.default
+                    .chain(e)
+                    .omit(['level', 'time', 'pid', 'hostname'])
+                    .thru((e) => JSON.stringify(e, null, 2))
+                    .thru((e) => r(e))
+                    .value()
+                : e.requestId
+                ? `[${e.requestId}] ${r(s)}`
+                : r(s);
+            },
+            timestampKey: 'time',
+            ignore: 'pid,hostname',
+            include: 'level,time',
+            singleLine: !1,
+            translateTime: 'yyyy-mm-dd HH:MM:ss',
+            sync: !0,
+          });
         t.default = class {
           constructor() {
             throw new Error('singleton cannot be instantiated');
           }
           static logger;
           static getLogger(e = 'info') {
-            return e ? ((this.logger = (0, o.default)({ level: e }, i)), this.logger) : (this.logger || (this.logger = (0, o.default)({ level: e }, i)), this.logger);
+            return e ? ((this.logger = (0, o.default)({ level: e }, l)), this.logger) : (this.logger || (this.logger = (0, o.default)({ level: e }, l)), this.logger);
           }
           static handleFaildLog(e) {
             const { msg: t, err: r } = e,
@@ -818,8 +841,8 @@
             prettifyTime: b,
             buildSafeSonicBoom: L,
             filterLog: E,
-            handleCustomlevelsOpts: j,
-            handleCustomlevelNamesOpts: M,
+            handleCustomlevelsOpts: M,
+            handleCustomlevelNamesOpts: j,
           } = r(385),
           O = (e) => {
             try {
@@ -863,8 +886,8 @@
             d = t.errorLikeObjectKeys,
             L = t.errorProps.split(','),
             P = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
-            w = j(t.customLevels),
-            $ = M(t.customLevels),
+            w = M(t.customLevels),
+            $ = j(t.customLevels),
             x = t.customColors
               ? t.customColors.split(',').reduce((e, r) => {
                   const [s, o] = r.split(':'),
@@ -894,19 +917,19 @@
               const e = ((P ? t.customLevels : void 0 !== $[i]) ? $[i] : f[i]) || Number(i);
               if (l[void 0 === n ? p : n] < e) return;
             }
-            const j = h({ log: l, messageKey: o, colorizer: F, messageFormat: u, levelLabel: a, ...k, useOnlyCustomProps: P });
+            const M = h({ log: l, messageKey: o, colorizer: F, messageFormat: u, levelLabel: a, ...k, useOnlyCustomProps: P });
             (T || A) && (l = E({ log: l, ignoreKeys: T, includeKeys: A }));
-            const M = y({ log: l, colorizer: F, levelKey: n, prettifier: R.level, ...k }),
+            const j = y({ log: l, colorizer: F, levelKey: n, prettifier: R.level, ...k }),
               S = v({ log: l, prettifiers: R }),
               w = b({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: R.time });
             let x = '';
             if (
-              (t.levelFirst && M && (x = `${M}`),
+              (t.levelFirst && j && (x = `${j}`),
               w && '' === x ? (x = `${w}`) : w && (x = `${x} ${w}`),
-              !t.levelFirst && M && (x = x.length > 0 ? `${x} ${M}` : M),
+              !t.levelFirst && j && (x = x.length > 0 ? `${x} ${j}` : j),
               S && (x = x.length > 0 ? `${x} ${S}:` : S),
               !1 === x.endsWith(':') && '' !== x && (x += ':'),
-              j && (x = x.length > 0 ? `${x} ${j}` : j),
+              M && (x = x.length > 0 ? `${x} ${M}` : M),
               x.length > 0 && !D && (x += r),
               'Error' === l.type && l.stack)
             ) {
@@ -1045,12 +1068,12 @@
         function E(e) {
           return '[object Object]' === Object.prototype.toString.apply(e);
         }
-        function j({ input: e, ident: t = '    ', eol: r = '\n' }) {
+        function M({ input: e, ident: t = '    ', eol: r = '\n' }) {
           const s = e.split(/\r?\n/);
           for (let e = 1; e < s.length; e += 1) s[e] = t + s[e];
           return s.join(r);
         }
-        function M({
+        function j({
           input: e,
           ident: t = '    ',
           eol: r = '\n',
@@ -1081,7 +1104,7 @@
                   let n = 'function' == typeof o[e] ? s : a(s, null, 2);
                   if (void 0 === n) return;
                   n = n.replace(/\\\\/gi, '\\');
-                  const i = j({ input: n, ident: t, eol: r });
+                  const i = M({ input: n, ident: t, eol: r });
                   f += `${t}${e}:${i.startsWith(r) ? '' : ' '}${i}${r}`;
                 }),
             Object.entries(y).forEach(([e, s]) => {
@@ -1093,7 +1116,7 @@
         }
         function O({ keyName: e, lines: t, eol: r, ident: s }) {
           let o = '';
-          const n = `${s}${e}: ${j({ input: t, ident: s, eol: r })}${r}`.split(r);
+          const n = `${s}${e}: ${M({ input: t, ident: s, eol: r })}${r}`.split(r);
           for (let e = 0; e < n.length; e += 1) {
             0 !== e && (o += r);
             const t = n[e];
@@ -1145,7 +1168,7 @@
         (e.exports = {
           isObject: E,
           prettifyErrorLog: function ({ log: e, messageKey: t = d, ident: r = '    ', eol: s = '\n', errorLikeKeys: o = c, errorProperties: n = [] }) {
-            let a = `${r}${j({ input: e.stack, ident: r, eol: s })}${s}`;
+            let a = `${r}${M({ input: e.stack, ident: r, eol: s })}${s}`;
             if (n.length > 0) {
               const i = m.concat(t, 'type', 'stack');
               let l;
@@ -1153,7 +1176,7 @@
               for (let t = 0; t < l.length; t += 1) {
                 const n = l[t];
                 n in e != 0 &&
-                  (a = E(e[n]) ? `${a}${r}${n}: {${s}${M({ input: e[n], errorLikeKeys: o, excludeLoggerKeys: !1, eol: s, ident: r + r })}${r}}${s}` : `${a}${r}${n}: ${e[n]}${s}`);
+                  (a = E(e[n]) ? `${a}${r}${n}: {${s}${j({ input: e[n], errorLikeKeys: o, excludeLoggerKeys: !1, eol: s, ident: r + r })}${r}}${s}` : `${a}${r}${n}: ${e[n]}${s}`);
               }
             }
             return a;
@@ -1196,7 +1219,7 @@
             }
             return e.caller && (r += `${'' === r ? '' : ' '}<${t.caller ? t.caller(e.caller) : e.caller}>`), '' === r ? void 0 : r;
           },
-          prettifyObject: M,
+          prettifyObject: j,
           prettifyTime: function ({ log: e, timestampKey: t = g, translateFormat: r, prettifier: s }) {
             let o = null;
             if ((t in e ? (o = e[t]) : 'timestamp' in e && (o = e.timestamp), null === o)) return;
@@ -1272,7 +1295,7 @@
         }),
           (e.exports.internals = {
             formatTime: _,
-            joinLinesWithIndentation: j,
+            joinLinesWithIndentation: M,
             prettifyError: O,
             getPropertyValue: P,
             deleteLogProperty: w,
