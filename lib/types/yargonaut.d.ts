@@ -2,6 +2,8 @@ type YargonautChalk = {
   grey(str: string): string;
   green(str: string): string;
   red(str: string): string;
+  white(str: string): string;
+  yellow(str: string): string;
 };
 
 declare module 'yargonaut' {
