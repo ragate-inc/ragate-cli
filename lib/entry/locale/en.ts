@@ -14,6 +14,7 @@ const locale: Locale = {
   options: {
     describe: {
       verbose: 'Show verbose logs',
+      region: 'Aws region',
     },
   },
   unProcessed: {

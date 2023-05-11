@@ -19,14 +19,14 @@ export default class App {
   constructor() {
     yargonautInit();
     this.chalk = chalk;
-    this.locale = config.lang;
-    this.lang = getLocaleLang(this.locale);
+    this.lang = config.lang;
+    this.locale = getLocaleLang(this.lang);
     this.npmVersion = config.npmVersion;
   }
 
   private chalk: YargonautChalk;
-  private locale: Lang;
-  private lang: Locale;
+  private lang: Lang;
+  private locale: Locale;
   private npmVersion: string;
   private verbose = false;
 
@@ -46,51 +46,80 @@ export default class App {
   };
 
   private cli() {
-    const { lang, version, chalk, locale } = this;
+    const { lang, version, chalk, locale: locale } = this;
     return yargs(process.argv.slice(2))
       .scriptName('')
       .default('processed', false)
       .hide('processed')
       .options({
         verbose: {
-          describe: chalk.grey(lang.options.describe.verbose),
+          describe: chalk.grey(locale.options.describe.verbose),
           default: false,
           type: 'boolean',
+        },
+        region: {
+          alias: 'r',
+          describe: chalk.grey(locale.options.describe.region),
+          default: 'ap-northeast-1',
+          type: 'string',
+          choices: [
+            'ap-northeast-1',
+            'us-east-2',
+            'us-east-1',
+            'us-west-1',
+            'us-west-2',
+            'af-south-1',
+            'ap-east-1',
+            'ap-south-2',
+            'ap-southeast-3',
+            'ap-southeast-3',
+            'ap-southeast-4',
+            'ap-south-1',
+            'ap-northeast-3',
+            'ap-northeast-2',
+            'ap-southeast-1',
+            'ap-southeast-2',
+            'ap-northeast-1',
+            'ca-central-1',
+            'eu-central-1',
+            'eu-west-1',
+            'eu-west-2',
+            'eu-south-1',
+            'eu-west-3',
+            'eu-south-2',
+            'eu-north-1',
+            'eu-central-2',
+            'me-south-1',
+            'me-central-1',
+            'sa-east-1',
+            'us-gov-east-1',
+            'us-gov-west-1',
+          ],
         },
       })
       .middleware((argv) => {
         this.verbose = argv.verbose || false;
       })
       .usage(version)
-      .help('help', chalk.grey(lang.help))
+      .help('help', chalk.grey(locale.help))
       .alias('h', 'help')
-      .version('version', chalk.grey(lang.version), version)
+      .version('version', chalk.grey(locale.version), version)
       .alias('v', 'version')
       .command(
         'create',
-        chalk.grey(lang.command.description.create),
-        (yargs) => createFeature.builder(yargs),
+        chalk.grey(locale.command.description.create),
+        (yargs) => new createFeature.builder().build({ yargs, logger: this.logger }),
         (argv) =>
-          createFeature
-            .handler({
-              argv: argv,
-            })
+          new createFeature.handler({
+            argv: argv,
+            logger: this.logger,
+          })
+            .run()
             .finally(() => (argv.processed = true))
       )
-      .command(
-        'add',
-        chalk.grey(lang.command.description.add),
-        (yargs) => addFeature.builder(yargs),
-        (argv) =>
-          addFeature
-            .handler({
-              argv: argv,
-            })
-            .finally(() => (argv.processed = true))
-      )
+      .command('add', chalk.grey(locale.command.description.add), (yargs) => new addFeature.builder().build({ yargs, logger: this.logger }))
       .wrap(Math.max(yargs().terminalWidth() - 5, 60))
-      .locale(locale);
-    // .fail((msg, err, yargs) => process.exit(1));
+      .locale(lang);
   }
 
   public async run() {
@@ -98,9 +127,9 @@ export default class App {
       const argv = await this.cli().parseAsync();
       if (!argv.processed) {
         if (_.isEmpty(argv._)) {
-          this.outputResultError([this.lang.unProcessed.required]);
+          this.outputResultError([this.locale.unProcessed.required]);
         } else {
-          this.outputResultError([this.lang.unProcessed.notFound, `${this.lang.yourInput}: ${argv._.join(' ')}`]);
+          this.outputResultError([this.locale.unProcessed.notFound, `${this.locale.yourInput}: ${argv._.join(' ')}`]);
         }
       }
     } catch (error) {

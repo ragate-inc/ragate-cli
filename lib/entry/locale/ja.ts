@@ -14,6 +14,7 @@ const locale: Locale = {
   options: {
     describe: {
       verbose: '詳細なログを出力',
+      region: 'AWSリージョン',
     },
   },
   unProcessed: {
