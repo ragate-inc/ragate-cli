@@ -8,6 +8,7 @@ import { Locale } from 'entry/types';
 import createFeature from 'features/create/index';
 import addFeature from 'features/add/index';
 import { FeatureBuilderAbstractArgs, FeatureHandlerAbstractArgs, awsRegions } from 'types/index';
+import _ from 'lodash';
 
 /**
  * yargs typescript : https://github.com/yargs/yargs/blob/main/docs/typescript.md
@@ -26,7 +27,6 @@ export default class {
           type: this.langRef.type,
         },
         verbose: {
-          default: this.verboseRef.default,
           type: this.verboseRef.type,
         },
         region: {
@@ -34,11 +34,15 @@ export default class {
           type: this.regionRef.type,
         },
       })
+      .check((argv) => {
+        argv.verbose = _.hasIn(argv, 'verbose');
+        return true;
+      })
       .help(false)
       .version(false)
       .parseSync();
     this.lang = argv.lang;
-    this.verbose = argv.verbose;
+    this.verbose = argv.verbose as boolean;
     this.region = argv.region;
     this.locale = getLocaleLang(argv.lang);
     this.logger = Logger.getLogger(this.verbose ? 'debug' : 'info');
@@ -57,8 +61,7 @@ export default class {
 
   private readonly verbose: boolean;
   private readonly verboseRef = {
-    default: false,
-    type: 'string' as 'boolean' | 'string' | 'array' | 'count' | undefined,
+    type: 'flag' as 'boolean' | 'string' | 'array' | 'count' | undefined,
   };
 
   private readonly npmVersion: string;
@@ -89,7 +92,6 @@ export default class {
       .options({
         verbose: {
           describe: chalk.grey(locale.options.describe.verbose),
-          default: this.verboseRef.default,
           type: this.verboseRef.type,
         },
         lang: {

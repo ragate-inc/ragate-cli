@@ -1,730 +1,1552 @@
 #!/usr/bin/env node
-/*
- * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
- * This devtool is neither made for production nor for readable output files.
- * It uses "eval()" calls to create a separate source file in the browser devtools.
- * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
- * or disable the default devtool with "devtool: false".
- * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
- */
-/******/ (() => {
-  // webpackBootstrap
-  /******/ 'use strict';
-  /******/ var __webpack_modules__ = {
-    /***/ './lib/app.ts':
-      /*!********************!*\
-  !*** ./lib/app.ts ***!
-  \********************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! entry/builder */ "./lib/entry/builder.ts"));\nvoid (async () => {\n    const entry = new builder_1.default();\n    await entry.run();\n})();\n\n\n//# sourceURL=webpack://ragate-cli/./lib/app.ts?'
+(() => {
+  'use strict';
+  var e = {
+      4712: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(9026));
+        (async () => {
+          const e = new o.default();
+          await e.run();
+        })();
+      },
+      2322: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(4147)),
+          a = s(r(6517)),
+          n = {
+            npmVersion: o.default.version,
+            repositoyUrl: 'https://github.com/ragate-inc/serverless-starter',
+            templates: a.default
+              .chain([{ category: 'Node.js', name: 'Node.js - aws-node-appsync', value: 'aws-node-appsync' }])
+              .sortBy('category')
+              .map((e) => ({ name: `${e.category} - ${e.name}`, value: e.value }))
+              .value(),
+          };
+        t.default = n;
+      },
+      9026: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(6444)),
+          a = s(r(9267)),
+          n = r(6870),
+          i = s(r(2322)),
+          l = r(8014),
+          u = s(r(8798)),
+          c = s(r(8072)),
+          d = r(6702),
+          p = s(r(6517));
+        t.default = class {
+          constructor() {
+            (0, n.init)(), (this.chalk = n.chalk);
+            const e = (0, a.default)(process.argv.slice(2))
+              .options({
+                lang: { default: this.langRef.default, type: this.langRef.type },
+                verbose: { type: this.verboseRef.type },
+                region: { default: this.regionRef.default, type: this.regionRef.type },
+              })
+              .check((e) => ((e.verbose = p.default.hasIn(e, 'verbose')), !0))
+              .help(!1)
+              .version(!1)
+              .parseSync();
+            (this.lang = e.lang),
+              (this.verbose = e.verbose),
+              (this.region = e.region),
+              (this.locale = (0, l.getLocaleLang)(e.lang)),
+              (this.logger = o.default.getLogger(this.verbose ? 'debug' : 'info')),
+              (this.npmVersion = i.default.npmVersion);
+          }
+          chalk;
+          logger;
+          locale;
+          lang;
+          langRef = { default: process.env.LANG ?? 'en', type: 'string' };
+          verbose;
+          verboseRef = { type: 'flag' };
+          npmVersion;
+          get version() {
+            return `ragate-cli v${this.npmVersion}`;
+          }
+          region;
+          regionRef = { default: 'ap-northeast-1', type: 'string' };
+          handleError(e) {
+            const t = [];
+            e && (e.stack ? t.push(e.stack) : t.push(e.message)), console.error('\n', n.chalk.red(t.join('\n\n'))), process.exit(1);
+          }
+          cli() {
+            const { version: e, chalk: t, locale: r, lang: s } = this;
+            return (0, a.default)(process.argv.slice(2))
+              .scriptName('')
+              .options({
+                verbose: { describe: t.grey(r.options.describe.verbose), type: this.verboseRef.type },
+                lang: { describe: t.grey(r.options.describe.lang), default: this.langRef.default, type: this.langRef.type },
+                region: { alias: 'r', describe: t.grey(r.options.describe.region), default: this.regionRef.default, type: this.regionRef.type, choices: d.awsRegions },
+              })
+              .usage(e)
+              .help('help', t.grey(r.help))
+              .alias('h', 'help')
+              .version('version', t.grey(r.version), e)
+              .alias('v', 'version')
+              .check((e) => {
+                if (0 === e._.length) throw new Error(this.locale.unProcessed.required);
+                return !0;
+              })
+              .command(
+                'create',
+                t.grey(r.command.description.create),
+                (e) => {
+                  const t = { lang: this.lang, region: this.region };
+                  return new u.default.builder(t).build(e);
+                },
+                (e) => new u.default.handler(e).run()
+              )
+              .command('add', t.grey(r.command.description.add), (e) => {
+                const t = { lang: this.lang, region: this.region };
+                return new c.default.builder(t).build(e);
+              })
+              .command(
+                '*',
+                '',
+                () => ({}),
+                () => {
+                  throw new Error(this.locale.unProcessed.notFound);
+                }
+              )
+              .wrap(Math.max((0, a.default)().terminalWidth() - 5, 60))
+              .locale(s)
+              .fail((e, t) => this.handleError(t));
+          }
+          async run() {
+            try {
+              await this.cli().parseAsync();
+            } catch (e) {
+              this.handleError(e);
+            }
+          }
+        };
+      },
+      1843: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            help: 'Show help',
+            version: 'Show version',
+            yourInput: 'your input',
+            command: { description: { create: 'Create a new project', add: 'Add aws resouces' } },
+            options: { describe: { verbose: 'Show verbose logs', region: 'Aws region', lang: 'Display language' } },
+            unProcessed: {
+              required: 'please input a command. Run "ragate help" for a list of all available commands.',
+              notFound: 'The command entered does not exist. Run "ragate help" for a list of all available commands.',
+            },
+          });
+      },
+      6471: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            help: 'ヘルプを表示',
+            version: 'バージョンを表示',
+            yourInput: '入力されたコマンド',
+            command: { description: { create: 'プロジェクトを作成', add: 'AWSリソースの追加' } },
+            options: { describe: { verbose: '詳細なログを出力', region: 'AWSリージョン', lang: '表示言語' } },
+            unProcessed: {
+              required: '指定のコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
+              notFound: '入力されたコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
+            },
+          });
+      },
+      8014: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
+        const o = s(r(6471)),
+          a = s(r(1843));
+        t.getLocaleLang = (e) => ('ja' === e ? o.default : a.default);
+      },
+      5033: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.DuplicatedPropertyError = t.CLIError = t.EnvironmentError = t.BaseClass = void 0);
+        class r extends Error {
+          constructor(e) {
+            super(e), (this.name = new.target.name), Error.captureStackTrace && Error.captureStackTrace(this, this.constructor), Object.setPrototypeOf(this, new.target.prototype);
+          }
+        }
+        (t.BaseClass = r),
+          (t.EnvironmentError = class extends r {
+            constructor(e) {
+              super(e), (this.name = 'EnvironmentError');
+            }
+          }),
+          (t.CLIError = class extends r {
+            constructor(e) {
+              super(e), (this.name = 'CLIError');
+            }
+          }),
+          (t.DuplicatedPropertyError = class extends r {
+            constructor(e) {
+              super(e), (this.name = 'DuplicatedPropertyError');
+            }
+          });
+      },
+      6040: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = r(6702),
+          a = s(r(6444)),
+          n = s(r(9211)),
+          i = s(r(592)),
+          l = r(6870),
+          u = r(7264);
+        class c extends o.FeatureBuilderAbstract {
+          constructor(e) {
+            super(e);
+          }
+          build(e) {
+            const t = this.args.lang,
+              r = (0, u.getLocaleLang)(t),
+              s = a.default.getLogger();
+            return e
+              .version(!1)
+              .usage('Usage: add <command> <options>')
+              .command(
+                'sns',
+                l.chalk.grey(r.command.description.sns),
+                (e) => new n.default.builder(this.args).build(e),
+                (e) => new n.default.handler(e).run()
+              )
+              .command(
+                'sqs',
+                l.chalk.grey(r.command.description.sns),
+                (e) => new i.default.builder(this.args).build(e),
+                (e) => new i.default.handler(e).run()
+              )
+              .command(
+                '*',
+                l.chalk.grey('<command> <options>'),
+                () => ({}),
+                () => {
+                  s.error(l.chalk.red(r.unProcessed));
+                }
+              );
+          }
+        }
+        t.default = c;
+      },
+      6433: (e, t, r) => {
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const s = r(6702);
+        class o extends s.FeatureBuilderAbstract {
+          constructor(e) {
+            super(e);
+          }
+          build(e) {
+            return e.version(!1).usage('Usage: $0 sns');
+          }
+        }
+        t.default = o;
+      },
+      2917: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(6444)),
+          a = r(6702),
+          n = s(r(6517)),
+          i = r(3462),
+          l = r(3362),
+          u = r(5033),
+          c = s(r(3290)),
+          d = s(r(7453)),
+          p = s(r(6243)),
+          f = s(r(5735));
+        class g extends a.FeatureHandlerAbstract {
+          constructor(e) {
+            super(e);
+          }
+          get defaultResourcePath() {
+            return `serverless/${this.argv.region}/resources/sns.yml`;
+          }
+          get defaultServerlessConfigPath() {
+            return `serverless/${this.argv.region}/serverless.yml`;
+          }
+          async run() {
+            const e = o.default.getLogger(),
+              t = (0, l.getLocaleLang)(this.lang),
+              r = await c.default
+                .prompt([
+                  {
+                    type: 'input',
+                    name: 'resourceName',
+                    message: 'input a sns resource name',
+                    filter: (e) => e.replace(/\s+/g, ''),
+                    transformer: (e) => e.replace(/\s+/g, ''),
+                    validate: (e) => (n.default.isEmpty(e) ? t.error.reqiredResourceName : d.default.resourceName(e, this.lang)),
+                  },
+                  {
+                    type: 'checkbox',
+                    name: 'subscriptions',
+                    message: 'select a sns subscriptions',
+                    choices: ['email', 'lambda'],
+                    validate: (e) => !n.default.isEmpty(e) || t.error.reqiredSubscriptions,
+                  },
+                  {
+                    type: 'input',
+                    name: 'filePath',
+                    message: 'input a cloudformation file path',
+                    default: () => this.defaultResourcePath,
+                    validate: (e) => d.default.filePath(e, this.lang),
+                    transformer: (e) => p.default.filePath(e),
+                    filter: (e) => f.default.filePath(e),
+                  },
+                  {
+                    type: 'input',
+                    name: 'serverlessConfigPath',
+                    message: 'input a serverless config file path',
+                    default: () => this.defaultServerlessConfigPath,
+                    validate: (e) => d.default.serverlessConfigPath(e, this.lang),
+                    transformer: (e) => p.default.serverlessConfigPath(e),
+                    filter: (e) => f.default.serverlessConfigPath(e),
+                  },
+                ])
+                .then((e) => e);
+            e.debug(`input values : ${JSON.stringify(r)}}`);
+            const { resourceName: s, filePath: a, subscriptions: g, serverlessConfigPath: m } = r,
+              h = {
+                Type: 'AWS::SNS::Topic',
+                Properties: { TopicName: s, Subscription: g.map((e) => ({ Endpoint: 'email' === e ? 'Your email address' : 'Your lambda Arn', Protocol: e })) },
+              };
+            try {
+              const r = (0, i.readYaml)(a) ?? {};
+              if (n.default.hasIn(r, `Resources.${s}`))
+                throw (e.error(`${t.error.alreadyExistResource}`), e.error(`ResourceName : ${s}`), e.error(r), new u.DuplicatedPropertyError(t.error.alreadyExistResource));
+              const o = (0, i.writeYaml)(a, { ...r, Resources: { ...r.Resources, [s]: h } });
+              e.info(a), e.info(`${t.overrightFile} : ${a}`), e.info(o);
+            } catch (r) {
+              if ('DuplicatedPropertyError' === r.name) throw r;
+              const o = (0, i.writeYaml)(a, { Resources: { [s]: h } });
+              e.info(a), e.info(`${t.outputFile} : ${a}`), e.info(o);
+            }
+            (0, i.writeServerlessConfig)({ serverlessConfigPath: m, resourceFilePath: a });
+          }
+        }
+        t.default = g;
+      },
+      9211: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(6433)),
+          a = s(r(2917));
+        t.default = { builder: o.default, handler: a.default };
+      },
+      6353: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            error: {
+              reqiredResourceName: 'resource name is required',
+              reqiredSubscriptions: 'required select a subscriptions',
+              mustByYamlFilePath: 'path is not yaml file',
+              alreadyExistResource: 'resource name is already exists',
+            },
+            overrightFile: 'overright yaml file',
+            outputFile: 'output yaml file',
+          });
+      },
+      5423: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            error: {
+              reqiredResourceName: 'リソース名を指定して下さい',
+              reqiredSubscriptions: 'サブスクリプションを選択して下さい',
+              mustByYamlFilePath: 'Yamlファイルのパスを指定して下さい',
+              alreadyExistResource: '指定のリソース名は既に存在します',
+            },
+            overrightFile: 'Yamlファイルを上書き',
+            outputFile: 'Yamlファイルを出力',
+          });
+      },
+      3362: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
+        const o = s(r(5423)),
+          a = s(r(6353));
+        t.getLocaleLang = (e) => ('ja' === e ? o.default : a.default);
+      },
+      6621: (e, t, r) => {
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const s = r(6702);
+        class o extends s.FeatureBuilderAbstract {
+          constructor(e) {
+            super(e);
+          }
+          build(e) {
+            return e.version(!1).usage('Usage: $0 sqs');
+          }
+        }
+        t.default = o;
+      },
+      4267: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(6444)),
+          a = r(6702),
+          n = s(r(6517)),
+          i = r(3462),
+          l = r(7009),
+          u = r(5033),
+          c = s(r(3290)),
+          d = s(r(7453)),
+          p = s(r(6243)),
+          f = s(r(5735));
+        class g extends a.FeatureHandlerAbstract {
+          constructor(e) {
+            super(e);
+          }
+          get defaultResourcePath() {
+            return `serverless/${this.argv.region}/resources/sqs.yml`;
+          }
+          get defaultServerlessConfigPath() {
+            return `serverless/${this.argv.region}/serverless.yml`;
+          }
+          async run() {
+            const e = o.default.getLogger(),
+              t = (0, l.getLocaleLang)(this.lang),
+              r = await c.default
+                .prompt([
+                  {
+                    type: 'input',
+                    name: 'resourceName',
+                    message: 'input a sqs resource name',
+                    filter: (e) => e.replace(/\s+/g, ''),
+                    transformer: (e) => e.replace(/\s+/g, ''),
+                    validate: (e) => (n.default.isEmpty(e) ? t.error.reqiredResourceName : d.default.resourceName(e, this.lang)),
+                  },
+                  { type: 'list', name: 'queueType', default: 'Standard', choices: ['Standard', 'Fifo'], message: 'Is it a FIFO queue?' },
+                  {
+                    type: 'expand',
+                    name: 'useDeadLetterQueue',
+                    message: 'Do you use dead letter queue?',
+                    choices: [
+                      { key: 'y', name: 'yes', value: !0 },
+                      { key: 'n', name: 'no', value: !1 },
+                    ],
+                  },
+                  {
+                    type: 'expand',
+                    name: 'contentBasedDeduplication',
+                    message: 'Do you use content-based deduplication?',
+                    choices: [
+                      { key: 'y', name: 'yes', value: !0 },
+                      { key: 'n', name: 'no', value: !1 },
+                    ],
+                  },
+                  {
+                    type: 'input',
+                    name: 'filePath',
+                    message: 'input a cloudformation file path',
+                    default: () => this.defaultResourcePath,
+                    validate: (e) => d.default.filePath(e, this.lang),
+                    transformer: (e) => p.default.filePath(e),
+                    filter: (e) => f.default.filePath(e),
+                  },
+                  {
+                    type: 'input',
+                    name: 'serverlessConfigPath',
+                    message: 'input a serverless config file path',
+                    default: () => this.defaultServerlessConfigPath,
+                    validate: (e) => d.default.serverlessConfigPath(e, this.lang),
+                    transformer: (e) => p.default.serverlessConfigPath(e),
+                    filter: (e) => f.default.serverlessConfigPath(e),
+                  },
+                ])
+                .then((e) => e);
+            e.debug(`input values : ${JSON.stringify(r)}}`);
+            const { resourceName: s, queueType: a, useDeadLetterQueue: g, contentBasedDeduplication: m, filePath: h, serverlessConfigPath: y } = r,
+              v = { Resources: {} };
+            if ('Standard' === a) {
+              const e = {
+                Type: 'AWS::SQS::Queue',
+                Properties: { ContentBasedDeduplication: m, DelaySeconds: 0, MaximumMessageSize: 262144, MessageRetentionPeriod: 240, QueueName: s, VisibilityTimeout: 40 },
+              };
+              if (g) {
+                const t = `${s}DeadLetter`,
+                  r = { Type: 'AWS::SQS::Queue', Properties: { DelaySeconds: 0, MaximumMessageSize: 262144, MessageRetentionPeriod: 240, QueueName: t, VisibilityTimeout: 40 } };
+                (e.Properties.RedrivePolicy = { deadLetterTargetArn: `!GetAtt ${t}.Arn`, maxReceiveCount: 5 }), (v.Resources = { ...v.Resources, [t]: r });
+              }
+              v.Resources = { ...v.Resources, [s]: e };
+            } else if ('Fifo' === a) {
+              const e = {
+                Type: 'AWS::SQS::Queue',
+                Properties: {
+                  ContentBasedDeduplication: m,
+                  DelaySeconds: 0,
+                  FifoQueue: !0,
+                  MaximumMessageSize: 262144,
+                  MessageRetentionPeriod: 240,
+                  QueueName: s,
+                  VisibilityTimeout: 40,
+                },
+              };
+              if (g) {
+                const t = `${s}DeadLetter`,
+                  r = {
+                    Type: 'AWS::SQS::Queue',
+                    Properties: { DelaySeconds: 0, FifoQueue: !0, MaximumMessageSize: 262144, MessageRetentionPeriod: 345600, QueueName: t, VisibilityTimeout: 60 },
+                  };
+                (e.Properties.RedrivePolicy = { deadLetterTargetArn: `!GetAtt ${t}.Arn`, maxReceiveCount: 5 }), (v.Resources = { ...v.Resources, [t]: r });
+              }
+              v.Resources = { ...v.Resources, [s]: e };
+            }
+            try {
+              const r = (0, i.readYaml)(h) ?? {};
+              if (n.default.hasIn(r, `Resources.${s}`))
+                throw (e.error(`${t.error.alreadyExistResource}`), e.error(`ResourceName : ${s}`), e.error(r), new u.DuplicatedPropertyError(t.error.alreadyExistResource));
+              const o = (0, i.writeYaml)(h, { ...r, Resources: { ...r.Resources, ...v.Resources } });
+              e.info(h), e.info(`${t.overrightFile} : ${h}`), e.info(o);
+            } catch (r) {
+              if ('DuplicatedPropertyError' === r.name) throw r;
+              const s = (0, i.writeYaml)(h, v);
+              e.info(h), e.info(`${t.outputFile} : ${h}`), e.info(s);
+            }
+            (0, i.writeServerlessConfig)({ serverlessConfigPath: y, resourceFilePath: h });
+          }
+        }
+        t.default = g;
+      },
+      592: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(6621)),
+          a = s(r(4267));
+        t.default = { builder: o.default, handler: a.default };
+      },
+      7450: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            error: { reqiredResourceName: 'resource name is required', mustByYamlFilePath: 'path is not yaml file', alreadyExistResource: 'resource name is already exists' },
+            overrightFile: 'overright yaml file',
+            outputFile: 'output yaml file',
+          });
+      },
+      911: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            error: {
+              reqiredResourceName: 'リソース名を指定して下さい',
+              mustByYamlFilePath: 'Yamlファイルのパスを指定して下さい',
+              alreadyExistResource: '指定のリソース名は既に存在します',
+            },
+            overrightFile: 'Yamlファイルを上書き',
+            outputFile: 'Yamlファイルを出力',
+          });
+      },
+      7009: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
+        const o = s(r(911)),
+          a = s(r(7450));
+        t.getLocaleLang = (e) => ('ja' === e ? o.default : a.default);
+      },
+      8072: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(6040));
+        t.default = { builder: o.default };
+      },
+      4005: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            command: { description: { sns: 'add AWS SQS', sqs: 'add AWS SQS' } },
+            unProcessed: 'The command entered does not exist. Run "ragate add help" for a list of all available commands.',
+          });
+      },
+      5699: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            command: { description: { sns: 'AWS SQSを追加', sqs: 'AWS SQSを追加' } },
+            unProcessed: '入力されたコマンドは存在しません。「ragate add help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
+          });
+      },
+      7264: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
+        const o = s(r(5699)),
+          a = s(r(4005));
+        t.getLocaleLang = (e) => ('ja' === e ? o.default : a.default);
+      },
+      3818: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = r(6702),
+          a = r(6870),
+          n = s(r(8798));
+        class i extends o.FeatureBuilderAbstract {
+          constructor(e) {
+            super(e);
+          }
+          build(e) {
+            return (
+              this.args.lang,
+              e
+                .version(!1)
+                .usage('Usage: create <options>')
+                .command(
+                  '*',
+                  a.chalk.grey('<command> <options>'),
+                  () => ({}),
+                  (e) => {
+                    if (1 === e._.length) return new n.default.handler(e).run();
+                    throw new Error('locale.error.unProcessed');
+                  }
+                )
+            );
+          }
+        }
+        t.default = i;
+      },
+      975: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(3290)),
+          a = s(r(2322)),
+          n = r(2868),
+          i = s(r(6517)),
+          l = s(r(169)),
+          u = r(2762),
+          c = s(r(6444)),
+          d = r(6702);
+        class p extends d.FeatureHandlerAbstract {
+          constructor(e) {
+            super(e), o.default.registerPrompt('autocomplete', l.default);
+          }
+          async run() {
+            const { argv: e } = this,
+              t = c.default.getLogger();
+            t.debug('create hander : ', e);
+            const r = (0, n.getLocaleLang)(this.lang),
+              s = await o.default
+                .prompt([
+                  {
+                    type: 'autocomplete',
+                    name: 'template',
+                    emptyText: r.inquirer.template.autocomplete.emptyText,
+                    message: r.inquirer.template.choiceTemplate,
+                    source: (e, t) => (i.default.isEmpty(t) ? a.default.templates : a.default.templates.filter((e) => e.name.includes(t))),
+                  },
+                  {
+                    type: 'input',
+                    name: 'projectName',
+                    message: 'input a project name',
+                    default: (e) => e.template,
+                    validate: (e) => !i.default.isEmpty(e) || 'required input a project name',
+                  },
+                ])
+                .then((e) => e);
+            t.debug(`input values : ${JSON.stringify(s)}}`);
+            const { template: l, projectName: d } = s;
+            if ((t.info(`template : ${l}`), t.info(`projectName : ${d}`), (0, u.isExistsDirectory)(`${u.processCurrent}/${d}`)))
+              throw new Error(`${r.error.alreadyExistsDirectory} : ${u.processCurrent}/${d}`);
+            (0, u.isExistsDirectory)(u.tmpPath) && (0, u.cleanUpTmpDirectory)(),
+              (0, u.gitClone)(a.default.repositoyUrl, u.tmpPath),
+              (0, u.copyDirectory)(`${u.tmpPath}/${l}`, `${u.processCurrent}/${d}`);
+          }
+        }
+        t.default = p;
+      },
+      8798: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(3818)),
+          a = s(r(975));
+        t.default = { builder: o.default, handler: a.default };
+      },
+      7544: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            error: {
+              alreadyExistsDirectory: 'already exists directory',
+              unProcessed: 'The command entered does not exist. Run "ragate create help" for a list of all available commands.',
+            },
+            inquirer: { template: { choiceTemplate: 'Choose a project template', autocomplete: { emptyText: 'No result' } } },
+          });
+      },
+      7016: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            error: {
+              alreadyExistsDirectory: '既にディレクトリが存在します',
+              unProcessed: '入力されたコマンドは存在しません。「ragate create help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
+            },
+            inquirer: { template: { choiceTemplate: 'プロジェクトの雛形を選択してください。', autocomplete: { emptyText: '該当するテンプレートが見つかりません' } } },
+          });
+      },
+      2868: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
+        const o = s(r(7016)),
+          a = s(r(7544));
+        t.getLocaleLang = (e) => ('ja' === e ? o.default : a.default);
+      },
+      6702: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.awsRegions = t.FeatureBuilderAbstract = t.FeatureHandlerAbstract = void 0);
+        const o = s(r(2322)),
+          a = r(6870);
+        (t.FeatureHandlerAbstract = class {
+          _argv;
+          _lang;
+          constructor(e) {
+            (this._argv = e), (this._lang = e.lang);
+          }
+          get argv() {
+            return this._argv;
+          }
+          get lang() {
+            return this._lang;
+          }
+        }),
+          (t.FeatureBuilderAbstract = class {
+            _args;
+            _npmVersion;
+            _chalk;
+            constructor(e) {
+              (this._chalk = a.chalk), (this._args = e), (this._npmVersion = o.default.npmVersion);
+            }
+            get args() {
+              return this._args;
+            }
+            get npmVersion() {
+              return this._npmVersion;
+            }
+            get chalk() {
+              return this._chalk;
+            }
+          }),
+          (t.awsRegions = [
+            'us-east-2',
+            'us-east-1',
+            'us-west-1',
+            'us-west-2',
+            'af-south-1',
+            'ap-east-1',
+            'ap-south-2',
+            'ap-southeast-3',
+            'ap-southeast-4',
+            'ap-south-1',
+            'ap-northeast-3',
+            'ap-northeast-2',
+            'ap-southeast-1',
+            'ap-southeast-2',
+            'ap-northeast-1',
+            'ca-central-1',
+            'eu-central-1',
+            'eu-west-1',
+            'eu-west-2',
+            'eu-south-1',
+            'eu-west-3',
+            'eu-south-2',
+            'eu-north-1',
+            'eu-central-2',
+            'me-south-1',
+            'me-central-1',
+            'sa-east-1',
+            'us-gov-east-1',
+            'us-gov-west-1',
+          ]);
+      },
+      2762: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.isExistsDirectory = t.cleanUpTmpDirectory = t.copyDirectory = t.gitClone = t.tmpPath = t.processCurrent = void 0);
+        const o = r(2081),
+          a = r(5033),
+          n = s(r(6444)),
+          i = s(r(1017));
+        t.processCurrent = i.default.resolve();
+        const l = i.default.dirname(process.argv[1]);
+        (t.tmpPath = `${l}/../tmp`),
+          (t.gitClone = function (e, t) {
+            const r = n.default.getLogger();
+            try {
+              r.debug((0, o.execSync)(`git clone ${e} ${t}`).toString());
+            } catch (e) {
+              const t = e;
+              throw new a.CLIError(t.message);
+            }
+          }),
+          (t.copyDirectory = function (e, t) {
+            const r = n.default.getLogger();
+            try {
+              r.debug((0, o.execSync)(`cp -r ${e} ${t}`).toString());
+            } catch (e) {
+              const t = e;
+              throw new a.CLIError(t.message);
+            }
+          }),
+          (t.cleanUpTmpDirectory = function () {
+            const e = n.default.getLogger();
+            try {
+              e.debug((0, o.execSync)(`rm -rf ${t.tmpPath}`).toString()), e.debug((0, o.execSync)(`mkdir ${t.tmpPath}`).toString());
+            } catch (e) {
+              const t = e;
+              throw new a.CLIError(t.message);
+            }
+          }),
+          (t.isExistsDirectory = function (e) {
+            const t = n.default.getLogger();
+            try {
+              return t.debug((0, o.execSync)(`test -d ${e}`).toString()), !0;
+            } catch (e) {
+              return !1;
+            }
+          });
+      },
+      5735: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = class {
+            static filePath = (e) => e.replace(/\s+/g, '');
+            static serverlessConfigPath = (e) => e.replace(/\s+/g, '');
+          });
+      },
+      6444: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(8545)),
+          a = s(r(4233)),
+          n = r(6870),
+          i = s(r(6517)),
+          l = (0, a.default)({
+            colorize: !0,
+            messageFormat: (e, t) => {
+              const r = (t) => (30 === e.level ? n.chalk.white(t) : e.level < 30 ? n.chalk.grey(t) : 40 === e.level ? n.chalk.yellow(t) : e.level >= 50 ? n.chalk.red(t) : t),
+                s = e[t];
+              return i.default.isEmpty(s)
+                ? i.default
+                    .chain(e)
+                    .omit(['level', 'time', 'pid', 'hostname'])
+                    .thru((e) => JSON.stringify(e, null, 2))
+                    .thru((e) => r(e))
+                    .value()
+                : e.requestId
+                ? `[${e.requestId}] ${r(s)}`
+                : r(s);
+            },
+            timestampKey: 'time',
+            ignore: 'pid,hostname',
+            include: 'level,time',
+            singleLine: !1,
+            translateTime: 'yyyy-mm-dd HH:MM:ss',
+            sync: !0,
+          });
+        t.default = class {
+          constructor() {
+            throw new Error('singleton cannot be instantiated');
+          }
+          static logger;
+          static getLogger(e) {
+            return e
+              ? ((this.logger = (0, o.default)({ level: e ?? 'info' }, l)), this.logger)
+              : (this.logger || (this.logger = (0, o.default)({ level: e ?? 'info' }, l)), this.logger);
+          }
+        };
+      },
+      6243: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = class {
+            static filePath = (e) => e.replace(/\s+/g, '');
+            static serverlessConfigPath = (e) => e.replace(/\s+/g, '');
+          });
+      },
+      7453: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const o = s(r(6517));
+        t.default = class {
+          static resourceName = (e, t) => !0;
+          static filePath = (e, t) =>
+            o.default.isEmpty(e) ? 'required input a cloudformation file path' : !(!e.endsWith('.yml') && !e.endsWith('.yaml')) || 'input a yaml file path';
+          static serverlessConfigPath = (e, t) =>
+            o.default.isEmpty(e) ? 'required input a serverless config file path' : !(!e.endsWith('.yml') && !e.endsWith('.yaml')) || 'input a yaml file path';
+        };
+      },
+      3462: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.writeServerlessConfig = t.readYaml = t.writeYaml = void 0);
+        const o = s(r(9793)),
+          a = s(r(7147)),
+          n = s(r(6444)),
+          i = r(2762),
+          l = (e) => (e.startsWith('/') ? e : `${i.processCurrent}/${e}`);
+        (t.writeYaml = (e, t) => {
+          const r = o.default.dump(t, {});
+          return a.default.writeFileSync(l(e), r, 'utf8'), r;
+        }),
+          (t.readYaml = (e) => o.default.load(a.default.readFileSync(l(e), 'utf8'))),
+          (t.writeServerlessConfig = (e) => {
+            const { serverlessConfigPath: r, resourceFilePath: s } = e,
+              o = n.default.getLogger(),
+              a = s.startsWith('/') ? s : `/${s}`;
+            try {
+              const e = (0, t.readYaml)(r) ?? {},
+                n = e.resources ?? [];
+              if (n.includes(s)) return;
+              n.push(`\${file(.${a})}`);
+              const i = (0, t.writeYaml)(r, { ...e, resources: n });
+              o.info(a), o.info(i);
+            } catch (e) {
+              o.debug(e), o.warn('not found serverless config file, skip update'), o.warn(`please check a input path : ${r}`);
+            }
+          });
+      },
+      6870: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.chalk = t.init = void 0);
+        const o = s(r(7347));
+        (t.init = () => o.default.font('SansSerif').helpStyle('grey').errorsStyle('red')), (t.chalk = o.default.chalk());
+      },
+      8387: (e) => {
+        e.exports = require('colorette');
+      },
+      4612: (e) => {
+        e.exports = require('dateformat');
+      },
+      4563: (e) => {
+        e.exports = require('fast-copy');
+      },
+      5376: (e) => {
+        e.exports = require('fast-safe-stringify');
+      },
+      3290: (e) => {
+        e.exports = require('inquirer');
+      },
+      169: (e) => {
+        e.exports = require('inquirer-autocomplete-prompt');
+      },
+      9793: (e) => {
+        e.exports = require('js-yaml');
+      },
+      6517: (e) => {
+        e.exports = require('lodash');
+      },
+      2067: (e) => {
+        e.exports = require('on-exit-leak-free');
+      },
+      8545: (e) => {
+        e.exports = require('pino');
+      },
+      454: (e) => {
+        e.exports = require('pino-abstract-transport');
+      },
+      7304: (e) => {
+        e.exports = require('pump');
+      },
+      3248: (e) => {
+        e.exports = require('readable-stream');
+      },
+      7915: (e) => {
+        e.exports = require('secure-json-parse');
+      },
+      5246: (e) => {
+        e.exports = require('sonic-boom');
+      },
+      7347: (e) => {
+        e.exports = require('yargonaut');
+      },
+      9267: (e) => {
+        e.exports = require('yargs/yargs');
+      },
+      2081: (e) => {
+        e.exports = require('child_process');
+      },
+      7147: (e) => {
+        e.exports = require('fs');
+      },
+      1017: (e) => {
+        e.exports = require('path');
+      },
+      1267: (e) => {
+        e.exports = require('worker_threads');
+      },
+      4233: (e, t, r) => {
+        const { isColorSupported: s } = r(8387),
+          o = r(7304),
+          { Transform: a } = r(3248),
+          n = r(454),
+          i = r(7915),
+          l = r(903),
+          { ERROR_LIKE_KEYS: u, MESSAGE_KEY: c, TIMESTAMP_KEY: d, LEVEL_KEY: p, LEVEL_NAMES: f } = r(7318),
+          {
+            isObject: g,
+            prettifyErrorLog: m,
+            prettifyLevel: h,
+            prettifyMessage: y,
+            prettifyMetadata: v,
+            prettifyObject: _,
+            prettifyTime: b,
+            buildSafeSonicBoom: P,
+            filterLog: L,
+            handleCustomlevelsOpts: E,
+            handleCustomlevelNamesOpts: S,
+          } = r(385),
+          M = (e) => {
+            try {
+              return { value: i.parse(e, { protoAction: 'remove' }) };
+            } catch (e) {
+              return { err: e };
+            }
+          },
+          w = {
+            colorize: s,
+            colorizeObjects: !0,
+            crlf: !1,
+            errorLikeObjectKeys: u,
+            errorProps: '',
+            customLevels: null,
+            customColors: null,
+            useOnlyCustomProps: !0,
+            levelFirst: !1,
+            messageKey: c,
+            messageFormat: !1,
+            timestampKey: d,
+            translateTime: !0,
+            useMetadata: !1,
+            outputStream: process.stdout,
+            customPrettifiers: {},
+            hideObject: !1,
+            ignore: 'hostname',
+            include: void 0,
+            singleLine: !1,
+          };
+        function j(e) {
+          const t = Object.assign({}, w, e),
+            r = t.crlf ? '\r\n' : '\n',
+            s = '    ',
+            o = t.messageKey,
+            a = t.levelKey,
+            n = t.levelLabel,
+            i = t.minimumLevel,
+            u = t.messageFormat,
+            c = t.timestampKey,
+            d = t.errorLikeObjectKeys,
+            P = t.errorProps.split(','),
+            j = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
+            O = E(t.customLevels),
+            $ = S(t.customLevels),
+            x = t.customColors
+              ? t.customColors.split(',').reduce((e, r) => {
+                  const [s, o] = r.split(':'),
+                    a = (j ? t.customLevels : void 0 !== $[s]) ? $[s] : f[s],
+                    n = void 0 !== a ? a : s;
+                  return e.push([n, o]), e;
+                }, [])
+              : void 0,
+            R = { customLevels: O, customLevelNames: $ };
+          j && !t.customLevels && ((R.customLevels = void 0), (R.customLevelNames = void 0));
+          const C = t.customPrettifiers,
+            k = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
+            D = !k && t.ignore ? new Set(t.ignore.split(',')) : void 0,
+            A = t.hideObject,
+            q = t.singleLine,
+            F = l(t.colorize, x, j),
+            T = t.colorizeObjects ? F : l(!1, [], !1);
+          return function (e) {
+            let l;
+            if (g(e)) l = e;
+            else {
+              const t = M(e);
+              if (t.err || !g(t.value)) return e + r;
+              l = t.value;
+            }
+            if (i) {
+              const e = ((j ? t.customLevels : void 0 !== $[i]) ? $[i] : f[i]) || Number(i);
+              if (l[void 0 === a ? p : a] < e) return;
+            }
+            const E = y({ log: l, messageKey: o, colorizer: F, messageFormat: u, levelLabel: n, ...R, useOnlyCustomProps: j });
+            (D || k) && (l = L({ log: l, ignoreKeys: D, includeKeys: k }));
+            const S = h({ log: l, colorizer: F, levelKey: a, prettifier: C.level, ...R }),
+              w = v({ log: l, prettifiers: C }),
+              O = b({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: C.time });
+            let x = '';
+            if (
+              (t.levelFirst && S && (x = `${S}`),
+              O && '' === x ? (x = `${O}`) : O && (x = `${x} ${O}`),
+              !t.levelFirst && S && (x = x.length > 0 ? `${x} ${S}` : S),
+              w && (x = x.length > 0 ? `${x} ${w}:` : w),
+              !1 === x.endsWith(':') && '' !== x && (x += ':'),
+              E && (x = x.length > 0 ? `${x} ${E}` : E),
+              x.length > 0 && !q && (x += r),
+              'Error' === l.type && l.stack)
+            ) {
+              const e = m({ log: l, errorLikeKeys: d, errorProperties: P, ident: s, eol: r });
+              q && (x += r), (x += e);
+            } else if (!A) {
+              const e = [o, a, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
+                t = _({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: d, eol: r, ident: s, singleLine: q, colorizer: T });
+              q && !/^\s$/.test(t) && (x += ' '), (x += t);
+            }
+            return x;
+          };
+        }
+        function O(e = {}) {
+          const t = j(e);
+          return n(
+            function (r) {
+              const s = new a({
+                objectMode: !0,
+                autoDestroy: !0,
+                transform(e, r, s) {
+                  s(null, t(e));
+                },
+              });
+              let n;
+              return (
+                (n =
+                  'object' == typeof e.destination && 'function' == typeof e.destination.write
+                    ? e.destination
+                    : P({ dest: e.destination || 1, append: e.append, mkdir: e.mkdir, sync: e.sync })),
+                r.on('unknown', function (e) {
+                  n.write(e + '\n');
+                }),
+                o(r, s, n),
+                s
+              );
+            },
+            { parse: 'lines' }
+          );
+        }
+        (e.exports = O), (e.exports.prettyFactory = j), (e.exports.colorizerFactory = l), (e.exports.default = O);
+      },
+      903: (e, t, r) => {
+        const { LEVELS: s, LEVEL_NAMES: o } = r(7318),
+          a = (e) => e,
+          n = { default: a, 60: a, 50: a, 40: a, 30: a, 20: a, 10: a, message: a, greyMessage: a },
+          { createColors: i } = r(8387),
+          l = i({ useColor: !0 }),
+          { white: u, bgRed: c, red: d, yellow: p, green: f, blue: g, gray: m, cyan: h } = l,
+          y = { default: u, 60: c, 50: d, 40: p, 30: f, 20: g, 10: m, message: h, greyMessage: m };
+        function v(e) {
+          return function (t, r, { customLevels: a, customLevelNames: n } = {}) {
+            const i = e ? a || s : Object.assign({}, s, a),
+              l = e ? n || o : Object.assign({}, o, n);
+            let u = 'default';
+            u = Number.isInteger(+t) ? (Object.prototype.hasOwnProperty.call(i, t) ? t : u) : Object.prototype.hasOwnProperty.call(l, t.toLowerCase()) ? l[t.toLowerCase()] : u;
+            const c = i[u];
+            return Object.prototype.hasOwnProperty.call(r, u) ? r[u](c) : r.default(c);
+          };
+        }
+        e.exports = function (e = !1, t, r) {
+          return e && void 0 !== t
+            ? (function (e, t) {
+                const r = (function (e) {
+                    return e.reduce(
+                      function (e, [t, r]) {
+                        return (e[t] = 'function' == typeof l[r] ? l[r] : u), e;
+                      },
+                      { default: u, message: h, greyMessage: m }
+                    );
+                  })(e),
+                  s = t ? r : Object.assign({}, y, r),
+                  o = v(t),
+                  a = function (e, t) {
+                    return o(e, s, t);
+                  };
+                return (a.message = a.message || s.message), (a.greyMessage = a.greyMessage || s.greyMessage), a;
+              })(t, r)
+            : e
+            ? (function (e) {
+                const t = v(e),
+                  r = function (e, r) {
+                    return t(e, y, r);
+                  };
+                return (r.message = y.message), (r.greyMessage = y.greyMessage), r;
+              })(r)
+            : (function (e) {
+                const t = v(e),
+                  r = function (e, r) {
+                    return t(e, n, r);
+                  };
+                return (r.message = n.message), (r.greyMessage = n.greyMessage), r;
+              })(r);
+        };
+      },
+      7318: (e) => {
+        e.exports = {
+          DATE_FORMAT: 'yyyy-mm-dd HH:MM:ss.l o',
+          DATE_FORMAT_SIMPLE: 'HH:MM:ss.l',
+          ERROR_LIKE_KEYS: ['err', 'error'],
+          MESSAGE_KEY: 'msg',
+          LEVEL_KEY: 'level',
+          LEVEL_LABEL: 'levelLabel',
+          TIMESTAMP_KEY: 'time',
+          LEVELS: { default: 'USERLVL', 60: 'FATAL', 50: 'ERROR', 40: 'WARN', 30: 'INFO', 20: 'DEBUG', 10: 'TRACE' },
+          LEVEL_NAMES: { fatal: 60, error: 50, warn: 40, info: 30, debug: 20, trace: 10 },
+          LOGGER_KEYS: ['pid', 'hostname', 'name', 'level', 'time', 'timestamp', 'caller'],
+        };
+      },
+      385: (e, t, r) => {
+        const { createCopier: s } = r(4563),
+          o = r(4612),
+          a = r(5246),
+          n = r(5376),
+          { isMainThread: i } = r(1267),
+          l = r(903)(),
+          { DATE_FORMAT: u, ERROR_LIKE_KEYS: c, MESSAGE_KEY: d, LEVEL_KEY: p, LEVEL_LABEL: f, TIMESTAMP_KEY: g, LOGGER_KEYS: m, LEVELS: h, DATE_FORMAT_SIMPLE: y } = r(7318),
+          v = s({});
+        function _(e, t = !1) {
+          if (!1 === t) return e;
+          const r = b(e);
+          if (!P(r)) return e;
+          if (!0 === t) return o(r, y);
+          const s = t.toUpperCase();
+          if ('SYS:STANDARD' === s) return o(r, u);
+          const a = s.substr(0, 4);
+          return o(r, 'SYS:' === a || 'UTC:' === a ? ('UTC:' === a ? t : t.slice(4)) : `UTC:${t}`);
+        }
+        function b(e) {
+          let t = new Date(e);
+          return P(t) || (t = new Date(+e)), t;
+        }
+        function P(e) {
+          return e instanceof Date && !Number.isNaN(e.getTime());
+        }
+        function L(e) {
+          return '[object Object]' === Object.prototype.toString.apply(e);
+        }
+        function E({ input: e, ident: t = '    ', eol: r = '\n' }) {
+          const s = e.split(/\r?\n/);
+          for (let e = 1; e < s.length; e += 1) s[e] = t + s[e];
+          return s.join(r);
+        }
+        function S({
+          input: e,
+          ident: t = '    ',
+          eol: r = '\n',
+          skipKeys: s = [],
+          customPrettifiers: o = {},
+          errorLikeKeys: a = c,
+          excludeLoggerKeys: i = !0,
+          singleLine: u = !1,
+          colorizer: d = l,
+        }) {
+          const p = [].concat(s);
+          !0 === i && Array.prototype.push.apply(p, m);
+          let f = '';
+          const { plain: g, errors: h } = Object.entries(e).reduce(
+            ({ plain: t, errors: r }, [s, n]) => {
+              if (!1 === p.includes(s)) {
+                const i = 'function' == typeof o[s] ? o[s](n, s, e) : n;
+                a.includes(s) ? (r[s] = i) : (t[s] = i);
+              }
+              return { plain: t, errors: r };
+            },
+            { plain: {}, errors: {} }
+          );
+          return (
+            u
+              ? (Object.keys(g).length > 0 && (f += d.greyMessage(n(g))), (f += r), (f = f.replace(/\\\\/gi, '\\')))
+              : Object.entries(g).forEach(([e, s]) => {
+                  let a = 'function' == typeof o[e] ? s : n(s, null, 2);
+                  if (void 0 === a) return;
+                  a = a.replace(/\\\\/gi, '\\');
+                  const i = E({ input: a, ident: t, eol: r });
+                  f += `${t}${e}:${i.startsWith(r) ? '' : ' '}${i}${r}`;
+                }),
+            Object.entries(h).forEach(([e, s]) => {
+              const a = 'function' == typeof o[e] ? s : n(s, null, 2);
+              void 0 !== a && (f += M({ keyName: e, lines: a, eol: r, ident: t }));
+            }),
+            f
+          );
+        }
+        function M({ keyName: e, lines: t, eol: r, ident: s }) {
+          let o = '';
+          const a = `${s}${e}: ${E({ input: t, ident: s, eol: r })}${r}`.split(r);
+          for (let e = 0; e < a.length; e += 1) {
+            0 !== e && (o += r);
+            const t = a[e];
+            if (/^\s*"stack"/.test(t)) {
+              const e = /^(\s*"stack":)\s*(".*"),?$/.exec(t);
+              if (e && 3 === e.length) {
+                const s = /^\s*/.exec(t)[0].length + 4,
+                  a = ' '.repeat(s),
+                  n = e[2];
+                o += e[1] + r + a + JSON.parse(n).replace(/\n/g, r + a);
+              } else o += t;
+            } else o += t;
+          }
+          return o;
+        }
+        function w(e) {
+          const t = [];
+          let r = !1,
+            s = '';
+          for (let o = 0; o < e.length; o++) {
+            const a = e.charAt(o);
+            '\\' !== a ? (r ? ((r = !1), (s += a)) : '.' !== a ? (s += a) : (t.push(s), (s = ''))) : (r = !0);
+          }
+          return s.length && t.push(s), t;
+        }
+        function j(e, t) {
+          const r = Array.isArray(t) ? t : w(t);
+          for (const t of r) {
+            if (!Object.prototype.hasOwnProperty.call(e, t)) return;
+            e = e[t];
+          }
+          return e;
+        }
+        function O(e, t) {
+          const r = w(t),
+            s = r.pop();
+          null !== (e = j(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, s) && delete e[s];
+        }
+        function $() {}
+        function x(e, t) {
+          e.destroyed ||
+            ('beforeExit' === t
+              ? (e.flush(),
+                e.on('drain', function () {
+                  e.end();
+                }))
+              : e.flushSync());
+        }
+        (e.exports = {
+          isObject: L,
+          prettifyErrorLog: function ({ log: e, messageKey: t = d, ident: r = '    ', eol: s = '\n', errorLikeKeys: o = c, errorProperties: a = [] }) {
+            let n = `${r}${E({ input: e.stack, ident: r, eol: s })}${s}`;
+            if (a.length > 0) {
+              const i = m.concat(t, 'type', 'stack');
+              let l;
+              l = '*' === a[0] ? Object.keys(e).filter((e) => !1 === i.includes(e)) : a.filter((e) => !1 === i.includes(e));
+              for (let t = 0; t < l.length; t += 1) {
+                const a = l[t];
+                a in e != 0 &&
+                  (n = L(e[a]) ? `${n}${r}${a}: {${s}${S({ input: e[a], errorLikeKeys: o, excludeLoggerKeys: !1, eol: s, ident: r + r })}${r}}${s}` : `${n}${r}${a}: ${e[a]}${s}`);
+              }
+            }
+            return n;
+          },
+          prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: r = p, prettifier: s, customLevels: o, customLevelNames: a }) {
+            const n = j(e, r);
+            return void 0 === n ? void 0 : s ? s(n) : t(n, { customLevels: o, customLevelNames: a });
+          },
+          prettifyMessage: function ({
+            log: e,
+            messageFormat: t,
+            messageKey: r = d,
+            colorizer: s = l,
+            levelLabel: o = f,
+            levelKey: a = p,
+            customLevels: n,
+            useOnlyCustomProps: i,
+          }) {
+            if (t && 'string' == typeof t) {
+              const r = String(t).replace(/{([^{}]+)}/g, function (t, r) {
+                let s;
+                return r === o && void 0 !== (s = j(e, a)) ? ((i ? void 0 === n : void 0 === n[s]) ? h[s] : n[s]) : j(e, r) || '';
+              });
+              return s.message(r);
+            }
+            if (t && 'function' == typeof t) {
+              const a = t(e, r, o);
+              return s.message(a);
+            }
+            return r in e == 0 || 'string' != typeof e[r] ? void 0 : s.message(e[r]);
+          },
+          prettifyMetadata: function ({ log: e, prettifiers: t = {} }) {
+            let r = '';
+            if (e.name || e.pid || e.hostname) {
+              if (((r += '('), e.name && (r += t.name ? t.name(e.name) : e.name), e.pid)) {
+                const s = t.pid ? t.pid(e.pid) : e.pid;
+                e.name && e.pid ? (r += '/' + s) : (r += s);
+              }
+              e.hostname && (r += `${'(' === r ? 'on' : ' on'} ${t.hostname ? t.hostname(e.hostname) : e.hostname}`), (r += ')');
+            }
+            return e.caller && (r += `${'' === r ? '' : ' '}<${t.caller ? t.caller(e.caller) : e.caller}>`), '' === r ? void 0 : r;
+          },
+          prettifyObject: S,
+          prettifyTime: function ({ log: e, timestampKey: t = g, translateFormat: r, prettifier: s }) {
+            let o = null;
+            if ((t in e ? (o = e[t]) : 'timestamp' in e && (o = e.timestamp), null === o)) return;
+            const a = r ? _(o, r) : o;
+            return s ? s(a) : `[${a}]`;
+          },
+          buildSafeSonicBoom: function (e) {
+            const t = new a(e);
+            return (
+              t.on('error', function e(r) {
+                if ('EPIPE' === r.code) return (t.write = $), (t.end = $), (t.flushSync = $), void (t.destroy = $);
+                t.removeListener('error', e);
+              }),
+              !e.sync &&
+                i &&
+                (function (e) {
+                  if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
+                    const t = r(2067);
+                    t.register(e, x),
+                      e.on('close', function () {
+                        t.unregister(e);
+                      });
+                  }
+                })(t),
+              t
+            );
+          },
+          filterLog: function ({ log: e, ignoreKeys: t, includeKeys: r }) {
+            const s = v(e);
+            if (r) {
+              const e = {};
+              return (
+                r.forEach((t) => {
+                  e[t] = s[t];
+                }),
+                e
+              );
+            }
+            return (
+              t.forEach((e) => {
+                O(s, e);
+              }),
+              s
+            );
+          },
+          handleCustomlevelsOpts: function (e) {
+            return e
+              ? 'string' == typeof e
+                ? e.split(',').reduce(
+                    (e, t, r) => {
+                      const [s, o = r] = t.split(':');
+                      return (e[o] = s.toUpperCase()), e;
+                    },
+                    { default: 'USERLVL' }
+                  )
+                : '[object Object]' === Object.prototype.toString.call(e)
+                ? Object.keys(e).reduce((t, r, s) => ((t[e[r]] = r.toUpperCase()), t), { default: 'USERLVL' })
+                : {}
+              : {};
+          },
+          handleCustomlevelNamesOpts: function (e) {
+            return e
+              ? 'string' == typeof e
+                ? e.split(',').reduce((e, t, r) => {
+                    const [s, o = r] = t.split(':');
+                    return (e[s.toLowerCase()] = o), e;
+                  }, {})
+                : '[object Object]' === Object.prototype.toString.call(e)
+                ? Object.keys(e).reduce((t, r, s) => ((t[r.toLowerCase()] = e[r]), t), {})
+                : {}
+              : {};
+          },
+        }),
+          (e.exports.internals = {
+            formatTime: _,
+            joinLinesWithIndentation: E,
+            prettifyError: M,
+            getPropertyValue: j,
+            deleteLogProperty: O,
+            splitPropertyKey: w,
+            createDate: b,
+            isValidDate: P,
+          });
+      },
+      4147: (e) => {
+        e.exports = JSON.parse(
+          '{"name":"ragate-cli","version":"0.1.0","description":"Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.","engines":{"node":">=18.x"},"scripts":{"test":"echo \'Sorry, test code is in preparation.\\n\'","build:dev":"ENV=development webpack","build:prd":"ENV=production webpack","lint":"eslint . --fix","format":"prettier . --write","prepare":"husky install"},"eslintIgnore":["!/.github",".serverless","bin","tmp","webpack.config.js"],"main":"./lib/app.ts","bin":{"ragate":"./bin/app.js"},"repository":{"type":"git","url":"git+https://github.com/ragate-inc/ragate-cli.git"},"lint-staged":{"*.{ts,js}":["eslint"],"*.{css,html,js,json,md,yaml,yml,ts,js}":["prettier . --write"]},"keywords":["aws","serverless","ragate","cli","amplify","serverless","lambda","amazon"],"author":"Ragate inc.","license":"MIT","bugs":{"url":"https://github.com/ragate-inc/ragate-cli/issues"},"homepage":"https://github.com/ragate-inc/ragate-cli#readme","devDependencies":{"@tsconfig/node-lts":"^18.12.1","@types/figlet":"^1.5.6","@types/inquirer":"^9.0.3","@types/inquirer-autocomplete-prompt":"^3.0.0","@types/lodash":"^4.14.194","@types/node":"^18.16.3","@types/webpack":"^5.28.1","@types/webpack-node-externals":"^3.0.0","@types/yargs":"^17.0.24","@typescript-eslint/eslint-plugin":"^5.59.2","@typescript-eslint/parser":"^5.59.2","eslint":"^8.39.0","eslint-config-prettier":"^8.8.0","eslint-config-standard-with-typescript":"^34.0.1","husky":"^6.0.0","lint-staged":"^13.2.2","prettier":"2.8.8","ts-loader":"^9.4.2","ts-node":"^10.9.1","tsconfig-paths-webpack-plugin":"^4.0.1","typescript":"^5.0.4","webpack":"^5.81.0","webpack-cli":"^5.0.2","webpack-node-externals":"^3.0.0"},"dependencies":{"@types/js-yaml":"^4.0.5","figlet":"^1.6.0","inquirer":"^8.0.0","inquirer-autocomplete-prompt":"^2.0.0","js-yaml":"^4.1.0","lodash":"^4.17.21","parent-require":"^1.0.0","pino":"^8.12.1","pino-pretty":"^10.0.0","yargonaut":"^1.1.4","yargs":"^17.1.1-candidate.0"}}'
         );
-
-        /***/
       },
-
-    /***/ './lib/config.ts':
-      /*!***********************!*\
-  !*** ./lib/config.ts ***!
-  \***********************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst package_json_1 = __importDefault(__webpack_require__(/*! package.json */ "./package.json"));\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ "lodash"));\n// Additional templates selectable via CLI\n// Consider migrating to a separate file if template types become bloated\nconst templates = [\n    {\n        category: \'Node.js\',\n        name: \'Node.js - aws-node-appsync\',\n        value: \'aws-node-appsync\',\n    },\n];\nconst config = {\n    // current npm package version in package.json\n    npmVersion: package_json_1.default.version,\n    // repository of template\n    repositoyUrl: \'https://github.com/ragate-inc/serverless-starter\',\n    // templates at repository\n    templates: lodash_1.default.chain(templates)\n        .sortBy(\'category\')\n        .map((item) => ({\n        name: `${item.category} - ${item.name}`,\n        value: item.value,\n    }))\n        .value(),\n};\nexports["default"] = config;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/config.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/entry/builder.ts':
-      /*!******************************!*\
-  !*** ./lib/entry/builder.ts ***!
-  \******************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          "\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ \"./lib/utils/logger.ts\"));\nconst yargs_1 = __importDefault(__webpack_require__(/*! yargs/yargs */ \"yargs/yargs\"));\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ \"./lib/utils/yargonaut.ts\");\nconst config_1 = __importDefault(__webpack_require__(/*! config */ \"./lib/config.ts\"));\nconst getLocale_1 = __webpack_require__(/*! entry/utils/getLocale */ \"./lib/entry/utils/getLocale.ts\");\nconst index_1 = __importDefault(__webpack_require__(/*! features/create/index */ \"./lib/features/create/index.ts\"));\nconst index_2 = __importDefault(__webpack_require__(/*! features/add/index */ \"./lib/features/add/index.ts\"));\nconst index_3 = __webpack_require__(/*! types/index */ \"./lib/types/index.ts\");\n/**\n * yargs typescript : https://github.com/yargs/yargs/blob/main/docs/typescript.md\n * yargs api reference : https://yargs.js.org/docs/\n * Inquirer : https://github.com/SBoudrias/Inquirer.js/tree/master\n */\nclass default_1 {\n    constructor() {\n        (0, yargonaut_1.init)();\n        this.chalk = yargonaut_1.chalk;\n        const argv = (0, yargs_1.default)(process.argv.slice(2))\n            .options({\n            lang: {\n                default: this.langRef.default,\n                type: this.langRef.type,\n            },\n            verbose: {\n                default: this.verboseRef.default,\n                type: this.verboseRef.type,\n            },\n            region: {\n                default: this.regionRef.default,\n                type: this.regionRef.type,\n            },\n        })\n            .help(false)\n            .version(false)\n            .parseSync();\n        this.lang = argv.lang;\n        this.verbose = argv.verbose;\n        this.region = argv.region;\n        this.locale = (0, getLocale_1.getLocaleLang)(argv.lang);\n        this.logger = logger_1.default.getLogger(this.verbose ? 'debug' : 'info');\n        this.npmVersion = config_1.default.npmVersion;\n    }\n    chalk;\n    logger;\n    locale;\n    lang;\n    langRef = {\n        default: process.env.LANG ?? 'en',\n        type: 'string',\n    };\n    verbose;\n    verboseRef = {\n        default: false,\n        type: 'string',\n    };\n    npmVersion;\n    get version() {\n        return `ragate-cli v${this.npmVersion}`;\n    }\n    region;\n    regionRef = {\n        default: 'ap-northeast-1',\n        type: 'string',\n    };\n    handleError(err) {\n        const res = [];\n        if (err) {\n            if (err.stack)\n                res.push(err.stack);\n            else\n                res.push(err.message);\n        }\n        console.error('\\n', yargonaut_1.chalk.red(res.join('\\n\\n')));\n        process.exit(1);\n    }\n    cli() {\n        const { version, chalk, locale, lang } = this;\n        return (0, yargs_1.default)(process.argv.slice(2))\n            .scriptName('')\n            .options({\n            verbose: {\n                describe: chalk.grey(locale.options.describe.verbose),\n                default: this.verboseRef.default,\n                type: this.verboseRef.type,\n            },\n            lang: {\n                describe: chalk.grey(locale.options.describe.lang),\n                default: this.langRef.default,\n                type: this.langRef.type,\n            },\n            region: {\n                alias: 'r',\n                describe: chalk.grey(locale.options.describe.region),\n                default: this.regionRef.default,\n                type: this.regionRef.type,\n                choices: index_3.awsRegions,\n            },\n        })\n            .usage(version)\n            .help('help', chalk.grey(locale.help))\n            .alias('h', 'help')\n            .version('version', chalk.grey(locale.version), version)\n            .alias('v', 'version')\n            .check((argv) => {\n            if (argv._.length === 0)\n                throw new Error(this.locale.unProcessed.required);\n            return true;\n        })\n            .command('create', chalk.grey(locale.command.description.create), (_yargs) => {\n            const args = { lang: this.lang, region: this.region };\n            return new index_1.default.builder(args).build(_yargs);\n        }, (argv) => new index_1.default.handler(argv).run())\n            .command('add', chalk.grey(locale.command.description.add), (_yargs) => {\n            const args = { lang: this.lang, region: this.region };\n            return new index_2.default.builder(args).build(_yargs);\n        })\n            .command('*', '', () => ({}), () => {\n            throw new Error(this.locale.unProcessed.notFound);\n        })\n            .wrap(Math.max((0, yargs_1.default)().terminalWidth() - 5, 60))\n            .locale(lang)\n            .fail((msg, err) => this.handleError(err));\n    }\n    async run() {\n        try {\n            await this.cli().parseAsync();\n        }\n        catch (e) {\n            this.handleError(e);\n        }\n    }\n}\nexports[\"default\"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/entry/builder.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/entry/locale/en.ts':
-      /*!********************************!*\
-  !*** ./lib/entry/locale/en.ts ***!
-  \********************************/
-      /***/ (__unused_webpack_module, exports) => {
-        eval(
-          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    help: 'Show help',\n    version: 'Show version',\n    yourInput: 'your input',\n    command: {\n        description: {\n            create: 'Create a new project',\n            add: 'Add aws resouces',\n        },\n    },\n    options: {\n        describe: {\n            verbose: 'Show verbose logs',\n            region: 'Aws region',\n            lang: 'Display language',\n        },\n    },\n    unProcessed: {\n        required: 'please input a command. Run \"ragate help\" for a list of all available commands.',\n        notFound: 'The command entered does not exist. Run \"ragate help\" for a list of all available commands.',\n    },\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/entry/locale/en.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/entry/locale/ja.ts':
-      /*!********************************!*\
-  !*** ./lib/entry/locale/ja.ts ***!
-  \********************************/
-      /***/ (__unused_webpack_module, exports) => {
-        eval(
-          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    help: 'ヘルプを表示',\n    version: 'バージョンを表示',\n    yourInput: '入力されたコマンド',\n    command: {\n        description: {\n            create: 'プロジェクトを作成',\n            add: 'AWSリソースの追加',\n        },\n    },\n    options: {\n        describe: {\n            verbose: '詳細なログを出力',\n            region: 'AWSリージョン',\n            lang: '表示言語',\n        },\n    },\n    unProcessed: {\n        required: '指定のコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',\n        notFound: '入力されたコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',\n    },\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/entry/locale/ja.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/entry/utils/getLocale.ts':
-      /*!**************************************!*\
-  !*** ./lib/entry/utils/getLocale.ts ***!
-  \**************************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.getLocaleLang = void 0;\nconst ja_1 = __importDefault(__webpack_require__(/*! entry/locale/ja */ "./lib/entry/locale/ja.ts"));\nconst en_1 = __importDefault(__webpack_require__(/*! entry/locale/en */ "./lib/entry/locale/en.ts"));\nconst getLocaleLang = (locale) => {\n    switch (locale) {\n        case \'ja\':\n            return ja_1.default;\n        case \'en\':\n            return en_1.default;\n        default:\n            return en_1.default;\n    }\n};\nexports.getLocaleLang = getLocaleLang;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/entry/utils/getLocale.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/exceptions/index.ts':
-      /*!*********************************!*\
-  !*** ./lib/exceptions/index.ts ***!
-  \*********************************/
-      /***/ (__unused_webpack_module, exports) => {
-        eval(
-          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nexports.DuplicatedPropertyError = exports.CLIError = exports.EnvironmentError = exports.BaseClass = void 0;\nclass BaseClass extends Error {\n    constructor(message) {\n        super(message);\n        this.name = new.target.name;\n        if (Error.captureStackTrace)\n            Error.captureStackTrace(this, this.constructor);\n        Object.setPrototypeOf(this, new.target.prototype);\n    }\n}\nexports.BaseClass = BaseClass;\nclass EnvironmentError extends BaseClass {\n    constructor(message) {\n        super(message);\n        this.name = 'EnvironmentError';\n    }\n}\nexports.EnvironmentError = EnvironmentError;\nclass CLIError extends BaseClass {\n    constructor(message) {\n        super(message);\n        this.name = 'CLIError';\n    }\n}\nexports.CLIError = CLIError;\nclass DuplicatedPropertyError extends BaseClass {\n    constructor(message) {\n        super(message);\n        this.name = 'DuplicatedPropertyError';\n    }\n}\nexports.DuplicatedPropertyError = DuplicatedPropertyError;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/exceptions/index.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/builder.ts':
-      /*!*************************************!*\
-  !*** ./lib/features/add/builder.ts ***!
-  \*************************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ "./lib/utils/logger.ts"));\nconst sns_1 = __importDefault(__webpack_require__(/*! features/add/features/sns */ "./lib/features/add/features/sns/index.ts"));\nconst sqs_1 = __importDefault(__webpack_require__(/*! features/add/features/sqs */ "./lib/features/add/features/sqs/index.ts"));\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ "./lib/utils/yargonaut.ts");\nconst getLocale_1 = __webpack_require__(/*! features/add/utils/getLocale */ "./lib/features/add/utils/getLocale.ts");\nclass default_1 extends index_1.FeatureBuilderAbstract {\n    constructor(args) {\n        super(args);\n    }\n    build(yargs) {\n        const lang = this.args.lang;\n        const locale = (0, getLocale_1.getLocaleLang)(lang);\n        const logger = logger_1.default.getLogger();\n        return yargs\n            .version(false)\n            .usage(\'Usage: add <command> <options>\')\n            .command(\'sns\', yargonaut_1.chalk.grey(locale.command.description.sns), (_yargs) => new sns_1.default.builder(this.args).build(_yargs), (argv) => new sns_1.default.handler(argv).run())\n            .command(\'sqs\', yargonaut_1.chalk.grey(locale.command.description.sns), (_yargs) => new sqs_1.default.builder(this.args).build(_yargs), (argv) => new sqs_1.default.handler(argv).run())\n            .command(\'*\', yargonaut_1.chalk.grey(\'<command> <options>\'), () => ({}), () => {\n            logger.error(yargonaut_1.chalk.red(locale.unProcessed));\n        });\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/builder.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/features/sns/builder.ts':
-      /*!**************************************************!*\
-  !*** ./lib/features/add/features/sns/builder.ts ***!
-  \**************************************************/
-      /***/ (__unused_webpack_module, exports, __webpack_require__) => {
-        eval(
-          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nclass default_1 extends index_1.FeatureBuilderAbstract {\n    constructor(args) {\n        super(args);\n    }\n    build(_yargs) {\n        return _yargs.version(false).usage(\'Usage: $0 sns \');\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sns/builder.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/features/sns/handler.ts':
-      /*!**************************************************!*\
-  !*** ./lib/features/add/features/sns/handler.ts ***!
-  \**************************************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          "\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ \"./lib/utils/logger.ts\"));\nconst index_1 = __webpack_require__(/*! types/index */ \"./lib/types/index.ts\");\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\nconst cli_1 = __webpack_require__(/*! utils/cli */ \"./lib/utils/cli.ts\");\nconst yaml_1 = __webpack_require__(/*! utils/yaml */ \"./lib/utils/yaml.ts\");\nconst getLocale_1 = __webpack_require__(/*! features/add/features/sns/utils/getLocale */ \"./lib/features/add/features/sns/utils/getLocale.ts\");\nconst index_2 = __webpack_require__(/*! exceptions/index */ \"./lib/exceptions/index.ts\");\nconst inquirer_1 = __importDefault(__webpack_require__(/*! inquirer */ \"inquirer\"));\nconst validator_1 = __importDefault(__webpack_require__(/*! utils/validator */ \"./lib/utils/validator.ts\"));\nconst transformer_1 = __importDefault(__webpack_require__(/*! utils/transformer */ \"./lib/utils/transformer.ts\"));\nclass default_1 extends index_1.FeatureHandlerAbstract {\n    constructor(argv) {\n        super(argv);\n    }\n    get defaultResourcePath() {\n        return `serverless/${this.argv.region}/resources/sns.yml`;\n    }\n    get defaultServerlessConfigPath() {\n        return `serverless/${this.argv.region}/serverless.yml`;\n    }\n    async run() {\n        const logger = logger_1.default.getLogger();\n        const locale = (0, getLocale_1.getLocaleLang)(this.lang);\n        const res = (await inquirer_1.default\n            .prompt([\n            {\n                type: 'input',\n                name: 'resourceName',\n                message: 'input a sns resource name]',\n                validate: (value) => {\n                    if (lodash_1.default.isEmpty(value))\n                        return locale.error.reqiredResourceName;\n                    return validator_1.default.resourceName(value, this.lang);\n                },\n            },\n            {\n                type: 'checkbox',\n                name: 'subscriptions',\n                message: 'select a sns subscriptions]',\n                choices: ['email', 'lambda'],\n                validate: (value) => {\n                    if (lodash_1.default.isEmpty(value))\n                        return locale.error.reqiredSubscriptions;\n                    return true;\n                },\n            },\n            {\n                type: 'input',\n                name: 'filePath',\n                message: 'input a cloudformation file path]',\n                default: () => this.defaultResourcePath,\n                validate: (value) => validator_1.default.filePath(value, this.lang),\n                transformer: (input) => transformer_1.default.filePath(input),\n            },\n            {\n                type: 'input',\n                name: 'serverlessConfigPath',\n                message: 'input a serverless config file path]',\n                default: () => this.defaultServerlessConfigPath,\n                validate: (value) => validator_1.default.serverlessConfigPath(value, this.lang),\n                transformer: (input) => transformer_1.default.serverlessConfigPath(input),\n            },\n        ])\n            .then((answers) => {\n            return answers;\n        }));\n        logger.debug(`input values : ${JSON.stringify(res)}}`);\n        const { resourceName, filePath, subscriptions, serverlessConfigPath } = res;\n        const path = `${cli_1.processCurrent}/${filePath}`;\n        const subscription = subscriptions.map((sub) => ({\n            Endpoint: sub === 'email' ? 'Your email address' : 'Your lambda Arn',\n            Protocol: sub,\n        }));\n        try {\n            const doc = (0, yaml_1.readYaml)(path) ?? {};\n            if (lodash_1.default.hasIn(doc, `Resources.${resourceName}`)) {\n                logger.error(`${locale.error.alreadyExistResource}`);\n                logger.error(`ResourceName : ${resourceName}`);\n                logger.error(doc);\n                throw new index_2.DuplicatedPropertyError(locale.error.alreadyExistResource);\n            }\n            const yamlText = (0, yaml_1.writeYaml)(path, {\n                ...doc,\n                Resources: {\n                    ...doc.Resources,\n                    [resourceName]: {\n                        Type: 'AWS::SNS::Topic',\n                        Properties: {\n                            TopicName: resourceName,\n                            Subscription: subscription,\n                        },\n                    },\n                },\n            });\n            logger.info(path);\n            logger.info(`${locale.overrightFile} : ${path}`);\n            logger.info(yamlText);\n        }\n        catch (e) {\n            if (e.name === 'DuplicatedPropertyError')\n                throw e;\n            const yamlText = (0, yaml_1.writeYaml)(path, {\n                Resources: {\n                    [resourceName]: {\n                        Type: 'AWS::SNS::Topic',\n                        Properties: {\n                            TopicName: resourceName,\n                            Subscription: subscription,\n                        },\n                    },\n                },\n            });\n            logger.info(path);\n            logger.info(`${locale.outputFile} : ${path}`);\n            logger.info(yamlText);\n        }\n        (0, yaml_1.writeServerlessConfig)({ serverlessConfigPath, resourceFilePath: filePath });\n    }\n}\nexports[\"default\"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sns/handler.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/features/sns/index.ts':
-      /*!************************************************!*\
-  !*** ./lib/features/add/features/sns/index.ts ***!
-  \************************************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! features/add/features/sns/builder */ "./lib/features/add/features/sns/builder.ts"));\nconst handler_1 = __importDefault(__webpack_require__(/*! features/add/features/sns/handler */ "./lib/features/add/features/sns/handler.ts"));\nexports["default"] = {\n    builder: builder_1.default,\n    handler: handler_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sns/index.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/features/sns/locale/en.ts':
-      /*!****************************************************!*\
-  !*** ./lib/features/add/features/sns/locale/en.ts ***!
-  \****************************************************/
-      /***/ (__unused_webpack_module, exports) => {
-        eval(
-          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    error: {\n        reqiredResourceName: 'resource name is required',\n        reqiredSubscriptions: 'required select a subscriptions',\n        mustByYamlFilePath: 'path is not yaml file',\n        alreadyExistResource: 'resource name is already exists',\n    },\n    overrightFile: 'overright yaml file',\n    outputFile: 'output yaml file',\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sns/locale/en.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/features/sns/locale/ja.ts':
-      /*!****************************************************!*\
-  !*** ./lib/features/add/features/sns/locale/ja.ts ***!
-  \****************************************************/
-      /***/ (__unused_webpack_module, exports) => {
-        eval(
-          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    error: {\n        reqiredResourceName: 'リソース名を指定して下さい',\n        reqiredSubscriptions: 'サブスクリプションを選択して下さい',\n        mustByYamlFilePath: 'Yamlファイルのパスを指定して下さい',\n        alreadyExistResource: '指定のリソース名は既に存在します',\n    },\n    overrightFile: 'Yamlファイルを上書き',\n    outputFile: 'Yamlファイルを出力',\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sns/locale/ja.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/features/sns/utils/getLocale.ts':
-      /*!**********************************************************!*\
-  !*** ./lib/features/add/features/sns/utils/getLocale.ts ***!
-  \**********************************************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.getLocaleLang = void 0;\nconst ja_1 = __importDefault(__webpack_require__(/*! features/add/features/sns/locale/ja */ "./lib/features/add/features/sns/locale/ja.ts"));\nconst en_1 = __importDefault(__webpack_require__(/*! features/add/features/sns/locale/en */ "./lib/features/add/features/sns/locale/en.ts"));\nconst getLocaleLang = (locale) => {\n    switch (locale) {\n        case \'ja\':\n            return ja_1.default;\n        case \'en\':\n            return en_1.default;\n        default:\n            return en_1.default;\n    }\n};\nexports.getLocaleLang = getLocaleLang;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sns/utils/getLocale.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/features/sqs/builder.ts':
-      /*!**************************************************!*\
-  !*** ./lib/features/add/features/sqs/builder.ts ***!
-  \**************************************************/
-      /***/ (__unused_webpack_module, exports, __webpack_require__) => {
-        eval(
-          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nclass default_1 extends index_1.FeatureBuilderAbstract {\n    constructor(args) {\n        super(args);\n    }\n    build(_yargs) {\n        return _yargs.version(false).usage(\'Usage: $0 sqs <options>\');\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sqs/builder.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/features/sqs/handler.ts':
-      /*!**************************************************!*\
-  !*** ./lib/features/add/features/sqs/handler.ts ***!
-  \**************************************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ "./lib/utils/logger.ts"));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nclass default_1 extends index_1.FeatureHandlerAbstract {\n    constructor(argv) {\n        super(argv);\n    }\n    async run() {\n        const logger = logger_1.default.getLogger();\n        logger.info(\'Coming soon\');\n        await new Promise((resolve) => setTimeout(resolve, 0));\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sqs/handler.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/features/sqs/index.ts':
-      /*!************************************************!*\
-  !*** ./lib/features/add/features/sqs/index.ts ***!
-  \************************************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! features/add/features/sqs/builder */ "./lib/features/add/features/sqs/builder.ts"));\nconst handler_1 = __importDefault(__webpack_require__(/*! features/add/features/sqs/handler */ "./lib/features/add/features/sqs/handler.ts"));\nexports["default"] = {\n    builder: builder_1.default,\n    handler: handler_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sqs/index.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/index.ts':
-      /*!***********************************!*\
-  !*** ./lib/features/add/index.ts ***!
-  \***********************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! features/add/builder */ "./lib/features/add/builder.ts"));\nexports["default"] = {\n    builder: builder_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/index.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/locale/en.ts':
-      /*!***************************************!*\
-  !*** ./lib/features/add/locale/en.ts ***!
-  \***************************************/
-      /***/ (__unused_webpack_module, exports) => {
-        eval(
-          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst locale = {\n    command: {\n        description: {\n            sns: \'add AWS SQS\',\n            sqs: \'add AWS SQS\',\n        },\n    },\n    unProcessed: \'The command entered does not exist. Run "ragate add help" for a list of all available commands.\',\n};\nexports["default"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/locale/en.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/locale/ja.ts':
-      /*!***************************************!*\
-  !*** ./lib/features/add/locale/ja.ts ***!
-  \***************************************/
-      /***/ (__unused_webpack_module, exports) => {
-        eval(
-          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    command: {\n        description: {\n            sns: 'AWS SQSを追加',\n            sqs: 'AWS SQSを追加',\n        },\n    },\n    unProcessed: '入力されたコマンドは存在しません。「ragate add help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/locale/ja.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/add/utils/getLocale.ts':
-      /*!*********************************************!*\
-  !*** ./lib/features/add/utils/getLocale.ts ***!
-  \*********************************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.getLocaleLang = void 0;\nconst ja_1 = __importDefault(__webpack_require__(/*! features/add/locale/ja */ "./lib/features/add/locale/ja.ts"));\nconst en_1 = __importDefault(__webpack_require__(/*! features/add/locale/en */ "./lib/features/add/locale/en.ts"));\nconst getLocaleLang = (locale) => {\n    switch (locale) {\n        case \'ja\':\n            return ja_1.default;\n        case \'en\':\n            return en_1.default;\n        default:\n            return en_1.default;\n    }\n};\nexports.getLocaleLang = getLocaleLang;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/utils/getLocale.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/create/builder.ts':
-      /*!****************************************!*\
-  !*** ./lib/features/create/builder.ts ***!
-  \****************************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ "./lib/utils/yargonaut.ts");\nconst index_2 = __importDefault(__webpack_require__(/*! features/create/index */ "./lib/features/create/index.ts"));\nclass default_1 extends index_1.FeatureBuilderAbstract {\n    constructor(args) {\n        super(args);\n    }\n    build(yargs) {\n        const lang = this.args.lang;\n        return yargs\n            .version(false)\n            .usage(\'Usage: create <options>\')\n            .command(\'*\', yargonaut_1.chalk.grey(\'<command> <options>\'), () => ({}), (argv) => {\n            if (argv._.length === 1)\n                return new index_2.default.handler(argv).run();\n            throw new Error(\'locale.error.unProcessed\');\n        });\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/create/builder.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/create/handler.ts':
-      /*!****************************************!*\
-  !*** ./lib/features/create/handler.ts ***!
-  \****************************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst inquirer_1 = __importDefault(__webpack_require__(/*! inquirer */ "inquirer"));\nconst config_1 = __importDefault(__webpack_require__(/*! config */ "./lib/config.ts"));\nconst getLocale_1 = __webpack_require__(/*! features/create/utils/getLocale */ "./lib/features/create/utils/getLocale.ts");\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ "lodash"));\nconst inquirer_autocomplete_prompt_1 = __importDefault(__webpack_require__(/*! inquirer-autocomplete-prompt */ "inquirer-autocomplete-prompt"));\nconst cli_1 = __webpack_require__(/*! utils/cli */ "./lib/utils/cli.ts");\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ "./lib/utils/logger.ts"));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nclass default_1 extends index_1.FeatureHandlerAbstract {\n    constructor(argv) {\n        super(argv);\n        inquirer_1.default.registerPrompt(\'autocomplete\', inquirer_autocomplete_prompt_1.default);\n    }\n    async run() {\n        const { argv } = this;\n        const logger = logger_1.default.getLogger();\n        logger.debug(\'create hander : \', argv);\n        const locale = (0, getLocale_1.getLocaleLang)(this.lang);\n        const res = (await inquirer_1.default\n            .prompt([\n            {\n                type: \'autocomplete\',\n                name: \'template\',\n                emptyText: locale.inquirer.template.autocomplete.emptyText,\n                message: locale.inquirer.template.choiceTemplate,\n                source: (answersSoFar, input) => (lodash_1.default.isEmpty(input) ? config_1.default.templates : config_1.default.templates.filter((item) => item.name.includes(input))),\n            },\n            {\n                type: \'input\',\n                name: \'projectName\',\n                message: \'input a project name\',\n                default: (answers) => answers.template,\n                validate: (value) => {\n                    if (lodash_1.default.isEmpty(value))\n                        return \'required input a project name\';\n                    return true;\n                },\n            },\n        ])\n            .then((answers) => {\n            return answers;\n        }));\n        logger.debug(`input values : ${JSON.stringify(res)}}`);\n        const { template, projectName } = res;\n        logger.info(`template : ${template}`);\n        logger.info(`projectName : ${projectName}`);\n        if ((0, cli_1.isExistsDirectory)(`${cli_1.processCurrent}/${projectName}`)) {\n            throw new Error(`${locale.error.alreadyExistsDirectory} : ${cli_1.processCurrent}/${projectName}`);\n        }\n        if ((0, cli_1.isExistsDirectory)(cli_1.tmpPath)) {\n            (0, cli_1.cleanUpTmpDirectory)();\n        }\n        (0, cli_1.gitClone)(config_1.default.repositoyUrl, cli_1.tmpPath);\n        (0, cli_1.copyDirectory)(`${cli_1.tmpPath}/${template}`, `${cli_1.processCurrent}/${projectName}`);\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/create/handler.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/create/index.ts':
-      /*!**************************************!*\
-  !*** ./lib/features/create/index.ts ***!
-  \**************************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! features/create/builder */ "./lib/features/create/builder.ts"));\nconst handler_1 = __importDefault(__webpack_require__(/*! features/create/handler */ "./lib/features/create/handler.ts"));\nexports["default"] = {\n    builder: builder_1.default,\n    handler: handler_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/create/index.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/create/locale/en.ts':
-      /*!******************************************!*\
-  !*** ./lib/features/create/locale/en.ts ***!
-  \******************************************/
-      /***/ (__unused_webpack_module, exports) => {
-        eval(
-          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    error: {\n        alreadyExistsDirectory: 'already exists directory',\n        unProcessed: 'The command entered does not exist. Run \"ragate create help\" for a list of all available commands.',\n    },\n    inquirer: {\n        template: {\n            choiceTemplate: 'Choose a project template',\n            autocomplete: {\n                emptyText: 'No result',\n            },\n        },\n    },\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/create/locale/en.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/create/locale/ja.ts':
-      /*!******************************************!*\
-  !*** ./lib/features/create/locale/ja.ts ***!
-  \******************************************/
-      /***/ (__unused_webpack_module, exports) => {
-        eval(
-          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    error: {\n        alreadyExistsDirectory: '既にディレクトリが存在します',\n        unProcessed: '入力されたコマンドは存在しません。「ragate create help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',\n    },\n    inquirer: {\n        template: {\n            choiceTemplate: 'プロジェクトの雛形を選択してください。',\n            autocomplete: {\n                emptyText: '該当するテンプレートが見つかりません',\n            },\n        },\n    },\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/create/locale/ja.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/features/create/utils/getLocale.ts':
-      /*!************************************************!*\
-  !*** ./lib/features/create/utils/getLocale.ts ***!
-  \************************************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.getLocaleLang = void 0;\nconst ja_1 = __importDefault(__webpack_require__(/*! features/create/locale/ja */ "./lib/features/create/locale/ja.ts"));\nconst en_1 = __importDefault(__webpack_require__(/*! features/create/locale/en */ "./lib/features/create/locale/en.ts"));\nconst getLocaleLang = (locale) => {\n    switch (locale) {\n        case \'ja\':\n            return ja_1.default;\n        case \'en\':\n            return en_1.default;\n        default:\n            return en_1.default;\n    }\n};\nexports.getLocaleLang = getLocaleLang;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/create/utils/getLocale.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/types/index.ts':
-      /*!****************************!*\
-  !*** ./lib/types/index.ts ***!
-  \****************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          "\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nexports.awsRegions = exports.FeatureBuilderAbstract = exports.FeatureHandlerAbstract = void 0;\nconst config_1 = __importDefault(__webpack_require__(/*! config */ \"./lib/config.ts\"));\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ \"./lib/utils/yargonaut.ts\");\nclass FeatureHandlerAbstract {\n    _argv;\n    _lang;\n    constructor(argv) {\n        this._argv = argv;\n        this._lang = argv.lang;\n    }\n    get argv() {\n        return this._argv;\n    }\n    get lang() {\n        return this._lang;\n    }\n}\nexports.FeatureHandlerAbstract = FeatureHandlerAbstract;\nclass FeatureBuilderAbstract {\n    _args;\n    _npmVersion;\n    _chalk;\n    constructor(args) {\n        this._chalk = yargonaut_1.chalk;\n        this._args = args;\n        this._npmVersion = config_1.default.npmVersion;\n    }\n    get args() {\n        return this._args;\n    }\n    get npmVersion() {\n        return this._npmVersion;\n    }\n    get chalk() {\n        return this._chalk;\n    }\n}\nexports.FeatureBuilderAbstract = FeatureBuilderAbstract;\nexports.awsRegions = [\n    'us-east-2',\n    'us-east-1',\n    'us-west-1',\n    'us-west-2',\n    'af-south-1',\n    'ap-east-1',\n    'ap-south-2',\n    'ap-southeast-3',\n    'ap-southeast-4',\n    'ap-south-1',\n    'ap-northeast-3',\n    'ap-northeast-2',\n    'ap-southeast-1',\n    'ap-southeast-2',\n    'ap-northeast-1',\n    'ca-central-1',\n    'eu-central-1',\n    'eu-west-1',\n    'eu-west-2',\n    'eu-south-1',\n    'eu-west-3',\n    'eu-south-2',\n    'eu-north-1',\n    'eu-central-2',\n    'me-south-1',\n    'me-central-1',\n    'sa-east-1',\n    'us-gov-east-1',\n    'us-gov-west-1',\n];\n\n\n//# sourceURL=webpack://ragate-cli/./lib/types/index.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/utils/cli.ts':
-      /*!**************************!*\
-  !*** ./lib/utils/cli.ts ***!
-  \**************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.isExistsDirectory = exports.cleanUpTmpDirectory = exports.copyDirectory = exports.gitClone = exports.tmpPath = exports.processCurrent = void 0;\nconst child_process_1 = __webpack_require__(/*! child_process */ "child_process");\nconst index_1 = __webpack_require__(/*! exceptions/index */ "./lib/exceptions/index.ts");\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ "./lib/utils/logger.ts"));\nconst path_1 = __importDefault(__webpack_require__(/*! path */ "path"));\nexports.processCurrent = path_1.default.resolve();\nconst execFilePath = path_1.default.dirname(process.argv[1]);\nexports.tmpPath = `${execFilePath}/../tmp`;\nfunction gitClone(repositoryUrl, destinationPath) {\n    const logger = logger_1.default.getLogger();\n    try {\n        logger.debug((0, child_process_1.execSync)(`git clone ${repositoryUrl} ${destinationPath}`).toString());\n    }\n    catch (error) {\n        const err = error;\n        throw new index_1.CLIError(err.message);\n    }\n}\nexports.gitClone = gitClone;\nfunction copyDirectory(from, to) {\n    const logger = logger_1.default.getLogger();\n    try {\n        logger.debug((0, child_process_1.execSync)(`cp -r ${from} ${to}`).toString());\n    }\n    catch (error) {\n        const err = error;\n        throw new index_1.CLIError(err.message);\n    }\n}\nexports.copyDirectory = copyDirectory;\nfunction cleanUpTmpDirectory() {\n    const logger = logger_1.default.getLogger();\n    try {\n        logger.debug((0, child_process_1.execSync)(`rm -rf ${exports.tmpPath}`).toString());\n        logger.debug((0, child_process_1.execSync)(`mkdir ${exports.tmpPath}`).toString());\n    }\n    catch (error) {\n        const err = error;\n        throw new index_1.CLIError(err.message);\n    }\n}\nexports.cleanUpTmpDirectory = cleanUpTmpDirectory;\nfunction isExistsDirectory(path) {\n    const logger = logger_1.default.getLogger();\n    try {\n        logger.debug((0, child_process_1.execSync)(`test -d ${path}`).toString());\n        return true;\n    }\n    catch (error) {\n        return false;\n    }\n}\nexports.isExistsDirectory = isExistsDirectory;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/cli.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/utils/logger.ts':
-      /*!*****************************!*\
-  !*** ./lib/utils/logger.ts ***!
-  \*****************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          "\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst pino_1 = __importDefault(__webpack_require__(/*! pino */ \"pino\"));\nconst pino_pretty_1 = __importDefault(__webpack_require__(/*! pino-pretty */ \"./node_modules/pino-pretty/index.js\"));\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ \"./lib/utils/yargonaut.ts\");\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\nconst stream = (0, pino_pretty_1.default)({\n    colorize: true,\n    messageFormat: (log, messageKey) => {\n        const adjust = (msg) => {\n            if (log.level === 30)\n                return yargonaut_1.chalk.white(msg);\n            if (log.level < 30)\n                return yargonaut_1.chalk.grey(msg);\n            if (log.level === 40)\n                return yargonaut_1.chalk.yellow(msg);\n            if (log.level >= 50)\n                return yargonaut_1.chalk.red(msg);\n            return msg;\n        };\n        const message = log[messageKey];\n        if (lodash_1.default.isEmpty(message)) {\n            return lodash_1.default.chain(log)\n                .omit(['level', 'time', 'pid', 'hostname'])\n                .thru((v) => JSON.stringify(v, null, 2))\n                .thru((v) => adjust(v))\n                .value();\n        }\n        if (log.requestId)\n            return `[${log.requestId}] ${adjust(message)}`;\n        return adjust(message);\n    },\n    timestampKey: 'time',\n    ignore: 'pid,hostname',\n    include: 'level,time',\n    singleLine: false,\n    translateTime: 'yyyy-mm-dd HH:MM:ss',\n    sync: true, // by default we write asynchronously\n});\nclass default_1 {\n    constructor() {\n        throw new Error('singleton cannot be instantiated');\n    }\n    static logger;\n    static getLogger(logLevel = 'info') {\n        if (logLevel) {\n            this.logger = (0, pino_1.default)({\n                level: logLevel,\n            }, stream);\n            return this.logger;\n        }\n        if (this.logger) {\n            return this.logger;\n        }\n        this.logger = (0, pino_1.default)({\n            level: logLevel,\n        }, stream);\n        return this.logger;\n    }\n}\nexports[\"default\"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/logger.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/utils/transformer.ts':
-      /*!**********************************!*\
-  !*** ./lib/utils/transformer.ts ***!
-  \**********************************/
-      /***/ (__unused_webpack_module, exports) => {
-        eval(
-          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nclass default_1 {\n    static filePath = (str) => {\n        if (str.startsWith(\'/\'))\n            return str.slice(1);\n        return str;\n    };\n    static serverlessConfigPath = (str) => {\n        if (str.startsWith(\'/\'))\n            return str.slice(1);\n        return str;\n    };\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/transformer.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/utils/validator.ts':
-      /*!********************************!*\
-  !*** ./lib/utils/validator.ts ***!
-  \********************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          "\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\n//TODO: 多言語化すること : Must be Multilingualization\nclass default_1 {\n    static resourceName = (str, lang) => {\n        // TODO: サーバーレスフレームワーク及びCloudFormationの規約を調査しバリデーションを実装\n        // Investigate serverless framework and CloudFormation rules and implement validation\n        return true;\n    };\n    static filePath = (str, lang) => {\n        if (lodash_1.default.isEmpty(str))\n            return 'required input a cloudformation file path';\n        if (!str.endsWith('.yml') && !str.endsWith('.yaml'))\n            return 'input a yaml file path';\n        return true;\n    };\n    static serverlessConfigPath = (str, lang) => {\n        if (lodash_1.default.isEmpty(str))\n            return 'required input a serverless config file path';\n        if (!str.endsWith('.yml') && !str.endsWith('.yaml'))\n            return 'input a yaml file path';\n        return true;\n    };\n}\nexports[\"default\"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/validator.ts?"
-        );
-
-        /***/
-      },
-
-    /***/ './lib/utils/yaml.ts':
-      /*!***************************!*\
-  !*** ./lib/utils/yaml.ts ***!
-  \***************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.writeServerlessConfig = exports.readYaml = exports.writeYaml = void 0;\nconst js_yaml_1 = __importDefault(__webpack_require__(/*! js-yaml */ "js-yaml"));\nconst fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ "./lib/utils/logger.ts"));\nconst cli_1 = __webpack_require__(/*! utils/cli */ "./lib/utils/cli.ts");\nconst writeYaml = (path, data) => {\n    const yamlText = js_yaml_1.default.dump(data);\n    // TODO: ディレクトリを再帰的に作成すること\n    fs_1.default.writeFileSync(path, yamlText, \'utf8\');\n    return yamlText;\n};\nexports.writeYaml = writeYaml;\nconst readYaml = (path) => {\n    return js_yaml_1.default.load(fs_1.default.readFileSync(path, \'utf8\'));\n};\nexports.readYaml = readYaml;\nconst writeServerlessConfig = (args) => {\n    const { serverlessConfigPath, resourceFilePath } = args;\n    const logger = logger_1.default.getLogger();\n    const path = `${cli_1.processCurrent}/${serverlessConfigPath}`;\n    try {\n        const doc = (0, exports.readYaml)(path) ?? {};\n        const resources = doc.resources ?? [];\n        if (resources.includes(resourceFilePath))\n            return;\n        resources.push(`\\${file(./${resourceFilePath})}`);\n        const yamlText = (0, exports.writeYaml)(path, {\n            ...doc,\n            resources,\n        });\n        logger.info(path);\n        logger.info(yamlText);\n    }\n    catch (e) {\n        logger.warn(\'not found serverless config file, skip update\');\n        logger.warn(`please check a input path : ${path}`);\n    }\n};\nexports.writeServerlessConfig = writeServerlessConfig;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/yaml.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ './lib/utils/yargonaut.ts':
-      /*!********************************!*\
-  !*** ./lib/utils/yargonaut.ts ***!
-  \********************************/
-      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
-        eval(
-          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.chalk = exports.init = void 0;\nconst yargonaut_1 = __importDefault(__webpack_require__(/*! yargonaut */ "yargonaut"));\nconst init = () => yargonaut_1.default.font(\'SansSerif\').helpStyle(\'grey\').errorsStyle(\'red\');\nexports.init = init;\nexports.chalk = yargonaut_1.default.chalk();\n// const listFonts = (): string[] => {\n//   return yargonaut.listFonts();\n// };\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/yargonaut.ts?'
-        );
-
-        /***/
-      },
-
-    /***/ colorette:
-      /*!****************************!*\
-  !*** external "colorette" ***!
-  \****************************/
-      /***/ (module) => {
-        module.exports = require('colorette');
-
-        /***/
-      },
-
-    /***/ dateformat:
-      /*!*****************************!*\
-  !*** external "dateformat" ***!
-  \*****************************/
-      /***/ (module) => {
-        module.exports = require('dateformat');
-
-        /***/
-      },
-
-    /***/ 'fast-copy':
-      /*!****************************!*\
-  !*** external "fast-copy" ***!
-  \****************************/
-      /***/ (module) => {
-        module.exports = require('fast-copy');
-
-        /***/
-      },
-
-    /***/ 'fast-safe-stringify':
-      /*!**************************************!*\
-  !*** external "fast-safe-stringify" ***!
-  \**************************************/
-      /***/ (module) => {
-        module.exports = require('fast-safe-stringify');
-
-        /***/
-      },
-
-    /***/ inquirer:
-      /*!***************************!*\
-  !*** external "inquirer" ***!
-  \***************************/
-      /***/ (module) => {
-        module.exports = require('inquirer');
-
-        /***/
-      },
-
-    /***/ 'inquirer-autocomplete-prompt':
-      /*!***********************************************!*\
-  !*** external "inquirer-autocomplete-prompt" ***!
-  \***********************************************/
-      /***/ (module) => {
-        module.exports = require('inquirer-autocomplete-prompt');
-
-        /***/
-      },
-
-    /***/ 'js-yaml':
-      /*!**************************!*\
-  !*** external "js-yaml" ***!
-  \**************************/
-      /***/ (module) => {
-        module.exports = require('js-yaml');
-
-        /***/
-      },
-
-    /***/ lodash:
-      /*!*************************!*\
-  !*** external "lodash" ***!
-  \*************************/
-      /***/ (module) => {
-        module.exports = require('lodash');
-
-        /***/
-      },
-
-    /***/ 'on-exit-leak-free':
-      /*!************************************!*\
-  !*** external "on-exit-leak-free" ***!
-  \************************************/
-      /***/ (module) => {
-        module.exports = require('on-exit-leak-free');
-
-        /***/
-      },
-
-    /***/ pino:
-      /*!***********************!*\
-  !*** external "pino" ***!
-  \***********************/
-      /***/ (module) => {
-        module.exports = require('pino');
-
-        /***/
-      },
-
-    /***/ 'pino-abstract-transport':
-      /*!******************************************!*\
-  !*** external "pino-abstract-transport" ***!
-  \******************************************/
-      /***/ (module) => {
-        module.exports = require('pino-abstract-transport');
-
-        /***/
-      },
-
-    /***/ pump:
-      /*!***********************!*\
-  !*** external "pump" ***!
-  \***********************/
-      /***/ (module) => {
-        module.exports = require('pump');
-
-        /***/
-      },
-
-    /***/ 'readable-stream':
-      /*!**********************************!*\
-  !*** external "readable-stream" ***!
-  \**********************************/
-      /***/ (module) => {
-        module.exports = require('readable-stream');
-
-        /***/
-      },
-
-    /***/ 'secure-json-parse':
-      /*!************************************!*\
-  !*** external "secure-json-parse" ***!
-  \************************************/
-      /***/ (module) => {
-        module.exports = require('secure-json-parse');
-
-        /***/
-      },
-
-    /***/ 'sonic-boom':
-      /*!*****************************!*\
-  !*** external "sonic-boom" ***!
-  \*****************************/
-      /***/ (module) => {
-        module.exports = require('sonic-boom');
-
-        /***/
-      },
-
-    /***/ yargonaut:
-      /*!****************************!*\
-  !*** external "yargonaut" ***!
-  \****************************/
-      /***/ (module) => {
-        module.exports = require('yargonaut');
-
-        /***/
-      },
-
-    /***/ 'yargs/yargs':
-      /*!******************************!*\
-  !*** external "yargs/yargs" ***!
-  \******************************/
-      /***/ (module) => {
-        module.exports = require('yargs/yargs');
-
-        /***/
-      },
-
-    /***/ child_process:
-      /*!********************************!*\
-  !*** external "child_process" ***!
-  \********************************/
-      /***/ (module) => {
-        module.exports = require('child_process');
-
-        /***/
-      },
-
-    /***/ fs:
-      /*!*********************!*\
-  !*** external "fs" ***!
-  \*********************/
-      /***/ (module) => {
-        module.exports = require('fs');
-
-        /***/
-      },
-
-    /***/ path:
-      /*!***********************!*\
-  !*** external "path" ***!
-  \***********************/
-      /***/ (module) => {
-        module.exports = require('path');
-
-        /***/
-      },
-
-    /***/ worker_threads:
-      /*!*********************************!*\
-  !*** external "worker_threads" ***!
-  \*********************************/
-      /***/ (module) => {
-        module.exports = require('worker_threads');
-
-        /***/
-      },
-
-    /***/ './node_modules/pino-pretty/index.js':
-      /*!*******************************************!*\
-  !*** ./node_modules/pino-pretty/index.js ***!
-  \*******************************************/
-      /***/ (module, __unused_webpack_exports, __webpack_require__) => {
-        eval(
-          "\n\nconst { isColorSupported } = __webpack_require__(/*! colorette */ \"colorette\")\nconst pump = __webpack_require__(/*! pump */ \"pump\")\nconst { Transform } = __webpack_require__(/*! readable-stream */ \"readable-stream\")\nconst abstractTransport = __webpack_require__(/*! pino-abstract-transport */ \"pino-abstract-transport\")\nconst sjs = __webpack_require__(/*! secure-json-parse */ \"secure-json-parse\")\nconst colors = __webpack_require__(/*! ./lib/colors */ \"./node_modules/pino-pretty/lib/colors.js\")\nconst { ERROR_LIKE_KEYS, MESSAGE_KEY, TIMESTAMP_KEY, LEVEL_KEY, LEVEL_NAMES } = __webpack_require__(/*! ./lib/constants */ \"./node_modules/pino-pretty/lib/constants.js\")\nconst {\n  isObject,\n  prettifyErrorLog,\n  prettifyLevel,\n  prettifyMessage,\n  prettifyMetadata,\n  prettifyObject,\n  prettifyTime,\n  buildSafeSonicBoom,\n  filterLog,\n  handleCustomlevelsOpts,\n  handleCustomlevelNamesOpts\n} = __webpack_require__(/*! ./lib/utils */ \"./node_modules/pino-pretty/lib/utils.js\")\n\nconst jsonParser = input => {\n  try {\n    return { value: sjs.parse(input, { protoAction: 'remove' }) }\n  } catch (err) {\n    return { err }\n  }\n}\n\nconst defaultOptions = {\n  colorize: isColorSupported,\n  colorizeObjects: true,\n  crlf: false,\n  errorLikeObjectKeys: ERROR_LIKE_KEYS,\n  errorProps: '',\n  customLevels: null,\n  customColors: null,\n  useOnlyCustomProps: true,\n  levelFirst: false,\n  messageKey: MESSAGE_KEY,\n  messageFormat: false,\n  timestampKey: TIMESTAMP_KEY,\n  translateTime: true,\n  useMetadata: false,\n  outputStream: process.stdout,\n  customPrettifiers: {},\n  hideObject: false,\n  ignore: 'hostname',\n  include: undefined,\n  singleLine: false\n}\n\nfunction prettyFactory (options) {\n  const opts = Object.assign({}, defaultOptions, options)\n  const EOL = opts.crlf ? '\\r\\n' : '\\n'\n  const IDENT = '    '\n  const messageKey = opts.messageKey\n  const levelKey = opts.levelKey\n  const levelLabel = opts.levelLabel\n  const minimumLevel = opts.minimumLevel\n  const messageFormat = opts.messageFormat\n  const timestampKey = opts.timestampKey\n  const errorLikeObjectKeys = opts.errorLikeObjectKeys\n  const errorProps = opts.errorProps.split(',')\n  const useOnlyCustomProps = typeof opts.useOnlyCustomProps === 'boolean' ? opts.useOnlyCustomProps : opts.useOnlyCustomProps === 'true'\n  const customLevels = handleCustomlevelsOpts(opts.customLevels)\n  const customLevelNames = handleCustomlevelNamesOpts(opts.customLevels)\n\n  const customColors = opts.customColors\n    ? opts.customColors\n      .split(',')\n      .reduce((agg, value) => {\n        const [level, color] = value.split(':')\n\n        const condition = useOnlyCustomProps ? opts.customLevels : customLevelNames[level] !== undefined\n        const levelNum = condition ? customLevelNames[level] : LEVEL_NAMES[level]\n        const colorIdx = levelNum !== undefined ? levelNum : level\n\n        agg.push([colorIdx, color])\n\n        return agg\n      }, [])\n    : undefined\n  const customProps = {\n    customLevels,\n    customLevelNames\n  }\n  if (useOnlyCustomProps && !opts.customLevels) {\n    customProps.customLevels = undefined\n    customProps.customLevelNames = undefined\n  }\n  const customPrettifiers = opts.customPrettifiers\n  const includeKeys = opts.include !== undefined ? new Set(opts.include.split(',')) : undefined\n  const ignoreKeys = (!includeKeys && opts.ignore) ? new Set(opts.ignore.split(',')) : undefined\n  const hideObject = opts.hideObject\n  const singleLine = opts.singleLine\n  const colorizer = colors(opts.colorize, customColors, useOnlyCustomProps)\n  const objectColorizer = opts.colorizeObjects ? colorizer : colors(false, [], false)\n\n  return pretty\n\n  function pretty (inputData) {\n    let log\n    if (!isObject(inputData)) {\n      const parsed = jsonParser(inputData)\n      if (parsed.err || !isObject(parsed.value)) {\n        // pass through\n        return inputData + EOL\n      }\n      log = parsed.value\n    } else {\n      log = inputData\n    }\n\n    if (minimumLevel) {\n      const condition = useOnlyCustomProps ? opts.customLevels : customLevelNames[minimumLevel] !== undefined\n      const minimum = (condition ? customLevelNames[minimumLevel] : LEVEL_NAMES[minimumLevel]) || Number(minimumLevel)\n      const level = log[levelKey === undefined ? LEVEL_KEY : levelKey]\n      if (level < minimum) return\n    }\n\n    const prettifiedMessage = prettifyMessage({ log, messageKey, colorizer, messageFormat, levelLabel, ...customProps, useOnlyCustomProps })\n\n    if (ignoreKeys || includeKeys) {\n      log = filterLog({ log, ignoreKeys, includeKeys })\n    }\n\n    const prettifiedLevel = prettifyLevel({ log, colorizer, levelKey, prettifier: customPrettifiers.level, ...customProps })\n    const prettifiedMetadata = prettifyMetadata({ log, prettifiers: customPrettifiers })\n    const prettifiedTime = prettifyTime({ log, translateFormat: opts.translateTime, timestampKey, prettifier: customPrettifiers.time })\n\n    let line = ''\n    if (opts.levelFirst && prettifiedLevel) {\n      line = `${prettifiedLevel}`\n    }\n\n    if (prettifiedTime && line === '') {\n      line = `${prettifiedTime}`\n    } else if (prettifiedTime) {\n      line = `${line} ${prettifiedTime}`\n    }\n\n    if (!opts.levelFirst && prettifiedLevel) {\n      if (line.length > 0) {\n        line = `${line} ${prettifiedLevel}`\n      } else {\n        line = prettifiedLevel\n      }\n    }\n\n    if (prettifiedMetadata) {\n      if (line.length > 0) {\n        line = `${line} ${prettifiedMetadata}:`\n      } else {\n        line = prettifiedMetadata\n      }\n    }\n\n    if (line.endsWith(':') === false && line !== '') {\n      line += ':'\n    }\n\n    if (prettifiedMessage) {\n      if (line.length > 0) {\n        line = `${line} ${prettifiedMessage}`\n      } else {\n        line = prettifiedMessage\n      }\n    }\n\n    if (line.length > 0 && !singleLine) {\n      line += EOL\n    }\n\n    // pino@7+ does not log this anymore\n    if (log.type === 'Error' && log.stack) {\n      const prettifiedErrorLog = prettifyErrorLog({\n        log,\n        errorLikeKeys: errorLikeObjectKeys,\n        errorProperties: errorProps,\n        ident: IDENT,\n        eol: EOL\n      })\n      if (singleLine) line += EOL\n      line += prettifiedErrorLog\n    } else if (!hideObject) {\n      const skipKeys = [messageKey, levelKey, timestampKey].filter(key => typeof log[key] === 'string' || typeof log[key] === 'number')\n      const prettifiedObject = prettifyObject({\n        input: log,\n        skipKeys,\n        customPrettifiers,\n        errorLikeKeys: errorLikeObjectKeys,\n        eol: EOL,\n        ident: IDENT,\n        singleLine,\n        colorizer: objectColorizer\n      })\n\n      // In single line mode, include a space only if prettified version isn't empty\n      if (singleLine && !/^\\s$/.test(prettifiedObject)) {\n        line += ' '\n      }\n      line += prettifiedObject\n    }\n\n    return line\n  }\n}\n\nfunction build (opts = {}) {\n  const pretty = prettyFactory(opts)\n  return abstractTransport(function (source) {\n    const stream = new Transform({\n      objectMode: true,\n      autoDestroy: true,\n      transform (chunk, enc, cb) {\n        const line = pretty(chunk)\n        cb(null, line)\n      }\n    })\n\n    let destination\n\n    if (typeof opts.destination === 'object' && typeof opts.destination.write === 'function') {\n      destination = opts.destination\n    } else {\n      destination = buildSafeSonicBoom({\n        dest: opts.destination || 1,\n        append: opts.append,\n        mkdir: opts.mkdir,\n        sync: opts.sync // by default sonic will be async\n      })\n    }\n\n    source.on('unknown', function (line) {\n      destination.write(line + '\\n')\n    })\n\n    pump(source, stream, destination)\n    return stream\n  }, { parse: 'lines' })\n}\n\nmodule.exports = build\nmodule.exports.prettyFactory = prettyFactory\nmodule.exports.colorizerFactory = colors\nmodule.exports[\"default\"] = build\n\n\n//# sourceURL=webpack://ragate-cli/./node_modules/pino-pretty/index.js?"
-        );
-
-        /***/
-      },
-
-    /***/ './node_modules/pino-pretty/lib/colors.js':
-      /*!************************************************!*\
-  !*** ./node_modules/pino-pretty/lib/colors.js ***!
-  \************************************************/
-      /***/ (module, __unused_webpack_exports, __webpack_require__) => {
-        eval(
-          '\n\nconst { LEVELS, LEVEL_NAMES } = __webpack_require__(/*! ./constants */ "./node_modules/pino-pretty/lib/constants.js")\n\nconst nocolor = input => input\nconst plain = {\n  default: nocolor,\n  60: nocolor,\n  50: nocolor,\n  40: nocolor,\n  30: nocolor,\n  20: nocolor,\n  10: nocolor,\n  message: nocolor,\n  greyMessage: nocolor\n}\n\nconst { createColors } = __webpack_require__(/*! colorette */ "colorette")\nconst availableColors = createColors({ useColor: true })\nconst { white, bgRed, red, yellow, green, blue, gray, cyan } = availableColors\n\nconst colored = {\n  default: white,\n  60: bgRed,\n  50: red,\n  40: yellow,\n  30: green,\n  20: blue,\n  10: gray,\n  message: cyan,\n  greyMessage: gray\n}\n\nfunction resolveCustomColoredColorizer (customColors) {\n  return customColors.reduce(\n    function (agg, [level, color]) {\n      agg[level] = typeof availableColors[color] === \'function\' ? availableColors[color] : white\n\n      return agg\n    },\n    { default: white, message: cyan, greyMessage: gray }\n  )\n}\n\nfunction colorizeLevel (useOnlyCustomProps) {\n  return function (level, colorizer, { customLevels, customLevelNames } = {}) {\n    const levels = useOnlyCustomProps ? customLevels || LEVELS : Object.assign({}, LEVELS, customLevels)\n    const levelNames = useOnlyCustomProps ? customLevelNames || LEVEL_NAMES : Object.assign({}, LEVEL_NAMES, customLevelNames)\n\n    let levelNum = \'default\'\n    if (Number.isInteger(+level)) {\n      levelNum = Object.prototype.hasOwnProperty.call(levels, level) ? level : levelNum\n    } else {\n      levelNum = Object.prototype.hasOwnProperty.call(levelNames, level.toLowerCase()) ? levelNames[level.toLowerCase()] : levelNum\n    }\n\n    const levelStr = levels[levelNum]\n\n    return Object.prototype.hasOwnProperty.call(colorizer, levelNum) ? colorizer[levelNum](levelStr) : colorizer.default(levelStr)\n  }\n}\n\nfunction plainColorizer (useOnlyCustomProps) {\n  const newPlainColorizer = colorizeLevel(useOnlyCustomProps)\n  const customColoredColorizer = function (level, opts) {\n    return newPlainColorizer(level, plain, opts)\n  }\n  customColoredColorizer.message = plain.message\n  customColoredColorizer.greyMessage = plain.greyMessage\n  return customColoredColorizer\n}\n\nfunction coloredColorizer (useOnlyCustomProps) {\n  const newColoredColorizer = colorizeLevel(useOnlyCustomProps)\n  const customColoredColorizer = function (level, opts) {\n    return newColoredColorizer(level, colored, opts)\n  }\n  customColoredColorizer.message = colored.message\n  customColoredColorizer.greyMessage = colored.greyMessage\n  return customColoredColorizer\n}\n\nfunction customColoredColorizerFactory (customColors, useOnlyCustomProps) {\n  const onlyCustomColored = resolveCustomColoredColorizer(customColors)\n  const customColored = useOnlyCustomProps ? onlyCustomColored : Object.assign({}, colored, onlyCustomColored)\n  const colorizeLevelCustom = colorizeLevel(useOnlyCustomProps)\n\n  const customColoredColorizer = function (level, opts) {\n    return colorizeLevelCustom(level, customColored, opts)\n  }\n  customColoredColorizer.message = customColoredColorizer.message || customColored.message\n  customColoredColorizer.greyMessage = customColoredColorizer.greyMessage || customColored.greyMessage\n\n  return customColoredColorizer\n}\n\n/**\n * Factory function get a function to colorized levels. The returned function\n * also includes a `.message(str)` method to colorize strings.\n *\n * @param {boolean} [useColors=false] When `true` a function that applies standard\n * terminal colors is returned.\n * @param {array[]} [customColors] Touple where first item of each array is the level index and the second item is the color\n * @param {boolean} [useOnlyCustomProps] When `true`, only use the provided custom colors provided and not fallback to default\n *\n * @returns {function} `function (level) {}` has a `.message(str)` method to\n * apply colorization to a string. The core function accepts either an integer\n * `level` or a `string` level. The integer level will map to a known level\n * string or to `USERLVL` if not known.  The string `level` will map to the same\n * colors as the integer `level` and will also default to `USERLVL` if the given\n * string is not a recognized level name.\n */\nmodule.exports = function getColorizer (useColors = false, customColors, useOnlyCustomProps) {\n  if (useColors && customColors !== undefined) {\n    return customColoredColorizerFactory(customColors, useOnlyCustomProps)\n  } else if (useColors) {\n    return coloredColorizer(useOnlyCustomProps)\n  }\n\n  return plainColorizer(useOnlyCustomProps)\n}\n\n\n//# sourceURL=webpack://ragate-cli/./node_modules/pino-pretty/lib/colors.js?'
-        );
-
-        /***/
-      },
-
-    /***/ './node_modules/pino-pretty/lib/constants.js':
-      /*!***************************************************!*\
-  !*** ./node_modules/pino-pretty/lib/constants.js ***!
-  \***************************************************/
-      /***/ (module) => {
-        eval(
-          "\n\nmodule.exports = {\n  DATE_FORMAT: 'yyyy-mm-dd HH:MM:ss.l o',\n  DATE_FORMAT_SIMPLE: 'HH:MM:ss.l',\n\n  ERROR_LIKE_KEYS: ['err', 'error'],\n\n  MESSAGE_KEY: 'msg',\n\n  LEVEL_KEY: 'level',\n\n  LEVEL_LABEL: 'levelLabel',\n\n  TIMESTAMP_KEY: 'time',\n\n  LEVELS: {\n    default: 'USERLVL',\n    60: 'FATAL',\n    50: 'ERROR',\n    40: 'WARN',\n    30: 'INFO',\n    20: 'DEBUG',\n    10: 'TRACE'\n  },\n\n  LEVEL_NAMES: {\n    fatal: 60,\n    error: 50,\n    warn: 40,\n    info: 30,\n    debug: 20,\n    trace: 10\n  },\n\n  // Object keys that probably came from a logger like Pino or Bunyan.\n  LOGGER_KEYS: [\n    'pid',\n    'hostname',\n    'name',\n    'level',\n    'time',\n    'timestamp',\n    'caller'\n  ]\n}\n\n\n//# sourceURL=webpack://ragate-cli/./node_modules/pino-pretty/lib/constants.js?"
-        );
-
-        /***/
-      },
-
-    /***/ './node_modules/pino-pretty/lib/utils.js':
-      /*!***********************************************!*\
-  !*** ./node_modules/pino-pretty/lib/utils.js ***!
-  \***********************************************/
-      /***/ (module, __unused_webpack_exports, __webpack_require__) => {
-        eval(
-          "\n\nconst { createCopier } = __webpack_require__(/*! fast-copy */ \"fast-copy\")\nconst dateformat = __webpack_require__(/*! dateformat */ \"dateformat\")\nconst SonicBoom = __webpack_require__(/*! sonic-boom */ \"sonic-boom\")\nconst stringifySafe = __webpack_require__(/*! fast-safe-stringify */ \"fast-safe-stringify\")\nconst { isMainThread } = __webpack_require__(/*! worker_threads */ \"worker_threads\")\nconst defaultColorizer = __webpack_require__(/*! ./colors */ \"./node_modules/pino-pretty/lib/colors.js\")()\nconst {\n  DATE_FORMAT,\n  ERROR_LIKE_KEYS,\n  MESSAGE_KEY,\n  LEVEL_KEY,\n  LEVEL_LABEL,\n  TIMESTAMP_KEY,\n  LOGGER_KEYS,\n  LEVELS,\n  DATE_FORMAT_SIMPLE\n} = __webpack_require__(/*! ./constants */ \"./node_modules/pino-pretty/lib/constants.js\")\n\nconst fastCopy = createCopier({})\n\nmodule.exports = {\n  isObject,\n  prettifyErrorLog,\n  prettifyLevel,\n  prettifyMessage,\n  prettifyMetadata,\n  prettifyObject,\n  prettifyTime,\n  buildSafeSonicBoom,\n  filterLog,\n  handleCustomlevelsOpts,\n  handleCustomlevelNamesOpts\n}\n\nmodule.exports.internals = {\n  formatTime,\n  joinLinesWithIndentation,\n  prettifyError,\n  getPropertyValue,\n  deleteLogProperty,\n  splitPropertyKey,\n  createDate,\n  isValidDate\n}\n\n/**\n * Converts a given `epoch` to a desired display format.\n *\n * @param {number|string} epoch The time to convert. May be any value that is\n * valid for `new Date()`.\n * @param {boolean|string} [translateTime=false] When `false`, the given `epoch`\n * will simply be returned. When `true`, the given `epoch` will be converted\n * to a string at UTC using the `DATE_FORMAT` constant. If `translateTime` is\n * a string, the following rules are available:\n *\n * - `<format string>`: The string is a literal format string. This format\n * string will be used to interpret the `epoch` and return a display string\n * at UTC.\n * - `SYS:STANDARD`: The returned display string will follow the `DATE_FORMAT`\n * constant at the system's local timezone.\n * - `SYS:<format string>`: The returned display string will follow the given\n * `<format string>` at the system's local timezone.\n * - `UTC:<format string>`: The returned display string will follow the given\n * `<format string>` at UTC.\n *\n * @returns {number|string} The formatted time.\n */\nfunction formatTime (epoch, translateTime = false) {\n  if (translateTime === false) {\n    return epoch\n  }\n\n  const instant = createDate(epoch)\n\n  // If the Date is invalid, do not attempt to format\n  if (!isValidDate(instant)) {\n    return epoch\n  }\n\n  if (translateTime === true) {\n    return dateformat(instant, DATE_FORMAT_SIMPLE)\n  }\n\n  const upperFormat = translateTime.toUpperCase()\n  if (upperFormat === 'SYS:STANDARD') {\n    return dateformat(instant, DATE_FORMAT)\n  }\n\n  const prefix = upperFormat.substr(0, 4)\n  if (prefix === 'SYS:' || prefix === 'UTC:') {\n    if (prefix === 'UTC:') {\n      return dateformat(instant, translateTime)\n    }\n    return dateformat(instant, translateTime.slice(4))\n  }\n\n  return dateformat(instant, `UTC:${translateTime}`)\n}\n\n/**\n * Constructs a JS Date from a number or string. Accepts any single number\n * or single string argument that is valid for the Date() constructor,\n * or an epoch as a string.\n *\n * @param {string|number} epoch The representation of the Date.\n *\n * @returns {Date} The constructed Date.\n */\nfunction createDate (epoch) {\n  // If epoch is already a valid argument, return the valid Date\n  let date = new Date(epoch)\n  if (isValidDate(date)) {\n    return date\n  }\n\n  // Convert to a number to permit epoch as a string\n  date = new Date(+epoch)\n  return date\n}\n\n/**\n * Checks if the argument is a JS Date and not 'Invalid Date'.\n *\n * @param {Date} date The date to check.\n *\n * @returns {boolean} true if the argument is a JS Date and not 'Invalid Date'.\n */\nfunction isValidDate (date) {\n  return date instanceof Date && !Number.isNaN(date.getTime())\n}\n\nfunction isObject (input) {\n  return Object.prototype.toString.apply(input) === '[object Object]'\n}\n\n/**\n * Given a string with line separators, either `\\r\\n` or `\\n`, add indentation\n * to all lines subsequent to the first line and rejoin the lines using an\n * end of line sequence.\n *\n * @param {object} input\n * @param {string} input.input The string to split and reformat.\n * @param {string} [input.ident] The indentation string. Default: `    ` (4 spaces).\n * @param {string} [input.eol] The end of line sequence to use when rejoining\n * the lines. Default: `'\\n'`.\n *\n * @returns {string} A string with lines subsequent to the first indented\n * with the given indentation sequence.\n */\nfunction joinLinesWithIndentation ({ input, ident = '    ', eol = '\\n' }) {\n  const lines = input.split(/\\r?\\n/)\n  for (let i = 1; i < lines.length; i += 1) {\n    lines[i] = ident + lines[i]\n  }\n  return lines.join(eol)\n}\n\n/**\n * Given a log object that has a `type: 'Error'` key, prettify the object and\n * return the result. In other\n *\n * @param {object} input\n * @param {object} input.log The error log to prettify.\n * @param {string} [input.messageKey] The name of the key that contains a\n * general log message. This is not the error's message property but the logger\n * messsage property. Default: `MESSAGE_KEY` constant.\n * @param {string} [input.ident] The sequence to use for indentation. Default: `'    '`.\n * @param {string} [input.eol] The sequence to use for EOL. Default: `'\\n'`.\n * @param {string[]} [input.errorLikeKeys] A set of keys that should be considered\n * to have error objects as values. Default: `ERROR_LIKE_KEYS` constant.\n * @param {string[]} [input.errorProperties] A set of specific error object\n * properties, that are not the value of `messageKey`, `type`, or `stack`, to\n * include in the prettified result. The first entry in the list may be `'*'`\n * to indicate that all sibiling properties should be prettified. Default: `[]`.\n *\n * @returns {string} A sring that represents the prettified error log.\n */\nfunction prettifyErrorLog ({\n  log,\n  messageKey = MESSAGE_KEY,\n  ident = '    ',\n  eol = '\\n',\n  errorLikeKeys = ERROR_LIKE_KEYS,\n  errorProperties = []\n}) {\n  const stack = log.stack\n  const joinedLines = joinLinesWithIndentation({ input: stack, ident, eol })\n  let result = `${ident}${joinedLines}${eol}`\n\n  if (errorProperties.length > 0) {\n    const excludeProperties = LOGGER_KEYS.concat(messageKey, 'type', 'stack')\n    let propertiesToPrint\n    if (errorProperties[0] === '*') {\n      // Print all sibling properties except for the standard exclusions.\n      propertiesToPrint = Object.keys(log).filter(k => excludeProperties.includes(k) === false)\n    } else {\n      // Print only specified properties unless the property is a standard exclusion.\n      propertiesToPrint = errorProperties.filter(k => excludeProperties.includes(k) === false)\n    }\n\n    for (let i = 0; i < propertiesToPrint.length; i += 1) {\n      const key = propertiesToPrint[i]\n      if (key in log === false) continue\n      if (isObject(log[key])) {\n        // The nested object may have \"logger\" type keys but since they are not\n        // at the root level of the object being processed, we want to print them.\n        // Thus, we invoke with `excludeLoggerKeys: false`.\n        const prettifiedObject = prettifyObject({ input: log[key], errorLikeKeys, excludeLoggerKeys: false, eol, ident: ident + ident })\n        result = `${result}${ident}${key}: {${eol}${prettifiedObject}${ident}}${eol}`\n        continue\n      }\n      result = `${result}${ident}${key}: ${log[key]}${eol}`\n    }\n  }\n\n  return result\n}\n\n/**\n * Checks if the passed in log has a `level` value and returns a prettified\n * string for that level if so.\n *\n * @param {object} input\n * @param {object} input.log The log object.\n * @param {function} [input.colorizer] A colorizer function that accepts a level\n * value and returns a colorized string. Default: a no-op colorizer.\n * @param {string} [input.levelKey='level'] The key to find the level under.\n * @param {function} [input.prettifier] A user-supplied formatter to be called instead of colorizer.\n * @param {object} [input.customLevels] The custom levels where key as the level index and value as the level name.\n * @param {object} [input.customLevelNames] The custom level names where key is the level name and value is the level index.\n *\n * @returns {undefined|string} If `log` does not have a `level` property then\n * `undefined` will be returned. Otherwise, a string from the specified\n * `colorizer` is returned.\n */\nfunction prettifyLevel ({ log, colorizer = defaultColorizer, levelKey = LEVEL_KEY, prettifier, customLevels, customLevelNames }) {\n  const output = getPropertyValue(log, levelKey)\n  if (output === undefined) return undefined\n  return prettifier ? prettifier(output) : colorizer(output, { customLevels, customLevelNames })\n}\n\n/**\n * Prettifies a message string if the given `log` has a message property.\n *\n * @param {object} input\n * @param {object} input.log The log object with the message to colorize.\n * @param {string} [input.messageKey='msg'] The property of the `log` that is the\n * message to be prettified.\n * @param {string|function} [input.messageFormat=undefined] A format string or function that defines how the\n *  logged message should be formatted, e.g. `'{level} - {pid}'`.\n * @param {function} [input.colorizer] A colorizer function that has a\n * `.message(str)` method attached to it. This function should return a colorized\n * string which will be the \"prettified\" message. Default: a no-op colorizer.\n * @param {string} [input.levelLabel='levelLabel'] The label used to output the log level\n * @param {string} [input.levelKey='level'] The key to find the level under.\n * @param {object} [input.customLevels] The custom levels where key as the level index and value as the level name.\n *\n * @returns {undefined|string} If the message key is not found, or the message\n * key is not a string, then `undefined` will be returned. Otherwise, a string\n * that is the prettified message.\n */\nfunction prettifyMessage ({ log, messageFormat, messageKey = MESSAGE_KEY, colorizer = defaultColorizer, levelLabel = LEVEL_LABEL, levelKey = LEVEL_KEY, customLevels, useOnlyCustomProps }) {\n  if (messageFormat && typeof messageFormat === 'string') {\n    const message = String(messageFormat).replace(/{([^{}]+)}/g, function (match, p1) {\n      // return log level as string instead of int\n      let level\n      if (p1 === levelLabel && (level = getPropertyValue(log, levelKey)) !== undefined) {\n        const condition = useOnlyCustomProps ? customLevels === undefined : customLevels[level] === undefined\n        return condition ? LEVELS[level] : customLevels[level]\n      }\n      // Parse nested key access, e.g. `{keyA.subKeyB}`.\n      return getPropertyValue(log, p1) || ''\n    })\n    return colorizer.message(message)\n  }\n  if (messageFormat && typeof messageFormat === 'function') {\n    const msg = messageFormat(log, messageKey, levelLabel)\n    return colorizer.message(msg)\n  }\n  if (messageKey in log === false) return undefined\n  if (typeof log[messageKey] !== 'string') return undefined\n  return colorizer.message(log[messageKey])\n}\n\n/**\n * Prettifies metadata that is usually present in a Pino log line. It looks for\n * fields `name`, `pid`, `hostname`, and `caller` and returns a formatted string using\n * the fields it finds.\n *\n * @param {object} input\n * @param {object} input.log The log that may or may not contain metadata to\n * be prettified.\n * @param {object} input.prettifiers A set of functions used to prettify each\n * key of the input log's metadata. The keys are the keys of the metadata (like\n * `hostname`, `pid`, `name`, etc), and the values are functions which take the\n * metadata value and return a string. Each key is optional.\n *\n * @returns {undefined|string} If no metadata is found then `undefined` is\n * returned. Otherwise, a string of prettified metadata is returned.\n */\nfunction prettifyMetadata ({ log, prettifiers = {} }) {\n  let line = ''\n\n  if (log.name || log.pid || log.hostname) {\n    line += '('\n\n    if (log.name) {\n      line += prettifiers.name ? prettifiers.name(log.name) : log.name\n    }\n\n    if (log.pid) {\n      const prettyPid = prettifiers.pid ? prettifiers.pid(log.pid) : log.pid\n      if (log.name && log.pid) {\n        line += '/' + prettyPid\n      } else {\n        line += prettyPid\n      }\n    }\n\n    if (log.hostname) {\n      // If `pid` and `name` were in the ignore keys list then we don't need\n      // the leading space.\n      line += `${line === '(' ? 'on' : ' on'} ${prettifiers.hostname ? prettifiers.hostname(log.hostname) : log.hostname}`\n    }\n\n    line += ')'\n  }\n\n  if (log.caller) {\n    line += `${line === '' ? '' : ' '}<${prettifiers.caller ? prettifiers.caller(log.caller) : log.caller}>`\n  }\n\n  if (line === '') {\n    return undefined\n  } else {\n    return line\n  }\n}\n\n/**\n * Prettifies a standard object. Special care is taken when processing the object\n * to handle child objects that are attached to keys known to contain error\n * objects.\n *\n * @param {object} input\n * @param {object} input.input The object to prettify.\n * @param {string} [input.ident] The identation sequence to use. Default: `'    '`.\n * @param {string} [input.eol] The EOL sequence to use. Default: `'\\n'`.\n * @param {string[]} [input.skipKeys] A set of object keys to exclude from the\n * prettified result. Default: `[]`.\n * @param {Object<string, function>} [input.customPrettifiers] Dictionary of\n * custom prettifiers. Default: `{}`.\n * @param {string[]} [input.errorLikeKeys] A set of object keys that contain\n * error objects. Default: `ERROR_LIKE_KEYS` constant.\n * @param {boolean} [input.excludeLoggerKeys] Indicates if known logger specific\n * keys should be excluded from prettification. Default: `true`.\n * @param {boolean} [input.singleLine] Should non-error keys all be formatted\n * on a single line? This does NOT apply to errors, which will still be\n * multi-line. Default: `false`\n *\n * @returns {string} The prettified string. This can be as little as `''` if\n * there was nothing to prettify.\n */\nfunction prettifyObject ({\n  input,\n  ident = '    ',\n  eol = '\\n',\n  skipKeys = [],\n  customPrettifiers = {},\n  errorLikeKeys = ERROR_LIKE_KEYS,\n  excludeLoggerKeys = true,\n  singleLine = false,\n  colorizer = defaultColorizer\n}) {\n  const keysToIgnore = [].concat(skipKeys)\n\n  if (excludeLoggerKeys === true) Array.prototype.push.apply(keysToIgnore, LOGGER_KEYS)\n\n  let result = ''\n\n  // Split object keys into two categories: error and non-error\n  const { plain, errors } = Object.entries(input).reduce(({ plain, errors }, [k, v]) => {\n    if (keysToIgnore.includes(k) === false) {\n      // Pre-apply custom prettifiers, because all 3 cases below will need this\n      const pretty = typeof customPrettifiers[k] === 'function'\n        ? customPrettifiers[k](v, k, input)\n        : v\n      if (errorLikeKeys.includes(k)) {\n        errors[k] = pretty\n      } else {\n        plain[k] = pretty\n      }\n    }\n    return { plain, errors }\n  }, { plain: {}, errors: {} })\n\n  if (singleLine) {\n    // Stringify the entire object as a single JSON line\n    if (Object.keys(plain).length > 0) {\n      result += colorizer.greyMessage(stringifySafe(plain))\n    }\n    result += eol\n    // Avoid printing the escape character on escaped backslashes.\n    result = result.replace(/\\\\\\\\/gi, '\\\\')\n  } else {\n    // Put each object entry on its own line\n    Object.entries(plain).forEach(([keyName, keyValue]) => {\n      // custom prettifiers are already applied above, so we can skip it now\n      let lines = typeof customPrettifiers[keyName] === 'function'\n        ? keyValue\n        : stringifySafe(keyValue, null, 2)\n\n      if (lines === undefined) return\n\n      // Avoid printing the escape character on escaped backslashes.\n      lines = lines.replace(/\\\\\\\\/gi, '\\\\')\n\n      const joinedLines = joinLinesWithIndentation({ input: lines, ident, eol })\n      result += `${ident}${keyName}:${joinedLines.startsWith(eol) ? '' : ' '}${joinedLines}${eol}`\n    })\n  }\n\n  // Errors\n  Object.entries(errors).forEach(([keyName, keyValue]) => {\n    // custom prettifiers are already applied above, so we can skip it now\n    const lines = typeof customPrettifiers[keyName] === 'function'\n      ? keyValue\n      : stringifySafe(keyValue, null, 2)\n\n    if (lines === undefined) return\n\n    result += prettifyError({ keyName, lines, eol, ident })\n  })\n\n  return result\n}\n\n/**\n * Prettifies a timestamp if the given `log` has either `time`, `timestamp` or custom specified timestamp\n * property.\n *\n * @param {object} input\n * @param {object} input.log The log object with the timestamp to be prettified.\n * @param {string} [input.timestampKey='time'] The log property that should be used to resolve timestamp value\n * @param {boolean|string} [input.translateFormat=undefined] When `true` the\n * timestamp will be prettified into a string at UTC using the default\n * `DATE_FORMAT`. If a string, then `translateFormat` will be used as the format\n * string to determine the output; see the `formatTime` function for details.\n * @param {function} [input.prettifier] A user-supplied formatter for altering output.\n *\n * @returns {undefined|string} If a timestamp property cannot be found then\n * `undefined` is returned. Otherwise, the prettified time is returned as a\n * string.\n */\nfunction prettifyTime ({ log, timestampKey = TIMESTAMP_KEY, translateFormat = undefined, prettifier }) {\n  let time = null\n\n  if (timestampKey in log) {\n    time = log[timestampKey]\n  } else if ('timestamp' in log) {\n    time = log.timestamp\n  }\n\n  if (time === null) return undefined\n  const output = translateFormat ? formatTime(time, translateFormat) : time\n\n  return prettifier ? prettifier(output) : `[${output}]`\n}\n\n/**\n * Prettifies an error string into a multi-line format.\n * @param {object} input\n * @param {string} input.keyName The key assigned to this error in the log object\n * @param {string} input.lines The STRINGIFIED error. If the error field has a\n *  custom prettifier, that should be pre-applied as well\n * @param {string} input.ident The indentation sequence to use\n * @param {string} input.eol The EOL sequence to use\n */\nfunction prettifyError ({ keyName, lines, eol, ident }) {\n  let result = ''\n  const joinedLines = joinLinesWithIndentation({ input: lines, ident, eol })\n  const splitLines = `${ident}${keyName}: ${joinedLines}${eol}`.split(eol)\n\n  for (let j = 0; j < splitLines.length; j += 1) {\n    if (j !== 0) result += eol\n\n    const line = splitLines[j]\n    if (/^\\s*\"stack\"/.test(line)) {\n      const matches = /^(\\s*\"stack\":)\\s*(\".*\"),?$/.exec(line)\n      /* istanbul ignore else */\n      if (matches && matches.length === 3) {\n        const indentSize = /^\\s*/.exec(line)[0].length + 4\n        const indentation = ' '.repeat(indentSize)\n        const stackMessage = matches[2]\n        result += matches[1] + eol + indentation + JSON.parse(stackMessage).replace(/\\n/g, eol + indentation)\n      } else {\n        result += line\n      }\n    } else {\n      result += line\n    }\n  }\n\n  return result\n}\n\n/**\n * Splits the property key delimited by a dot character but not when it is preceded\n * by a backslash.\n *\n * @param {string} key A string identifying the property.\n *\n * @returns {string[]} Returns a list of string containing each delimited property.\n * e.g. `'prop2\\.domain\\.corp.prop2'` should return [ 'prop2.domain.com', 'prop2' ]\n */\nfunction splitPropertyKey (key) {\n  const result = []\n  let backslash = false\n  let segment = ''\n\n  for (let i = 0; i < key.length; i++) {\n    const c = key.charAt(i)\n\n    if (c === '\\\\') {\n      backslash = true\n      continue\n    }\n\n    if (backslash) {\n      backslash = false\n      segment += c\n      continue\n    }\n\n    /* Non-escaped dot, push to result */\n    if (c === '.') {\n      result.push(segment)\n      segment = ''\n      continue\n    }\n\n    segment += c\n  }\n\n  /* Push last entry to result */\n  if (segment.length) {\n    result.push(segment)\n  }\n\n  return result\n}\n\n/**\n * Gets a specified property from an object if it exists.\n *\n * @param {object} obj The object to be searched.\n * @param {string|string[]} property A string, or an array of strings, identifying\n  * the property to be retrieved from the object.\n * Accepts nested properties delimited by a `.`.\n * Delimiter can be escaped to preserve property names that contain the delimiter.\n * e.g. `'prop1.prop2'` or `'prop2\\.domain\\.corp.prop2'`.\n *\n * @returns {*}\n */\nfunction getPropertyValue (obj, property) {\n  const props = Array.isArray(property) ? property : splitPropertyKey(property)\n\n  for (const prop of props) {\n    if (!Object.prototype.hasOwnProperty.call(obj, prop)) {\n      return\n    }\n    obj = obj[prop]\n  }\n\n  return obj\n}\n\n/**\n * Deletes a specified property from a log object if it exists.\n * This function mutates the passed in `log` object.\n *\n * @param {object} log The log object to be modified.\n * @param {string} property A string identifying the property to be deleted from\n * the log object. Accepts nested properties delimited by a `.`\n * Delimiter can be escaped to preserve property names that contain the delimiter.\n * e.g. `'prop1.prop2'` or `'prop2\\.domain\\.corp.prop2'`\n */\nfunction deleteLogProperty (log, property) {\n  const props = splitPropertyKey(property)\n  const propToDelete = props.pop()\n\n  log = getPropertyValue(log, props)\n\n  if (log !== null && typeof log === 'object' && Object.prototype.hasOwnProperty.call(log, propToDelete)) {\n    delete log[propToDelete]\n  }\n}\n\n/**\n * Filter a log object by removing or including keys accordingly.\n * When `includeKeys` is passed, `ignoredKeys` will be ignored.\n * One of ignoreKeys or includeKeys must be pass in.\n *\n * @param {object} input\n * @param {object} input.log The log object to be modified.\n * @param {Set<string> | Array<string> | undefined} input.ignoreKeys\n *  An array of strings identifying the properties to be removed.\n * @param {Set<string> | Array<string> | undefined} input.includeKeys\n *  An array of strings identifying the properties to be included.\n *\n * @returns {object} A new `log` object instance that\n *  either only includes the keys in ignoreKeys\n *  or does not include those in ignoredKeys.\n */\nfunction filterLog ({ log, ignoreKeys, includeKeys }) {\n  const logCopy = fastCopy(log)\n\n  if (includeKeys) {\n    const logIncluded = {}\n\n    includeKeys.forEach((key) => {\n      logIncluded[key] = logCopy[key]\n    })\n    return logIncluded\n  }\n\n  ignoreKeys.forEach((ignoreKey) => {\n    deleteLogProperty(logCopy, ignoreKey)\n  })\n  return logCopy\n}\n\nfunction noop () {}\n\n/**\n * Creates a safe SonicBoom instance\n *\n * @param {object} opts Options for SonicBoom\n *\n * @returns {object} A new SonicBoom stream\n */\nfunction buildSafeSonicBoom (opts) {\n  const stream = new SonicBoom(opts)\n  stream.on('error', filterBrokenPipe)\n  // if we are sync: false, we must flush on exit\n  if (!opts.sync && isMainThread) {\n    setupOnExit(stream)\n  }\n  return stream\n\n  function filterBrokenPipe (err) {\n    if (err.code === 'EPIPE') {\n      stream.write = noop\n      stream.end = noop\n      stream.flushSync = noop\n      stream.destroy = noop\n      return\n    }\n    stream.removeListener('error', filterBrokenPipe)\n  }\n}\n\nfunction setupOnExit (stream) {\n  /* istanbul ignore next */\n  if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {\n    // This is leak free, it does not leave event handlers\n    const onExit = __webpack_require__(/*! on-exit-leak-free */ \"on-exit-leak-free\")\n\n    onExit.register(stream, autoEnd)\n\n    stream.on('close', function () {\n      onExit.unregister(stream)\n    })\n  }\n}\n\n/* istanbul ignore next */\nfunction autoEnd (stream, eventName) {\n  // This check is needed only on some platforms\n\n  if (stream.destroyed) {\n    return\n  }\n\n  if (eventName === 'beforeExit') {\n    // We still have an event loop, let's use it\n    stream.flush()\n    stream.on('drain', function () {\n      stream.end()\n    })\n  } else {\n    // We do not have an event loop, so flush synchronously\n    stream.flushSync()\n  }\n}\n\n/**\n * Parse a CSV string or options object that specifies\n * configuration for custom levels.\n *\n * @param {string|object} cLevels An object mapping level\n * names to values, e.g. `{ info: 30, debug: 65 }`, or a\n * CSV string in the format `level_name:level_value`, e.g.\n * `info:30,debug:65`.\n *\n * @returns {object} An object mapping levels to labels that\n * appear in logs, e.g. `{ '30': 'INFO', '65': 'DEBUG' }`.\n */\nfunction handleCustomlevelsOpts (cLevels) {\n  if (!cLevels) return {}\n\n  if (typeof cLevels === 'string') {\n    return cLevels\n      .split(',')\n      .reduce((agg, value, idx) => {\n        const [levelName, levelIdx = idx] = value.split(':')\n        agg[levelIdx] = levelName.toUpperCase()\n        return agg\n      },\n      { default: 'USERLVL' })\n  } else if (Object.prototype.toString.call(cLevels) === '[object Object]') {\n    return Object\n      .keys(cLevels)\n      .reduce((agg, levelName, idx) => {\n        agg[cLevels[levelName]] = levelName.toUpperCase()\n        return agg\n      }, { default: 'USERLVL' })\n  } else {\n    return {}\n  }\n}\n\n/**\n * Parse a CSV string or options object that maps level\n * labels to level values.\n *\n * @param {string|object} cLevels An object mapping level\n * names to level values, e.g. `{ info: 30, debug: 65 }`, or a\n * CSV string in the format `level_name:level_value`, e.g.\n * `info:30,debug:65`.\n *\n * @returns {object} An object mapping levels names to level values\n * e.g. `{ info: 30, debug: 65 }`.\n */\nfunction handleCustomlevelNamesOpts (cLevels) {\n  if (!cLevels) return {}\n\n  if (typeof cLevels === 'string') {\n    return cLevels\n      .split(',')\n      .reduce((agg, value, idx) => {\n        const [levelName, levelIdx = idx] = value.split(':')\n        agg[levelName.toLowerCase()] = levelIdx\n        return agg\n      }, {})\n  } else if (Object.prototype.toString.call(cLevels) === '[object Object]') {\n    return Object\n      .keys(cLevels)\n      .reduce((agg, levelName, idx) => {\n        agg[levelName.toLowerCase()] = cLevels[levelName]\n        return agg\n      }, {})\n  } else {\n    return {}\n  }\n}\n\n\n//# sourceURL=webpack://ragate-cli/./node_modules/pino-pretty/lib/utils.js?"
-        );
-
-        /***/
-      },
-
-    /***/ './package.json':
-      /*!**********************!*\
-  !*** ./package.json ***!
-  \**********************/
-      /***/ (module) => {
-        eval(
-          'module.exports = JSON.parse(\'{"name":"ragate-cli","version":"0.1.0","description":"Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.","engines":{"node":">=18.x"},"scripts":{"test":"echo \\\'Sorry, test code is in preparation.\\\\n\\\'","build:dev":"ENV=development webpack","build:prd":"ENV=production webpack","lint":"eslint . --fix","format":"prettier . --write","prepare":"husky install"},"eslintIgnore":["!/.github",".serverless","bin","tmp","webpack.config.js"],"main":"./lib/app.ts","bin":{"ragate":"./bin/app.js"},"repository":{"type":"git","url":"git+https://github.com/ragate-inc/ragate-cli.git"},"lint-staged":{"*.{ts,js}":["eslint"],"*.{css,html,js,json,md,yaml,yml,ts,js}":["prettier . --write"]},"keywords":["aws","serverless","ragate","cli","amplify","serverless","lambda","amazon"],"author":"Ragate inc.","license":"MIT","bugs":{"url":"https://github.com/ragate-inc/ragate-cli/issues"},"homepage":"https://github.com/ragate-inc/ragate-cli#readme","devDependencies":{"@tsconfig/node-lts":"^18.12.1","@types/figlet":"^1.5.6","@types/inquirer":"^9.0.3","@types/inquirer-autocomplete-prompt":"^3.0.0","@types/lodash":"^4.14.194","@types/node":"^18.16.3","@types/webpack":"^5.28.1","@types/webpack-node-externals":"^3.0.0","@types/yargs":"^17.0.24","@typescript-eslint/eslint-plugin":"^5.59.2","@typescript-eslint/parser":"^5.59.2","eslint":"^8.39.0","eslint-config-prettier":"^8.8.0","eslint-config-standard-with-typescript":"^34.0.1","husky":"^6.0.0","lint-staged":"^13.2.2","prettier":"2.8.8","ts-loader":"^9.4.2","ts-node":"^10.9.1","tsconfig-paths-webpack-plugin":"^4.0.1","typescript":"^5.0.4","webpack":"^5.81.0","webpack-cli":"^5.0.2","webpack-node-externals":"^3.0.0"},"dependencies":{"@types/js-yaml":"^4.0.5","figlet":"^1.6.0","inquirer":"^8.0.0","inquirer-autocomplete-prompt":"^2.0.0","js-yaml":"^4.1.0","lodash":"^4.17.21","parent-require":"^1.0.0","pino":"^8.12.1","pino-pretty":"^10.0.0","yargonaut":"^1.1.4","yargs":"^17.1.1-candidate.0"}}\');\n\n//# sourceURL=webpack://ragate-cli/./package.json?'
-        );
-
-        /***/
-      },
-
-    /******/
-  };
-  /************************************************************************/
-  /******/ // The module cache
-  /******/ var __webpack_module_cache__ = {};
-  /******/
-  /******/ // The require function
-  /******/ function __webpack_require__(moduleId) {
-    /******/ // Check if module is in cache
-    /******/ var cachedModule = __webpack_module_cache__[moduleId];
-    /******/ if (cachedModule !== undefined) {
-      /******/ return cachedModule.exports;
-      /******/
-    }
-    /******/ // Create a new module (and put it into the cache)
-    /******/ var module = (__webpack_module_cache__[moduleId] = {
-      /******/ // no module.id needed
-      /******/ // no module.loaded needed
-      /******/ exports: {},
-      /******/
-    });
-    /******/
-    /******/ // Execute the module function
-    /******/ __webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-    /******/
-    /******/ // Return the exports of the module
-    /******/ return module.exports;
-    /******/
-  }
-  /******/
-  /************************************************************************/
-  /******/
-  /******/ // startup
-  /******/ // Load entry module and return exports
-  /******/ // This entry module is referenced by other modules so it can't be inlined
-  /******/ var __webpack_exports__ = __webpack_require__('./lib/app.ts');
-  /******/
-  /******/
+    },
+    t = {};
+  !(function r(s) {
+    var o = t[s];
+    if (void 0 !== o) return o.exports;
+    var a = (t[s] = { exports: {} });
+    return e[s].call(a.exports, a, a.exports, r), a.exports;
+  })(4712);
 })();

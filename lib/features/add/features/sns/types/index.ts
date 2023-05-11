@@ -8,3 +8,14 @@ export type Locale = {
   overrightFile: string;
   outputFile: string;
 };
+
+export type SnsType = {
+  Type: 'AWS::SNS::Topic';
+  Properties: {
+    TopicName: string;
+    Subscription: {
+      Endpoint: string;
+      Protocol: string;
+    }[];
+  };
+};

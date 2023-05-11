@@ -107,3 +107,7 @@ export const awsRegions: AWS_REGION[] = [
   'us-gov-east-1',
   'us-gov-west-1',
 ];
+
+export type AwsResource<T> = {
+  Resources?: Record<string, T>;
+};

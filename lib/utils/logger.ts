@@ -41,22 +41,20 @@ export default class {
 
   private static logger: pino.Logger;
 
-  public static getLogger(logLevel: LogLevel = 'info'): pino.Logger {
+  public static getLogger(logLevel?: LogLevel): pino.Logger {
     if (logLevel) {
       this.logger = pino(
         {
-          level: logLevel,
+          level: logLevel ?? 'info',
         },
         stream
       );
       return this.logger;
     }
-    if (this.logger) {
-      return this.logger;
-    }
+    if (this.logger) return this.logger;
     this.logger = pino(
       {
-        level: logLevel,
+        level: logLevel ?? 'info',
       },
       stream
     );
