@@ -82,6 +82,10 @@
           }
           region;
           regionRef = { default: 'ap-northeast-1', type: 'string' };
+          handleError(e) {
+            const t = [];
+            e && (e.stack ? t.push(e.stack) : t.push(e.message)), console.error('\n', a.chalk.red(t.join('\n\n'))), process.exit(1);
+          }
           cli() {
             const { version: e, chalk: t, locale: r, lang: s } = this;
             return (0, n.default)(process.argv.slice(2))
@@ -96,6 +100,10 @@
               .alias('h', 'help')
               .version('version', t.grey(r.version), e)
               .alias('v', 'version')
+              .check((e) => {
+                if (0 === e._.length) throw new Error(this.locale.unProcessed.required);
+                return !0;
+              })
               .command(
                 'create',
                 t.grey(r.command.description.create),
@@ -113,15 +121,20 @@
                 '*',
                 '',
                 () => ({}),
-                (e) => {
-                  0 === e._.length ? this.logger.error(t.red(this.locale.unProcessed.required)) : this.logger.error(t.red(this.locale.unProcessed.notFound));
+                () => {
+                  throw new Error(this.locale.unProcessed.notFound);
                 }
               )
               .wrap(Math.max((0, n.default)().terminalWidth() - 5, 60))
-              .locale(s);
+              .locale(s)
+              .fail((e, t) => this.handleError(t));
           }
           async run() {
-            await this.cli().parseAsync();
+            try {
+              await this.cli().parseAsync();
+            } catch (e) {
+              this.handleError(e);
+            }
           }
         };
       },
@@ -165,7 +178,7 @@
         t.getLocaleLang = (e) => ('ja' === e ? o.default : n.default);
       },
       5033: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.CLIError = t.EnvironmentError = t.BaseClass = void 0);
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.DuplicatedPropertyError = t.CLIError = t.EnvironmentError = t.BaseClass = void 0);
         class r extends Error {
           constructor(e) {
             super(e), (this.name = new.target.name), Error.captureStackTrace && Error.captureStackTrace(this, this.constructor), Object.setPrototypeOf(this, new.target.prototype);
@@ -180,6 +193,11 @@
           (t.CLIError = class extends r {
             constructor(e) {
               super(e), (this.name = 'CLIError');
+            }
+          }),
+          (t.DuplicatedPropertyError = class extends r {
+            constructor(e) {
+              super(e), (this.name = 'DuplicatedPropertyError');
             }
           });
       },
@@ -231,16 +249,10 @@
         }
         t.default = c;
       },
-      6433: function (e, t, r) {
-        var s =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
+      6433: (e, t, r) => {
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = r(6702),
-          n = s(r(6444));
-        class a extends o.FeatureBuilderAbstract {
+        const s = r(6702);
+        class o extends s.FeatureBuilderAbstract {
           constructor(e) {
             super(e);
           }
@@ -248,11 +260,10 @@
             return e
               .version(!1)
               .usage('Usage: $0 sns <resource_name>')
-              .options({ path: { alias: 'p', describe: 'Path to the file', type: 'string' } })
-              .fail((e, t) => n.default.handleFaildLog({ msg: e, err: t }));
+              .options({ path: { alias: 'p', describe: 'Path to the file', type: 'string' } });
           }
         }
-        t.default = a;
+        t.default = o;
       },
       2917: function (e, t, r) {
         var s =
@@ -267,11 +278,12 @@
           i = r(2762),
           l = r(3462),
           u = r(3362),
-          c = [
+          c = r(5033),
+          d = [
             { Endpoint: 'Your lambda Arn', Protocol: 'lambda' },
             { Endpoint: 'Your email address', Protocol: 'email' },
           ];
-        class d extends n.FeatureHandlerAbstract {
+        class p extends n.FeatureHandlerAbstract {
           constructor(e) {
             super(e);
           }
@@ -283,27 +295,28 @@
               t = (0, u.getLocaleLang)(this.lang),
               r = this.argv,
               s = r._[2];
-            if (a.default.isEmpty(s)) return void e.error(t.error.reqiredResourceName);
+            if (a.default.isEmpty(s)) throw new Error(t.error.reqiredResourceName);
             const n = a.default
               .chain(r.path)
               .thru((e) =>
                 a.default.isEmpty(e) ? `${i.processCurrent}/${this.defaultResourcePath}` : a.default.startsWith(e, '/') ? `${i.processCurrent}${e}` : `${i.processCurrent}/${e}`
               )
               .value();
-            if (n.endsWith('.yml') || n.endsWith('.yaml'))
-              try {
-                const r = (0, l.readYaml)(n) ?? {};
-                if (a.default.hasIn(r, `Resources.${s}`)) return e.error(`${t.error.alreadyExistResource} : ${s}`), void e.error(r);
-                const o = (0, l.writeYaml)(n, { ...r, Resources: { ...r.Resources, [s]: { Type: 'AWS::SNS::Topic', Properties: { TopicName: s, Subscription: c } } } });
-                return e.info(n), e.info(`${t.overrightFile} : ${n}`), void e.info(o);
-              } catch (r) {
-                const o = (0, l.writeYaml)(n, { Resources: { ErrorNotifySnsTopic: { Type: 'AWS::SNS::Topic', Properties: { TopicName: s, Subscription: c } } } });
-                e.info(n), e.info(`${t.outputFile} : ${n}`), e.info(o);
-              }
-            else e.error(`${t.error.mustByYamlFilePath} : ${n}`);
+            if (!n.endsWith('.yml') && !n.endsWith('.yaml')) throw new Error(`${t.error.mustByYamlFilePath} : ${n}`);
+            try {
+              const r = (0, l.readYaml)(n) ?? {};
+              if (a.default.hasIn(r, `Resources.${s}`))
+                throw (e.error(`${t.error.alreadyExistResource}`), e.error(`ResourceName : ${s}`), e.error(r), new c.DuplicatedPropertyError(t.error.alreadyExistResource));
+              const o = (0, l.writeYaml)(n, { ...r, Resources: { ...r.Resources, [s]: { Type: 'AWS::SNS::Topic', Properties: { TopicName: s, Subscription: d } } } });
+              return e.info(n), e.info(`${t.overrightFile} : ${n}`), void e.info(o);
+            } catch (r) {
+              if ('DuplicatedPropertyError' === r.name) throw r;
+              const o = (0, l.writeYaml)(n, { Resources: { [s]: { Type: 'AWS::SNS::Topic', Properties: { TopicName: s, Subscription: d } } } });
+              e.info(n), e.info(`${t.outputFile} : ${n}`), e.info(o);
+            }
           }
         }
-        t.default = d;
+        t.default = p;
       },
       9211: function (e, t, r) {
         var s =
@@ -347,27 +360,18 @@
           n = s(r(6353));
         t.getLocaleLang = (e) => ('ja' === e ? o.default : n.default);
       },
-      6621: function (e, t, r) {
-        var s =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
+      6621: (e, t, r) => {
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = r(6702),
-          n = s(r(6444));
-        class a extends o.FeatureBuilderAbstract {
+        const s = r(6702);
+        class o extends s.FeatureBuilderAbstract {
           constructor(e) {
             super(e);
           }
           build(e) {
-            return e
-              .version(!1)
-              .usage('Usage: $0 sqs <options>')
-              .fail((e, t) => n.default.handleFaildLog({ msg: e, err: t }));
+            return e.version(!1).usage('Usage: $0 sqs <options>');
           }
         }
-        t.default = a;
+        t.default = o;
       },
       4267: function (e, t, r) {
         var s =
@@ -442,33 +446,33 @@
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
         const o = r(6702),
-          n = s(r(6444)),
-          a = r(6870),
-          i = r(2868),
-          l = s(r(8798));
-        class u extends o.FeatureBuilderAbstract {
+          n = r(6870),
+          a = r(2868),
+          i = s(r(8798));
+        class l extends o.FeatureBuilderAbstract {
           constructor(e) {
             super(e);
           }
           build(e) {
-            const t = this.args.lang,
-              r = (0, i.getLocaleLang)(t),
-              s = n.default.getLogger();
-            return e
-              .version(!1)
-              .usage('Usage: create <options>')
-              .command(
-                '*',
-                a.chalk.grey('<command> <options>'),
-                () => ({}),
-                (e) => {
-                  if (1 === e._.length) return new l.default.handler(e).run();
-                  s.error(a.chalk.red(r.error.unProcessed));
-                }
-              );
+            const t = this.args.lang;
+            return (
+              (0, a.getLocaleLang)(t),
+              e
+                .version(!1)
+                .usage('Usage: create <options>')
+                .command(
+                  '*',
+                  n.chalk.grey('<command> <options>'),
+                  () => ({}),
+                  (e) => {
+                    if (1 === e._.length) return new i.default.handler(e).run();
+                    throw new Error('locale.error.unProcessed');
+                  }
+                )
+            );
           }
         }
-        t.default = u;
+        t.default = l;
       },
       975: function (e, t, r) {
         var s =
@@ -693,7 +697,6 @@
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-<<<<<<< HEAD
         const o = s(r(8545)),
           n = s(r(4233)),
           a = r(6870),
@@ -701,23 +704,10 @@
           l = (0, n.default)({
             colorize: !0,
             messageFormat: (e, t) => {
-              const r = (t) => (e.level <= 30 ? a.chalk.grey(t) : 40 === e.level ? a.chalk.yellow(t) : e.level >= 50 ? a.chalk.red(t) : t),
+              const r = (t) => (30 === e.level ? a.chalk.white(t) : e.level < 30 ? a.chalk.grey(t) : 40 === e.level ? a.chalk.yellow(t) : e.level >= 50 ? a.chalk.red(t) : t),
                 s = e[t];
               return i.default.isEmpty(s)
                 ? i.default
-=======
-        const o = s(r(545)),
-          n = s(r(233)),
-          i = r(870),
-          a = s(r(517)),
-          l = (0, n.default)({
-            colorize: !0,
-            messageFormat: (e, t) => {
-              const r = (t) => (e.level <= 30 ? i.chalk.grey(t) : 40 === e.level ? i.chalk.yellow(t) : e.level >= 50 ? i.chalk.red(t) : t),
-                s = e[t];
-              return a.default.isEmpty(s)
-                ? a.default
->>>>>>> dev
                     .chain(e)
                     .omit(['level', 'time', 'pid', 'hostname'])
                     .thru((e) => JSON.stringify(e, null, 2))
@@ -741,11 +731,6 @@
           static logger;
           static getLogger(e = 'info') {
             return e ? ((this.logger = (0, o.default)({ level: e }, l)), this.logger) : (this.logger || (this.logger = (0, o.default)({ level: e }, l)), this.logger);
-          }
-          static handleFaildLog(e) {
-            const { msg: t, err: r } = e,
-              s = this.getLogger();
-            t && s.error(a.chalk.red(t)), r && (r.stack ? s.error(a.chalk.red(r.stack)) : s.error(a.chalk.red(r.message))), process.exit(1);
           }
         };
       },
@@ -855,17 +840,17 @@
             prettifyTime: b,
             buildSafeSonicBoom: L,
             filterLog: E,
-            handleCustomlevelsOpts: M,
+            handleCustomlevelsOpts: w,
             handleCustomlevelNamesOpts: j,
           } = r(385),
-          O = (e) => {
+          M = (e) => {
             try {
               return { value: i.parse(e, { protoAction: 'remove' }) };
             } catch (e) {
               return { err: e };
             }
           },
-          S = {
+          O = {
             colorize: s,
             colorizeObjects: !0,
             crlf: !1,
@@ -888,7 +873,7 @@
             singleLine: !1,
           };
         function P(e) {
-          const t = Object.assign({}, S, e),
+          const t = Object.assign({}, O, e),
             r = t.crlf ? '\r\n' : '\n',
             s = '    ',
             o = t.messageKey,
@@ -900,13 +885,9 @@
             d = t.errorLikeObjectKeys,
             L = t.errorProps.split(','),
             P = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
-            w = M(t.customLevels),
+            S = w(t.customLevels),
             $ = j(t.customLevels),
-<<<<<<< HEAD
             x = t.customColors
-=======
-            k = t.customColors
->>>>>>> dev
               ? t.customColors.split(',').reduce((e, r) => {
                   const [s, o] = r.split(':'),
                     n = (P ? t.customLevels : void 0 !== $[s]) ? $[s] : f[s],
@@ -914,31 +895,20 @@
                   return e.push([a, o]), e;
                 }, [])
               : void 0,
-<<<<<<< HEAD
-            k = { customLevels: w, customLevelNames: $ };
+            k = { customLevels: S, customLevelNames: $ };
           P && !t.customLevels && ((k.customLevels = void 0), (k.customLevelNames = void 0));
           const R = t.customPrettifiers,
-=======
-            P = { customLevels: S, customLevelNames: $ };
-          x && !t.customLevels && ((P.customLevels = void 0), (P.customLevelNames = void 0));
-          const C = t.customPrettifiers,
->>>>>>> dev
             A = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
-            T = !A && t.ignore ? new Set(t.ignore.split(',')) : void 0,
-            C = t.hideObject,
-            D = t.singleLine,
-<<<<<<< HEAD
-            F = l(t.colorize, x, P),
-            K = t.colorizeObjects ? F : l(!1, [], !1);
-=======
-            q = l(t.colorize, k, x),
-            R = t.colorizeObjects ? q : l(!1, [], !1);
->>>>>>> dev
+            D = !A && t.ignore ? new Set(t.ignore.split(',')) : void 0,
+            T = t.hideObject,
+            C = t.singleLine,
+            K = l(t.colorize, x, P),
+            q = t.colorizeObjects ? K : l(!1, [], !1);
           return function (e) {
             let l;
             if (g(e)) l = e;
             else {
-              const t = O(e);
+              const t = M(e);
               if (t.err || !g(t.value)) return e + r;
               l = t.value;
             }
@@ -946,60 +916,33 @@
               const e = ((P ? t.customLevels : void 0 !== $[i]) ? $[i] : f[i]) || Number(i);
               if (l[void 0 === n ? p : n] < e) return;
             }
-<<<<<<< HEAD
-            const M = h({ log: l, messageKey: o, colorizer: F, messageFormat: u, levelLabel: a, ...k, useOnlyCustomProps: P });
-            (T || A) && (l = E({ log: l, ignoreKeys: T, includeKeys: A }));
-            const j = y({ log: l, colorizer: F, levelKey: n, prettifier: R.level, ...k }),
-              S = v({ log: l, prettifiers: R }),
-              w = b({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: R.time });
+            const w = h({ log: l, messageKey: o, colorizer: K, messageFormat: u, levelLabel: a, ...k, useOnlyCustomProps: P });
+            (D || A) && (l = E({ log: l, ignoreKeys: D, includeKeys: A }));
+            const j = y({ log: l, colorizer: K, levelKey: n, prettifier: R.level, ...k }),
+              O = v({ log: l, prettifiers: R }),
+              S = b({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: R.time });
             let x = '';
             if (
               (t.levelFirst && j && (x = `${j}`),
-              w && '' === x ? (x = `${w}`) : w && (x = `${x} ${w}`),
+              S && '' === x ? (x = `${S}`) : S && (x = `${x} ${S}`),
               !t.levelFirst && j && (x = x.length > 0 ? `${x} ${j}` : j),
-              S && (x = x.length > 0 ? `${x} ${S}:` : S),
+              O && (x = x.length > 0 ? `${x} ${O}:` : O),
               !1 === x.endsWith(':') && '' !== x && (x += ':'),
-              M && (x = x.length > 0 ? `${x} ${M}` : M),
-              x.length > 0 && !D && (x += r),
+              w && (x = x.length > 0 ? `${x} ${w}` : w),
+              x.length > 0 && !C && (x += r),
               'Error' === l.type && l.stack)
             ) {
               const e = m({ log: l, errorLikeKeys: d, errorProperties: L, ident: s, eol: r });
-              D && (x += r), (x += e);
-            } else if (!C) {
-              const e = [o, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = _({ input: l, skipKeys: e, customPrettifiers: R, errorLikeKeys: d, eol: r, ident: s, singleLine: D, colorizer: K });
-              D && !/^\s$/.test(t) && (x += ' '), (x += t);
-            }
-            return x;
-=======
-            const O = h({ log: l, messageKey: o, colorizer: q, messageFormat: u, levelLabel: i, ...P, useOnlyCustomProps: x });
-            (K || A) && (l = E({ log: l, ignoreKeys: K, includeKeys: A }));
-            const j = y({ log: l, colorizer: q, levelKey: n, prettifier: C.level, ...P }),
-              M = v({ log: l, prettifiers: C }),
-              S = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: C.time });
-            let k = '';
-            if (
-              (t.levelFirst && j && (k = `${j}`),
-              S && '' === k ? (k = `${S}`) : S && (k = `${k} ${S}`),
-              !t.levelFirst && j && (k = k.length > 0 ? `${k} ${j}` : j),
-              M && (k = k.length > 0 ? `${k} ${M}:` : M),
-              !1 === k.endsWith(':') && '' !== k && (k += ':'),
-              O && (k = k.length > 0 ? `${k} ${O}` : O),
-              k.length > 0 && !D && (k += r),
-              'Error' === l.type && l.stack)
-            ) {
-              const e = m({ log: l, errorLikeKeys: p, errorProperties: L, ident: s, eol: r });
-              D && (k += r), (k += e);
+              C && (x += r), (x += e);
             } else if (!T) {
               const e = [o, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = b({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: p, eol: r, ident: s, singleLine: D, colorizer: R });
-              D && !/^\s$/.test(t) && (k += ' '), (k += t);
+                t = _({ input: l, skipKeys: e, customPrettifiers: R, errorLikeKeys: d, eol: r, ident: s, singleLine: C, colorizer: q });
+              C && !/^\s$/.test(t) && (x += ' '), (x += t);
             }
-            return k;
->>>>>>> dev
+            return x;
           };
         }
-        function w(e = {}) {
+        function S(e = {}) {
           const t = P(e);
           return a(
             function (r) {
@@ -1026,7 +969,7 @@
             { parse: 'lines' }
           );
         }
-        (e.exports = w), (e.exports.prettyFactory = P), (e.exports.colorizerFactory = l), (e.exports.default = w);
+        (e.exports = S), (e.exports.prettyFactory = P), (e.exports.colorizerFactory = l), (e.exports.default = S);
       },
       903: (e, t, r) => {
         const { LEVELS: s, LEVEL_NAMES: o } = r(7318),
@@ -1124,7 +1067,7 @@
         function E(e) {
           return '[object Object]' === Object.prototype.toString.apply(e);
         }
-        function M({ input: e, ident: t = '    ', eol: r = '\n' }) {
+        function w({ input: e, ident: t = '    ', eol: r = '\n' }) {
           const s = e.split(/\r?\n/);
           for (let e = 1; e < s.length; e += 1) s[e] = t + s[e];
           return s.join(r);
@@ -1160,19 +1103,19 @@
                   let n = 'function' == typeof o[e] ? s : a(s, null, 2);
                   if (void 0 === n) return;
                   n = n.replace(/\\\\/gi, '\\');
-                  const i = M({ input: n, ident: t, eol: r });
+                  const i = w({ input: n, ident: t, eol: r });
                   f += `${t}${e}:${i.startsWith(r) ? '' : ' '}${i}${r}`;
                 }),
             Object.entries(y).forEach(([e, s]) => {
               const n = 'function' == typeof o[e] ? s : a(s, null, 2);
-              void 0 !== n && (f += O({ keyName: e, lines: n, eol: r, ident: t }));
+              void 0 !== n && (f += M({ keyName: e, lines: n, eol: r, ident: t }));
             }),
             f
           );
         }
-        function O({ keyName: e, lines: t, eol: r, ident: s }) {
+        function M({ keyName: e, lines: t, eol: r, ident: s }) {
           let o = '';
-          const n = `${s}${e}: ${M({ input: t, ident: s, eol: r })}${r}`.split(r);
+          const n = `${s}${e}: ${w({ input: t, ident: s, eol: r })}${r}`.split(r);
           for (let e = 0; e < n.length; e += 1) {
             0 !== e && (o += r);
             const t = n[e];
@@ -1188,7 +1131,7 @@
           }
           return o;
         }
-        function S(e) {
+        function O(e) {
           const t = [];
           let r = !1,
             s = '';
@@ -1199,24 +1142,20 @@
           return s.length && t.push(s), t;
         }
         function P(e, t) {
-          const r = Array.isArray(t) ? t : S(t);
+          const r = Array.isArray(t) ? t : O(t);
           for (const t of r) {
             if (!Object.prototype.hasOwnProperty.call(e, t)) return;
             e = e[t];
           }
           return e;
         }
-        function w(e, t) {
-          const r = S(t),
+        function S(e, t) {
+          const r = O(t),
             s = r.pop();
           null !== (e = P(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, s) && delete e[s];
         }
         function $() {}
-<<<<<<< HEAD
         function x(e, t) {
-=======
-        function k(e, t) {
->>>>>>> dev
           e.destroyed ||
             ('beforeExit' === t
               ? (e.flush(),
@@ -1228,7 +1167,7 @@
         (e.exports = {
           isObject: E,
           prettifyErrorLog: function ({ log: e, messageKey: t = d, ident: r = '    ', eol: s = '\n', errorLikeKeys: o = c, errorProperties: n = [] }) {
-            let a = `${r}${M({ input: e.stack, ident: r, eol: s })}${s}`;
+            let a = `${r}${w({ input: e.stack, ident: r, eol: s })}${s}`;
             if (n.length > 0) {
               const i = m.concat(t, 'type', 'stack');
               let l;
@@ -1297,13 +1236,8 @@
                 i &&
                 (function (e) {
                   if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
-<<<<<<< HEAD
                     const t = r(2067);
                     t.register(e, x),
-=======
-                    const t = r(67);
-                    t.register(e, k),
->>>>>>> dev
                       e.on('close', function () {
                         t.unregister(e);
                       });
@@ -1325,7 +1259,7 @@
             }
             return (
               t.forEach((e) => {
-                w(s, e);
+                S(s, e);
               }),
               s
             );
@@ -1360,11 +1294,11 @@
         }),
           (e.exports.internals = {
             formatTime: _,
-            joinLinesWithIndentation: M,
-            prettifyError: O,
+            joinLinesWithIndentation: w,
+            prettifyError: M,
             getPropertyValue: P,
-            deleteLogProperty: w,
-            splitPropertyKey: S,
+            deleteLogProperty: S,
+            splitPropertyKey: O,
             createDate: b,
             isValidDate: L,
           });

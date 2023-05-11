@@ -72,6 +72,16 @@ export default class {
     type: 'string' as 'boolean' | 'string' | 'array' | 'count' | undefined,
   };
 
+  private handleError(err: Error): void {
+    const res = [];
+    if (err) {
+      if (err.stack) res.push(err.stack);
+      else res.push(err.message);
+    }
+    console.error('\n', chalk.red(res.join('\n\n')));
+    process.exit(1);
+  }
+
   private cli() {
     const { version, chalk, locale, lang } = this;
     return yargs(process.argv.slice(2))
@@ -100,6 +110,10 @@ export default class {
       .alias('h', 'help')
       .version('version', chalk.grey(locale.version), version)
       .alias('v', 'version')
+      .check((argv) => {
+        if (argv._.length === 0) throw new Error(this.locale.unProcessed.required);
+        return true;
+      })
       .command(
         'create',
         chalk.grey(locale.command.description.create),
@@ -117,16 +131,20 @@ export default class {
         '*',
         '',
         () => ({}),
-        (argv) => {
-          if (argv._.length === 0) this.logger.error(chalk.red(this.locale.unProcessed.required));
-          else this.logger.error(chalk.red(this.locale.unProcessed.notFound));
+        () => {
+          throw new Error(this.locale.unProcessed.notFound);
         }
       )
       .wrap(Math.max(yargs().terminalWidth() - 5, 60))
-      .locale(lang);
+      .locale(lang)
+      .fail((msg, err) => this.handleError(err));
   }
 
   public async run() {
-    await this.cli().parseAsync();
+    try {
+      await this.cli().parseAsync();
+    } catch (e) {
+      this.handleError(e as Error);
+    }
   }
 }

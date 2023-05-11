@@ -1,6 +1,5 @@
 import { FeatureBuilderAbstract, FeatureBuilderAbstractArgs } from 'types/index';
 import yargs from 'yargs';
-import Logger from 'utils/logger';
 
 export default class extends FeatureBuilderAbstract {
   constructor(args: FeatureBuilderAbstractArgs) {
@@ -16,7 +15,6 @@ export default class extends FeatureBuilderAbstract {
           describe: 'Path to the file',
           type: 'string',
         },
-      })
-      .fail((msg, err) => Logger.handleFaildLog({ msg, err }));
+      });
   }
 }

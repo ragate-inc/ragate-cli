@@ -5,6 +5,7 @@ import _ from 'lodash';
 import { processCurrent } from 'utils/cli';
 import { readYaml, writeYaml } from 'utils/yaml';
 import { getLocaleLang } from 'features/add/features/sns/utils/getLocale';
+import { DuplicatedPropertyError } from 'exceptions/index';
 
 type SnsType = {
   Type: 'AWS::SNS::Topic';
@@ -45,10 +46,8 @@ export default class extends FeatureHandlerAbstract {
 
     const resourceName = argv._[2] as string;
     if (_.isEmpty(resourceName)) {
-      logger.error(locale.error.reqiredResourceName);
-      return;
+      throw new Error(locale.error.reqiredResourceName);
     }
-
     const path: string = _.chain(argv.path)
       .thru((v) => {
         if (_.isEmpty(v)) return `${processCurrent}/${this.defaultResourcePath}`;
@@ -58,17 +57,19 @@ export default class extends FeatureHandlerAbstract {
       .value();
 
     if (!path.endsWith('.yml') && !path.endsWith('.yaml')) {
-      logger.error(`${locale.error.mustByYamlFilePath} : ${path}`);
-      return;
+      throw new Error(`${locale.error.mustByYamlFilePath} : ${path}`);
     }
 
     try {
       const doc: Resource = (readYaml(path) as Resource) ?? {};
+
       if (_.hasIn(doc, `Resources.${resourceName}`)) {
-        logger.error(`${locale.error.alreadyExistResource} : ${resourceName}`);
+        logger.error(`${locale.error.alreadyExistResource}`);
+        logger.error(`ResourceName : ${resourceName}`);
         logger.error(doc);
-        return;
+        throw new DuplicatedPropertyError(locale.error.alreadyExistResource);
       }
+
       const yamlText = writeYaml(path, {
         ...doc,
         Resources: {
@@ -87,9 +88,10 @@ export default class extends FeatureHandlerAbstract {
       logger.info(yamlText);
       return;
     } catch (e) {
+      if ((e as Error).name === 'DuplicatedPropertyError') throw e;
       const yamlText = writeYaml(path, {
         Resources: {
-          ErrorNotifySnsTopic: {
+          [resourceName]: {
             Type: 'AWS::SNS::Topic',
             Properties: {
               TopicName: resourceName,
