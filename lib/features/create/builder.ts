@@ -1,7 +1,6 @@
 import { FeatureBuilderAbstract, FeatureBuilderAbstractArgs, FeatureHandlerAbstractArgs } from 'types/index';
 import yargs from 'yargs';
 import { chalk } from 'utils/yargonaut';
-import { getLocaleLang } from 'features/create/utils/getLocale';
 import createFeature from 'features/create/index';
 
 export default class extends FeatureBuilderAbstract {
@@ -9,7 +8,6 @@ export default class extends FeatureBuilderAbstract {
     super(args);
   }
   public build(yargs: yargs.Argv): yargs.Argv {
-    const lang = this.args.lang;
     return yargs
       .version(false)
       .usage('Usage: create <options>')
