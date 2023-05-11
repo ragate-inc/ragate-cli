@@ -472,14 +472,37 @@
         const o = s(r(545)),
           n = s(r(233)),
           i = r(870),
-          a = (0, n.default)({ colorize: !0 });
+          a = s(r(517)),
+          l = (0, n.default)({
+            colorize: !0,
+            messageFormat: (e, t) => {
+              const r = (t) => (e.level <= 30 ? i.chalk.grey(t) : 40 === e.level ? i.chalk.yellow(t) : e.level >= 50 ? i.chalk.red(t) : t),
+                s = e[t];
+              return a.default.isEmpty(s)
+                ? a.default
+                    .chain(e)
+                    .omit(['level', 'time', 'pid', 'hostname'])
+                    .thru((e) => JSON.stringify(e, null, 2))
+                    .thru((e) => r(e))
+                    .value()
+                : e.requestId
+                ? `[${e.requestId}] ${r(s)}`
+                : r(s);
+            },
+            timestampKey: 'time',
+            ignore: 'pid,hostname',
+            include: 'level,time',
+            singleLine: !1,
+            translateTime: 'yyyy-mm-dd HH:MM:ss',
+            sync: !0,
+          });
         t.default = class {
           constructor() {
             throw new Error('singleton cannot be instantiated');
           }
           static logger;
           static getLogger(e = 'info') {
-            return e ? ((this.logger = (0, o.default)({ level: e }, a)), this.logger) : (this.logger || (this.logger = (0, o.default)({ level: e }, a)), this.logger);
+            return e ? ((this.logger = (0, o.default)({ level: e }, l)), this.logger) : (this.logger || (this.logger = (0, o.default)({ level: e }, l)), this.logger);
           }
           static handleFaildLog(e) {
             const { msg: t, err: r } = e,
@@ -620,7 +643,7 @@
             x = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
             S = O(t.customLevels),
             $ = j(t.customLevels),
-            P = t.customColors
+            k = t.customColors
               ? t.customColors.split(',').reduce((e, r) => {
                   const [s, o] = r.split(':'),
                     n = (x ? t.customLevels : void 0 !== $[s]) ? $[s] : g[s],
@@ -628,14 +651,14 @@
                   return e.push([i, o]), e;
                 }, [])
               : void 0,
-            k = { customLevels: S, customLevelNames: $ };
-          x && !t.customLevels && ((k.customLevels = void 0), (k.customLevelNames = void 0));
+            P = { customLevels: S, customLevelNames: $ };
+          x && !t.customLevels && ((P.customLevels = void 0), (P.customLevelNames = void 0));
           const C = t.customPrettifiers,
             A = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
             K = !A && t.ignore ? new Set(t.ignore.split(',')) : void 0,
             T = t.hideObject,
             D = t.singleLine,
-            q = l(t.colorize, P, x),
+            q = l(t.colorize, k, x),
             R = t.colorizeObjects ? q : l(!1, [], !1);
           return function (e) {
             let l;
@@ -649,30 +672,30 @@
               const e = ((x ? t.customLevels : void 0 !== $[a]) ? $[a] : g[a]) || Number(a);
               if (l[void 0 === n ? d : n] < e) return;
             }
-            const O = h({ log: l, messageKey: o, colorizer: q, messageFormat: u, levelLabel: i, ...k, useOnlyCustomProps: x });
+            const O = h({ log: l, messageKey: o, colorizer: q, messageFormat: u, levelLabel: i, ...P, useOnlyCustomProps: x });
             (K || A) && (l = E({ log: l, ignoreKeys: K, includeKeys: A }));
-            const j = y({ log: l, colorizer: q, levelKey: n, prettifier: C.level, ...k }),
+            const j = y({ log: l, colorizer: q, levelKey: n, prettifier: C.level, ...P }),
               M = v({ log: l, prettifiers: C }),
               S = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: C.time });
-            let P = '';
+            let k = '';
             if (
-              (t.levelFirst && j && (P = `${j}`),
-              S && '' === P ? (P = `${S}`) : S && (P = `${P} ${S}`),
-              !t.levelFirst && j && (P = P.length > 0 ? `${P} ${j}` : j),
-              M && (P = P.length > 0 ? `${P} ${M}:` : M),
-              !1 === P.endsWith(':') && '' !== P && (P += ':'),
-              O && (P = P.length > 0 ? `${P} ${O}` : O),
-              P.length > 0 && !D && (P += r),
+              (t.levelFirst && j && (k = `${j}`),
+              S && '' === k ? (k = `${S}`) : S && (k = `${k} ${S}`),
+              !t.levelFirst && j && (k = k.length > 0 ? `${k} ${j}` : j),
+              M && (k = k.length > 0 ? `${k} ${M}:` : M),
+              !1 === k.endsWith(':') && '' !== k && (k += ':'),
+              O && (k = k.length > 0 ? `${k} ${O}` : O),
+              k.length > 0 && !D && (k += r),
               'Error' === l.type && l.stack)
             ) {
               const e = m({ log: l, errorLikeKeys: p, errorProperties: L, ident: s, eol: r });
-              D && (P += r), (P += e);
+              D && (k += r), (k += e);
             } else if (!T) {
               const e = [o, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
                 t = b({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: p, eol: r, ident: s, singleLine: D, colorizer: R });
-              D && !/^\s$/.test(t) && (P += ' '), (P += t);
+              D && !/^\s$/.test(t) && (k += ' '), (k += t);
             }
-            return P;
+            return k;
           };
         }
         function S(e = {}) {
@@ -888,7 +911,7 @@
           null !== (e = x(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, s) && delete e[s];
         }
         function $() {}
-        function P(e, t) {
+        function k(e, t) {
           e.destroyed ||
             ('beforeExit' === t
               ? (e.flush(),
@@ -970,7 +993,7 @@
                 (function (e) {
                   if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
                     const t = r(67);
-                    t.register(e, P),
+                    t.register(e, k),
                       e.on('close', function () {
                         t.unregister(e);
                       });
