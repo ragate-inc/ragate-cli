@@ -693,6 +693,7 @@
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
+<<<<<<< HEAD
         const o = s(r(8545)),
           n = s(r(4233)),
           a = r(6870),
@@ -704,6 +705,19 @@
                 s = e[t];
               return i.default.isEmpty(s)
                 ? i.default
+=======
+        const o = s(r(545)),
+          n = s(r(233)),
+          i = r(870),
+          a = s(r(517)),
+          l = (0, n.default)({
+            colorize: !0,
+            messageFormat: (e, t) => {
+              const r = (t) => (e.level <= 30 ? i.chalk.grey(t) : 40 === e.level ? i.chalk.yellow(t) : e.level >= 50 ? i.chalk.red(t) : t),
+                s = e[t];
+              return a.default.isEmpty(s)
+                ? a.default
+>>>>>>> dev
                     .chain(e)
                     .omit(['level', 'time', 'pid', 'hostname'])
                     .thru((e) => JSON.stringify(e, null, 2))
@@ -888,7 +902,11 @@
             P = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
             w = M(t.customLevels),
             $ = j(t.customLevels),
+<<<<<<< HEAD
             x = t.customColors
+=======
+            k = t.customColors
+>>>>>>> dev
               ? t.customColors.split(',').reduce((e, r) => {
                   const [s, o] = r.split(':'),
                     n = (P ? t.customLevels : void 0 !== $[s]) ? $[s] : f[s],
@@ -896,15 +914,26 @@
                   return e.push([a, o]), e;
                 }, [])
               : void 0,
+<<<<<<< HEAD
             k = { customLevels: w, customLevelNames: $ };
           P && !t.customLevels && ((k.customLevels = void 0), (k.customLevelNames = void 0));
           const R = t.customPrettifiers,
+=======
+            P = { customLevels: S, customLevelNames: $ };
+          x && !t.customLevels && ((P.customLevels = void 0), (P.customLevelNames = void 0));
+          const C = t.customPrettifiers,
+>>>>>>> dev
             A = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
             T = !A && t.ignore ? new Set(t.ignore.split(',')) : void 0,
             C = t.hideObject,
             D = t.singleLine,
+<<<<<<< HEAD
             F = l(t.colorize, x, P),
             K = t.colorizeObjects ? F : l(!1, [], !1);
+=======
+            q = l(t.colorize, k, x),
+            R = t.colorizeObjects ? q : l(!1, [], !1);
+>>>>>>> dev
           return function (e) {
             let l;
             if (g(e)) l = e;
@@ -917,6 +946,7 @@
               const e = ((P ? t.customLevels : void 0 !== $[i]) ? $[i] : f[i]) || Number(i);
               if (l[void 0 === n ? p : n] < e) return;
             }
+<<<<<<< HEAD
             const M = h({ log: l, messageKey: o, colorizer: F, messageFormat: u, levelLabel: a, ...k, useOnlyCustomProps: P });
             (T || A) && (l = E({ log: l, ignoreKeys: T, includeKeys: A }));
             const j = y({ log: l, colorizer: F, levelKey: n, prettifier: R.level, ...k }),
@@ -941,6 +971,32 @@
               D && !/^\s$/.test(t) && (x += ' '), (x += t);
             }
             return x;
+=======
+            const O = h({ log: l, messageKey: o, colorizer: q, messageFormat: u, levelLabel: i, ...P, useOnlyCustomProps: x });
+            (K || A) && (l = E({ log: l, ignoreKeys: K, includeKeys: A }));
+            const j = y({ log: l, colorizer: q, levelKey: n, prettifier: C.level, ...P }),
+              M = v({ log: l, prettifiers: C }),
+              S = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: C.time });
+            let k = '';
+            if (
+              (t.levelFirst && j && (k = `${j}`),
+              S && '' === k ? (k = `${S}`) : S && (k = `${k} ${S}`),
+              !t.levelFirst && j && (k = k.length > 0 ? `${k} ${j}` : j),
+              M && (k = k.length > 0 ? `${k} ${M}:` : M),
+              !1 === k.endsWith(':') && '' !== k && (k += ':'),
+              O && (k = k.length > 0 ? `${k} ${O}` : O),
+              k.length > 0 && !D && (k += r),
+              'Error' === l.type && l.stack)
+            ) {
+              const e = m({ log: l, errorLikeKeys: p, errorProperties: L, ident: s, eol: r });
+              D && (k += r), (k += e);
+            } else if (!T) {
+              const e = [o, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
+                t = b({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: p, eol: r, ident: s, singleLine: D, colorizer: R });
+              D && !/^\s$/.test(t) && (k += ' '), (k += t);
+            }
+            return k;
+>>>>>>> dev
           };
         }
         function w(e = {}) {
@@ -1156,7 +1212,11 @@
           null !== (e = P(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, s) && delete e[s];
         }
         function $() {}
+<<<<<<< HEAD
         function x(e, t) {
+=======
+        function k(e, t) {
+>>>>>>> dev
           e.destroyed ||
             ('beforeExit' === t
               ? (e.flush(),
@@ -1237,8 +1297,13 @@
                 i &&
                 (function (e) {
                   if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
+<<<<<<< HEAD
                     const t = r(2067);
                     t.register(e, x),
+=======
+                    const t = r(67);
+                    t.register(e, k),
+>>>>>>> dev
                       e.on('close', function () {
                         t.unregister(e);
                       });
