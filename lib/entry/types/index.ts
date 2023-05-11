@@ -1,5 +1,4 @@
 export type Locale = {
-  usage: string;
   help: string;
   version: string;
   yourInput: string;
@@ -13,6 +12,7 @@ export type Locale = {
     describe: {
       verbose: string;
       region: string;
+      lang: string;
     };
   };
   unProcessed: {

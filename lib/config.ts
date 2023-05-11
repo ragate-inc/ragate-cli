@@ -1,5 +1,4 @@
 import p from 'package.json';
-import { Lang } from './types';
 import _ from 'lodash';
 
 type Template = {
@@ -11,7 +10,6 @@ type Config = {
   npmVersion: string;
   repositoyUrl: string;
   templates: Template[];
-  lang: Lang;
 };
 
 // Additional templates selectable via CLI
@@ -39,7 +37,6 @@ const config: Config = {
       value: item.value,
     }))
     .value(),
-  lang: (process.env.LOCALE ?? 'en') as Lang,
 };
 
 export default config;

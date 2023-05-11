@@ -4,19 +4,20 @@ import { getLocaleLang } from 'features/create/utils/getLocale';
 import _ from 'lodash';
 import inquirerPrompt from 'inquirer-autocomplete-prompt';
 import { cleanUpTmpDirectory, gitClone, isExistsDirectory, copyDirectory, processCurrent, tmpPath } from 'utils/cli';
-import { Logger } from 'pino';
-import { FeatureHandlerAbstract } from 'types/index';
+import Logger from 'utils/logger';
+import { FeatureHandlerAbstract, FeatureHandlerAbstractArgs } from 'types/index';
 
 export default class extends FeatureHandlerAbstract {
-  constructor(args: { argv: Record<string, unknown>; logger: Logger }) {
-    super(args);
+  constructor(argv: FeatureHandlerAbstractArgs) {
+    super(argv);
     inquirer.registerPrompt('autocomplete', inquirerPrompt as inquirer.prompts.PromptConstructor);
   }
 
   public async run(): Promise<void> {
-    const { argv, logger } = this;
+    const { argv } = this;
+    const logger = Logger.getLogger();
     logger.debug('create hander : ', argv);
-    const locale = getLocaleLang(config.lang);
+    const locale = getLocaleLang(this.lang);
     const res = (await inquirer
       .prompt([
         {

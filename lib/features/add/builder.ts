@@ -1,13 +1,42 @@
-import { FeatureBuilderAbstract } from 'types/index';
+import { AWS_REGION, FeatureBuilderAbstract, FeatureBuilderAbstractArgs } from 'types/index';
 import yargs from 'yargs';
-import { Logger } from 'pino';
-import logger from 'utils/logger';
+import Logger from 'utils/logger';
+import addSnsFeature from 'features/add/features/sns';
+import addSqsFeature from 'features/add/features/sqs';
+import { chalk } from 'utils/yargonaut';
+import { getLocaleLang } from 'features/add/utils/getLocale';
 
 export default class extends FeatureBuilderAbstract {
-  constructor() {
-    super();
+  constructor(args: FeatureBuilderAbstractArgs) {
+    super(args);
   }
-  public build(args: { yargs: yargs.Argv; logger: Logger }): yargs.Argv {
-    return args.yargs.version(false).fail((msg, err) => logger.handleFaildLog({ msg, err }));
+
+  public build(yargs: yargs.Argv): yargs.Argv {
+    const lang = this.args.lang;
+    const locale = getLocaleLang(lang);
+    const logger = Logger.getLogger();
+    return yargs
+      .version(false)
+      .usage('Usage: add <command> <options>')
+      .command(
+        'sns',
+        chalk.grey(locale.command.description.sns),
+        (_yargs) => new addSnsFeature.builder(this.args).build(_yargs),
+        (argv) => new addSnsFeature.handler(argv as yargs.ArgumentsCamelCase<{ region: AWS_REGION }>).run()
+      )
+      .command(
+        'sqs',
+        chalk.grey(locale.command.description.sns),
+        (_yargs) => new addSqsFeature.builder(this.args).build(_yargs),
+        (argv) => new addSqsFeature.handler(argv as yargs.ArgumentsCamelCase<{ region: AWS_REGION }>).run()
+      )
+      .command(
+        '*',
+        chalk.grey('<command> <options>'),
+        () => ({}),
+        () => {
+          logger.error(chalk.red(locale.unProcessed));
+        }
+      );
   }
 }

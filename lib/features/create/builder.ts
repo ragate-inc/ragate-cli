@@ -1,12 +1,29 @@
-import { FeatureBuilderAbstract } from 'types/index';
+import { FeatureBuilderAbstract, FeatureBuilderAbstractArgs, FeatureHandlerAbstractArgs } from 'types/index';
 import yargs from 'yargs';
 import Logger from 'utils/logger';
+import { chalk } from 'utils/yargonaut';
+import { getLocaleLang } from 'features/create/utils/getLocale';
+import createFeature from 'features/create/index';
 
 export default class extends FeatureBuilderAbstract {
-  constructor() {
-    super();
+  constructor(args: FeatureBuilderAbstractArgs) {
+    super(args);
   }
-  public build(args: { yargs: yargs.Argv; logger: Logger }): yargs.Argv {
-    return args.yargs.version(false).fail((msg, err) => Logger.handleFaildLog({ msg, err }));
+  public build(yargs: yargs.Argv): yargs.Argv {
+    const lang = this.args.lang;
+    const locale = getLocaleLang(lang);
+    const logger = Logger.getLogger();
+    return yargs
+      .version(false)
+      .usage('Usage: create <options>')
+      .command(
+        '*',
+        chalk.grey('<command> <options>'),
+        () => ({}),
+        (argv) => {
+          if (argv._.length === 1) return new createFeature.handler(argv as FeatureHandlerAbstractArgs).run();
+          logger.error(chalk.red(locale.error.unProcessed));
+        }
+      );
   }
 }

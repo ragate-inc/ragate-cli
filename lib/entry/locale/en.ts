@@ -1,7 +1,6 @@
 import { Locale } from 'entry/types/index';
 
 const locale: Locale = {
-  usage: 'Usage',
   help: 'Show help',
   version: 'Show version',
   yourInput: 'your input',
@@ -15,6 +14,7 @@ const locale: Locale = {
     describe: {
       verbose: 'Show verbose logs',
       region: 'Aws region',
+      lang: 'Display language',
     },
   },
   unProcessed: {
