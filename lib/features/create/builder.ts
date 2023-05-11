@@ -10,7 +10,6 @@ export default class extends FeatureBuilderAbstract {
   }
   public build(yargs: yargs.Argv): yargs.Argv {
     const lang = this.args.lang;
-    const locale = getLocaleLang(lang);
     return yargs
       .version(false)
       .usage('Usage: create <options>')

@@ -3,9 +3,12 @@ import { AWS_REGION, FeatureHandlerAbstract } from 'types/index';
 import yargs from 'yargs';
 import _ from 'lodash';
 import { processCurrent } from 'utils/cli';
-import { readYaml, writeYaml } from 'utils/yaml';
+import { readYaml, writeServerlessConfig, writeYaml } from 'utils/yaml';
 import { getLocaleLang } from 'features/add/features/sns/utils/getLocale';
 import { DuplicatedPropertyError } from 'exceptions/index';
+import inquirer from 'inquirer';
+import validator from 'utils/validator';
+import transformer from 'utils/transformer';
 
 type SnsType = {
   Type: 'AWS::SNS::Topic';
@@ -19,17 +22,6 @@ type Resource = {
   Resources?: Record<string, SnsType>;
 };
 
-const defaultSubscription = [
-  {
-    Endpoint: 'Your lambda Arn',
-    Protocol: 'lambda',
-  },
-  {
-    Endpoint: 'Your email address',
-    Protocol: 'email',
-  },
-];
-
 export default class extends FeatureHandlerAbstract {
   constructor(argv: yargs.ArgumentsCamelCase<{ region: AWS_REGION }>) {
     super(argv);
@@ -39,26 +31,66 @@ export default class extends FeatureHandlerAbstract {
     return `serverless/${this.argv.region}/resources/sns.yml`;
   }
 
+  private get defaultServerlessConfigPath(): string {
+    return `serverless/${this.argv.region}/serverless.yml`;
+  }
+
   public async run(): Promise<void> {
     const logger = Logger.getLogger();
     const locale = getLocaleLang(this.lang);
-    const argv = this.argv;
 
-    const resourceName = argv._[2] as string;
-    if (_.isEmpty(resourceName)) {
-      throw new Error(locale.error.reqiredResourceName);
-    }
-    const path: string = _.chain(argv.path)
-      .thru((v) => {
-        if (_.isEmpty(v)) return `${processCurrent}/${this.defaultResourcePath}`;
-        if (_.startsWith(v as string, '/')) return `${processCurrent}${v as string}`;
-        return `${processCurrent}/${v as string}`;
-      })
-      .value();
+    const res = (await inquirer
+      .prompt([
+        {
+          type: 'input',
+          name: 'resourceName',
+          message: 'input a sns resource name]',
+          validate: (value: string) => {
+            if (_.isEmpty(value)) return locale.error.reqiredResourceName;
+            return validator.resourceName(value, this.lang);
+          },
+        },
+        {
+          type: 'checkbox',
+          name: 'subscriptions',
+          message: 'select a sns subscriptions]',
+          choices: ['email', 'lambda'],
+          validate: (value: string[]) => {
+            if (_.isEmpty(value)) return locale.error.reqiredSubscriptions;
+            return true;
+          },
+        },
+        {
+          type: 'input',
+          name: 'filePath',
+          message: 'input a cloudformation file path]',
+          default: () => this.defaultResourcePath,
+          validate: (value: string) => validator.filePath(value, this.lang),
+          transformer: (input: string) => transformer.filePath(input),
+        },
+        {
+          type: 'input',
+          name: 'serverlessConfigPath',
+          message: 'input a serverless config file path]',
+          default: () => this.defaultServerlessConfigPath,
+          validate: (value: string) => validator.serverlessConfigPath(value, this.lang),
+          transformer: (input: string) => transformer.serverlessConfigPath(input),
+        },
+      ])
+      .then((answers) => {
+        return answers as Record<string, unknown>;
+      })) as { resourceName: string; filePath: string; subscriptions: string[]; serverlessConfigPath: string };
 
-    if (!path.endsWith('.yml') && !path.endsWith('.yaml')) {
-      throw new Error(`${locale.error.mustByYamlFilePath} : ${path}`);
-    }
+    logger.debug(`input values : ${JSON.stringify(res)}}`);
+
+    const { resourceName, filePath, subscriptions, serverlessConfigPath } = res;
+
+    const path = `${processCurrent}/${filePath}`;
+
+    const subscription = subscriptions.map((sub) => ({
+      Endpoint: sub === 'email' ? 'Your email address' : 'Your lambda Arn',
+      Protocol: sub,
+    }));
 
     try {
       const doc: Resource = (readYaml(path) as Resource) ?? {};
@@ -78,7 +110,7 @@ export default class extends FeatureHandlerAbstract {
             Type: 'AWS::SNS::Topic',
             Properties: {
               TopicName: resourceName,
-              Subscription: defaultSubscription,
+              Subscription: subscription,
             },
           },
         },
@@ -86,7 +118,6 @@ export default class extends FeatureHandlerAbstract {
       logger.info(path);
       logger.info(`${locale.overrightFile} : ${path}`);
       logger.info(yamlText);
-      return;
     } catch (e) {
       if ((e as Error).name === 'DuplicatedPropertyError') throw e;
       const yamlText = writeYaml(path, {
@@ -95,7 +126,7 @@ export default class extends FeatureHandlerAbstract {
             Type: 'AWS::SNS::Topic',
             Properties: {
               TopicName: resourceName,
-              Subscription: defaultSubscription,
+              Subscription: subscription,
             },
           },
         },
@@ -104,5 +135,7 @@ export default class extends FeatureHandlerAbstract {
       logger.info(`${locale.outputFile} : ${path}`);
       logger.info(yamlText);
     }
+
+    writeServerlessConfig({ serverlessConfigPath, resourceFilePath: filePath });
   }
 }
