@@ -2,7 +2,7 @@ import Logger from 'utils/logger';
 import { AWS_REGION, AwsResource, FeatureHandlerAbstract } from 'types/index';
 import yargs from 'yargs';
 import _ from 'lodash';
-import { readYaml, writeServerlessConfig, writeYaml } from 'utils/yaml';
+import { loadYaml, writeServerlessConfig, writeYaml } from 'utils/yaml';
 import { getLocaleLang } from 'features/add/features/sns/utils/getLocale';
 import { DuplicatedPropertyError } from 'exceptions/index';
 import inquirer from 'inquirer';
@@ -10,6 +10,7 @@ import validator from 'utils/validator';
 import transformer from 'utils/transformer';
 import filter from 'utils/filter';
 import { SnsType } from 'features/add/features/sns/types';
+import { chalk } from 'yargonaut';
 
 export default class extends FeatureHandlerAbstract {
   constructor(argv: yargs.ArgumentsCamelCase<{ region: AWS_REGION }>) {
@@ -92,7 +93,7 @@ export default class extends FeatureHandlerAbstract {
     };
 
     try {
-      const doc = (readYaml(filePath) as AwsResource<SnsType>) ?? {};
+      const doc = loadYaml<AwsResource<SnsType>>(filePath) ?? {};
 
       if (_.hasIn(doc, `Resources.${resourceName}`)) {
         logger.error(`${locale.error.alreadyExistResource}`);
@@ -110,7 +111,7 @@ export default class extends FeatureHandlerAbstract {
       });
       logger.info(filePath);
       logger.info(`${locale.overrightFile} : ${filePath}`);
-      logger.info(yamlText);
+      logger.info(chalk().green(yamlText));
     } catch (e) {
       if ((e as Error).name === 'DuplicatedPropertyError') throw e;
       const yamlText = writeYaml(filePath, {
@@ -120,7 +121,7 @@ export default class extends FeatureHandlerAbstract {
       });
       logger.info(filePath);
       logger.info(`${locale.outputFile} : ${filePath}`);
-      logger.info(yamlText);
+      logger.info(chalk().green(yamlText));
     }
 
     writeServerlessConfig({ serverlessConfigPath, resourceFilePath: filePath });

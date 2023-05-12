@@ -2,7 +2,7 @@ import Logger from 'utils/logger';
 import { AWS_REGION, AwsResource, FeatureHandlerAbstract } from 'types/index';
 import yargs from 'yargs';
 import _ from 'lodash';
-import { readYaml, writeServerlessConfig, writeYaml } from 'utils/yaml';
+import { loadYaml, writeServerlessConfig, writeYaml } from 'utils/yaml';
 import { getLocaleLang } from 'features/add/features/sqs/utils/getLocale';
 import { DuplicatedPropertyError } from 'exceptions/index';
 import inquirer from 'inquirer';
@@ -10,6 +10,7 @@ import validator from 'utils/validator';
 import transformer from 'utils/transformer';
 import filter from 'utils/filter';
 import { StandardQueueType, StandardDeadLetterQueueType, FifoDeadLetterQueueType, FifoQueueType } from 'features/add/features/sqs/types';
+import { chalk } from 'yargonaut';
 
 export default class extends FeatureHandlerAbstract {
   constructor(argv: yargs.ArgumentsCamelCase<{ region: AWS_REGION }>) {
@@ -145,7 +146,7 @@ export default class extends FeatureHandlerAbstract {
           },
         };
         queue.Properties.RedrivePolicy = {
-          deadLetterTargetArn: `!GetAtt ${deadLetterQueueName}.Arn`, // TODO: 文字列をそのまま出力したいがシングルクートで囲われてしまう : I want to output strings as they are, but they are enclosed in single quotes.
+          deadLetterTargetArn: { 'Fn::GetAtt': [deadLetterQueueName, 'Arn'] },
           maxReceiveCount: 5,
         };
         resources.Resources = { ...resources.Resources, [deadLetterQueueName]: deadLetterQueue };
@@ -178,7 +179,7 @@ export default class extends FeatureHandlerAbstract {
           },
         };
         queue.Properties.RedrivePolicy = {
-          deadLetterTargetArn: `!GetAtt ${deadLetterQueueName}.Arn`, // TODO: 文字列をそのまま出力したいがシングルクートで囲われてしまう : I want to output strings as they are, but they are enclosed in single quotes.
+          deadLetterTargetArn: { 'Fn::GetAtt': [deadLetterQueueName, 'Arn'] },
           maxReceiveCount: 5,
         };
         resources.Resources = { ...resources.Resources, [deadLetterQueueName]: deadLetterQueue };
@@ -187,7 +188,9 @@ export default class extends FeatureHandlerAbstract {
     }
 
     try {
-      const doc = (readYaml(filePath) as AwsResource<StandardQueueType | StandardDeadLetterQueueType | FifoDeadLetterQueueType | FifoQueueType>) ?? {};
+      const doc = loadYaml<AwsResource<StandardQueueType | StandardDeadLetterQueueType | FifoDeadLetterQueueType | FifoQueueType>>(filePath) ?? {};
+      logger.debug('readed yaml file');
+      logger.debug(doc);
 
       if (_.hasIn(doc, `Resources.${resourceName}`)) {
         logger.error(`${locale.error.alreadyExistResource}`);
@@ -195,7 +198,6 @@ export default class extends FeatureHandlerAbstract {
         logger.error(doc);
         throw new DuplicatedPropertyError(locale.error.alreadyExistResource);
       }
-
       const yamlText = writeYaml(filePath, {
         ...doc,
         Resources: {
@@ -205,13 +207,14 @@ export default class extends FeatureHandlerAbstract {
       });
       logger.info(filePath);
       logger.info(`${locale.overrightFile} : ${filePath}`);
-      logger.info(yamlText);
+      logger.info(chalk().green(yamlText));
     } catch (e) {
       if ((e as Error).name === 'DuplicatedPropertyError') throw e;
+      logger.debug('create a new yaml file');
       const yamlText = writeYaml(filePath, resources);
       logger.info(filePath);
       logger.info(`${locale.outputFile} : ${filePath}`);
-      logger.info(yamlText);
+      logger.info(chalk().green(yamlText));
     }
 
     writeServerlessConfig({ serverlessConfigPath, resourceFilePath: filePath });

@@ -1,12 +1,12 @@
-import jsyaml from 'js-yaml';
 import fs from 'fs';
 import path from 'path';
 import Logger from 'utils/logger';
 import config from 'config';
+import jsyaml from 'js-yaml';
+import { schema } from 'yaml-cfn';
+import { chalk } from 'yargonaut';
 
-const convertAsFullPath = (path: string) => {
-  return path.startsWith('/') ? path : `${config.currentPath}/${path}`;
-};
+const asFullPath = (destinationPath: string) => path.join(config.currentPath, destinationPath);
 
 const createDirectories = (filePath: string): void => {
   const directories = filePath.split(path.sep).slice(0, -1);
@@ -19,33 +19,36 @@ const createDirectories = (filePath: string): void => {
   }, '');
 };
 
-export const writeYaml = (path: string, data: Record<string, unknown>): string => {
-  const yamlText = jsyaml.dump(data, {});
-  createDirectories(path);
-  fs.writeFileSync(convertAsFullPath(path), yamlText, 'utf8');
+export const writeYaml = (destinationPath: string, data: Record<string, unknown>): string => {
+  const yamlText = jsyaml.dump(data, { schema });
+  createDirectories(destinationPath);
+  fs.writeFileSync(asFullPath(destinationPath), yamlText, 'utf8');
   return yamlText;
 };
 
-export const readYaml = (path: string) => {
-  return jsyaml.load(fs.readFileSync(convertAsFullPath(path), 'utf8'));
+export const loadYaml = <T>(sourcePath: string): T => {
+  return jsyaml.load(fs.readFileSync(asFullPath(sourcePath), 'utf8'), { schema }) as T;
 };
 
 export const writeServerlessConfig = (args: { serverlessConfigPath: string; resourceFilePath: string }): void => {
   type ServerlessConfig = { resources: string[] };
   const { serverlessConfigPath, resourceFilePath } = args;
   const logger = Logger.getLogger();
-  const path = resourceFilePath.startsWith('/') ? resourceFilePath : `/${resourceFilePath}`;
+  const destinationPath = path.join('./', resourceFilePath);
   try {
-    const doc: ServerlessConfig = (readYaml(serverlessConfigPath) as ServerlessConfig) ?? {};
+    const doc: ServerlessConfig = loadYaml(serverlessConfigPath) ?? {};
     const resources = doc.resources ?? [];
-    if (resources.includes(resourceFilePath)) return;
-    resources.push(`\${file(.${path})}`);
+    if (resources.some((v) => v.includes(destinationPath))) {
+      logger.debug(`already exists resource file path : ${destinationPath}`);
+      return;
+    }
+    resources.push(`\${file(${destinationPath})}`);
     const yamlText = writeYaml(serverlessConfigPath, {
       ...doc,
       resources,
     });
-    logger.info(path);
-    logger.info(yamlText);
+    logger.info(destinationPath);
+    logger.info(chalk().green(yamlText));
   } catch (e) {
     logger.debug(e);
     logger.warn('not found serverless config file, skip update');

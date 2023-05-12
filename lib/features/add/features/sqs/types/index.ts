@@ -16,7 +16,7 @@ export type StandardQueueType = {
     MaximumMessageSize: number;
     MessageRetentionPeriod: number;
     QueueName: string;
-    RedrivePolicy?: { deadLetterTargetArn: string; maxReceiveCount: number };
+    RedrivePolicy?: { deadLetterTargetArn: Record<string, unknown>; maxReceiveCount: number };
     VisibilityTimeout: number;
   };
 };
@@ -41,7 +41,7 @@ export type FifoQueueType = {
     MaximumMessageSize: number;
     MessageRetentionPeriod: number;
     QueueName: string;
-    RedrivePolicy?: { deadLetterTargetArn: string; maxReceiveCount: number };
+    RedrivePolicy?: { deadLetterTargetArn: Record<string, unknown>; maxReceiveCount: number };
     VisibilityTimeout: number;
   };
 };

@@ -6,6 +6,7 @@ import inquirerPrompt from 'inquirer-autocomplete-prompt';
 import { gitClone, isExistsDirectory, moveDirectory } from 'utils/cli';
 import Logger from 'utils/logger';
 import { FeatureHandlerAbstract, FeatureHandlerAbstractArgs } from 'types/index';
+import path from 'path';
 
 export default class extends FeatureHandlerAbstract {
   constructor(argv: FeatureHandlerAbstractArgs) {
@@ -46,11 +47,12 @@ export default class extends FeatureHandlerAbstract {
     logger.info(`template : ${template}`);
     logger.info(`projectName : ${projectName}`);
 
-    if (isExistsDirectory(`${config.currentPath}/${projectName}`)) {
-      throw new Error(`${locale.error.alreadyExistsDirectory} : ${config.currentPath}/${projectName}`);
+    logger.debug(`check exists directory : ${path.join(config.currentPath, projectName)}`);
+    if (isExistsDirectory(path.join(config.currentPath, projectName))) {
+      throw new Error(`${locale.error.alreadyExistsDirectory} : ${path.join(config.currentPath, projectName)}`);
     }
 
     await gitClone(config.repositoyUrl, config.tmpPath);
-    moveDirectory(`${config.tmpPath}/${template}`, `${config.currentPath}/${projectName}`);
+    moveDirectory(path.join(config.tmpPath, template), path.join(config.currentPath, projectName));
   }
 }
