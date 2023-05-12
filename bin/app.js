@@ -278,7 +278,7 @@
           l = r(3362),
           u = r(5033),
           c = s(r(3290)),
-          d = s(r(7453)),
+          d = s(r(7973)),
           p = s(r(6243)),
           f = s(r(5735));
         class g extends a.FeatureHandlerAbstract {
@@ -428,7 +428,7 @@
           l = r(7009),
           u = r(5033),
           c = s(r(3290)),
-          d = s(r(7453)),
+          d = s(r(7973)),
           p = s(r(6243)),
           f = s(r(5735));
         class g extends a.FeatureHandlerAbstract {
@@ -930,21 +930,58 @@
             static serverlessConfigPath = (e) => e.replace(/\s+/g, '');
           });
       },
-      7453: function (e, t, r) {
+      7973: function (e, t, r) {
         var s =
           (this && this.__importDefault) ||
           function (e) {
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = s(r(6517));
+        const o = s(r(6517)),
+          a = r(2414);
         t.default = class {
-          static resourceName = (e, t) => !0;
-          static filePath = (e, t) =>
-            o.default.isEmpty(e) ? 'required input a cloudformation file path' : !(!e.endsWith('.yml') && !e.endsWith('.yaml')) || 'input a yaml file path';
-          static serverlessConfigPath = (e, t) =>
-            o.default.isEmpty(e) ? 'required input a serverless config file path' : !(!e.endsWith('.yml') && !e.endsWith('.yaml')) || 'input a yaml file path';
+          static resourceName = (e, t) => {
+            const r = (0, a.getLocaleLang)(t);
+            return !/[^\x01-\x7E]/.test(e) || r.resourceName.invalidFormat;
+          };
+          static filePath = (e, t) => {
+            const r = (0, a.getLocaleLang)(t);
+            return o.default.isEmpty(e) ? r.filePath.required : !(!e.endsWith('.yml') && !e.endsWith('.yaml')) || r.mustBeYaml;
+          };
+          static serverlessConfigPath = (e, t) => {
+            const r = (0, a.getLocaleLang)(t);
+            return o.default.isEmpty(e) ? r.serverlessConfigPath.required : !(!e.endsWith('.yml') && !e.endsWith('.yaml')) || r.mustBeYaml;
+          };
         };
+      },
+      4179: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            mustBeYaml: 'input a yaml file path',
+            resourceName: { invalidFormat: 'invalid format' },
+            filePath: { required: 'required input a cloudformation file path' },
+            serverlessConfigPath: { required: 'required input a serverless config file path' },
+          });
+      },
+      6028: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            mustBeYaml: 'Yamlファイルを指定して下さい',
+            resourceName: { invalidFormat: '正しいフォーマットで入力して下さい' },
+            filePath: { required: 'クラウドフォーメーションのパスは必須です' },
+            serverlessConfigPath: { required: 'サーバーレスフレームワークの設定ファイル(serverless.yml)のパスは必須です' },
+          });
+      },
+      2414: function (e, t, r) {
+        var s =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
+        const o = s(r(6028)),
+          a = s(r(4179));
+        t.getLocaleLang = (e) => ('ja' === e ? o.default : a.default);
       },
       3462: function (e, t, r) {
         var s =
@@ -1080,7 +1117,7 @@
               return { err: e };
             }
           },
-          w = {
+          j = {
             colorize: s,
             colorizeObjects: !0,
             crlf: !1,
@@ -1102,8 +1139,8 @@
             include: void 0,
             singleLine: !1,
           };
-        function j(e) {
-          const t = Object.assign({}, w, e),
+        function w(e) {
+          const t = Object.assign({}, j, e),
             r = t.crlf ? '\r\n' : '\n',
             s = '    ',
             o = t.messageKey,
@@ -1114,26 +1151,26 @@
             c = t.timestampKey,
             d = t.errorLikeObjectKeys,
             P = t.errorProps.split(','),
-            j = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
+            w = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
             O = E(t.customLevels),
-            $ = S(t.customLevels),
-            x = t.customColors
+            x = S(t.customLevels),
+            $ = t.customColors
               ? t.customColors.split(',').reduce((e, r) => {
                   const [s, o] = r.split(':'),
-                    a = (j ? t.customLevels : void 0 !== $[s]) ? $[s] : f[s],
+                    a = (w ? t.customLevels : void 0 !== x[s]) ? x[s] : f[s],
                     n = void 0 !== a ? a : s;
                   return e.push([n, o]), e;
                 }, [])
               : void 0,
-            R = { customLevels: O, customLevelNames: $ };
-          j && !t.customLevels && ((R.customLevels = void 0), (R.customLevelNames = void 0));
+            R = { customLevels: O, customLevelNames: x };
+          w && !t.customLevels && ((R.customLevels = void 0), (R.customLevelNames = void 0));
           const C = t.customPrettifiers,
             k = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
             D = !k && t.ignore ? new Set(t.ignore.split(',')) : void 0,
-            A = t.hideObject,
-            q = t.singleLine,
-            F = l(t.colorize, x, j),
-            T = t.colorizeObjects ? F : l(!1, [], !1);
+            q = t.hideObject,
+            A = t.singleLine,
+            F = l(t.colorize, $, w),
+            N = t.colorizeObjects ? F : l(!1, [], !1);
           return function (e) {
             let l;
             if (g(e)) l = e;
@@ -1143,37 +1180,37 @@
               l = t.value;
             }
             if (i) {
-              const e = ((j ? t.customLevels : void 0 !== $[i]) ? $[i] : f[i]) || Number(i);
+              const e = ((w ? t.customLevels : void 0 !== x[i]) ? x[i] : f[i]) || Number(i);
               if (l[void 0 === a ? p : a] < e) return;
             }
-            const E = y({ log: l, messageKey: o, colorizer: F, messageFormat: u, levelLabel: n, ...R, useOnlyCustomProps: j });
+            const E = y({ log: l, messageKey: o, colorizer: F, messageFormat: u, levelLabel: n, ...R, useOnlyCustomProps: w });
             (D || k) && (l = L({ log: l, ignoreKeys: D, includeKeys: k }));
             const S = h({ log: l, colorizer: F, levelKey: a, prettifier: C.level, ...R }),
-              w = v({ log: l, prettifiers: C }),
+              j = v({ log: l, prettifiers: C }),
               O = b({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: C.time });
-            let x = '';
+            let $ = '';
             if (
-              (t.levelFirst && S && (x = `${S}`),
-              O && '' === x ? (x = `${O}`) : O && (x = `${x} ${O}`),
-              !t.levelFirst && S && (x = x.length > 0 ? `${x} ${S}` : S),
-              w && (x = x.length > 0 ? `${x} ${w}:` : w),
-              !1 === x.endsWith(':') && '' !== x && (x += ':'),
-              E && (x = x.length > 0 ? `${x} ${E}` : E),
-              x.length > 0 && !q && (x += r),
+              (t.levelFirst && S && ($ = `${S}`),
+              O && '' === $ ? ($ = `${O}`) : O && ($ = `${$} ${O}`),
+              !t.levelFirst && S && ($ = $.length > 0 ? `${$} ${S}` : S),
+              j && ($ = $.length > 0 ? `${$} ${j}:` : j),
+              !1 === $.endsWith(':') && '' !== $ && ($ += ':'),
+              E && ($ = $.length > 0 ? `${$} ${E}` : E),
+              $.length > 0 && !A && ($ += r),
               'Error' === l.type && l.stack)
             ) {
               const e = m({ log: l, errorLikeKeys: d, errorProperties: P, ident: s, eol: r });
-              q && (x += r), (x += e);
-            } else if (!A) {
+              A && ($ += r), ($ += e);
+            } else if (!q) {
               const e = [o, a, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = _({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: d, eol: r, ident: s, singleLine: q, colorizer: T });
-              q && !/^\s$/.test(t) && (x += ' '), (x += t);
+                t = _({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: d, eol: r, ident: s, singleLine: A, colorizer: N });
+              A && !/^\s$/.test(t) && ($ += ' '), ($ += t);
             }
-            return x;
+            return $;
           };
         }
         function O(e = {}) {
-          const t = j(e);
+          const t = w(e);
           return n(
             function (r) {
               const s = new a({
@@ -1199,7 +1236,7 @@
             { parse: 'lines' }
           );
         }
-        (e.exports = O), (e.exports.prettyFactory = j), (e.exports.colorizerFactory = l), (e.exports.default = O);
+        (e.exports = O), (e.exports.prettyFactory = w), (e.exports.colorizerFactory = l), (e.exports.default = O);
       },
       903: (e, t, r) => {
         const { LEVELS: s, LEVEL_NAMES: o } = r(7318),
@@ -1361,7 +1398,7 @@
           }
           return o;
         }
-        function w(e) {
+        function j(e) {
           const t = [];
           let r = !1,
             s = '';
@@ -1371,8 +1408,8 @@
           }
           return s.length && t.push(s), t;
         }
-        function j(e, t) {
-          const r = Array.isArray(t) ? t : w(t);
+        function w(e, t) {
+          const r = Array.isArray(t) ? t : j(t);
           for (const t of r) {
             if (!Object.prototype.hasOwnProperty.call(e, t)) return;
             e = e[t];
@@ -1380,12 +1417,12 @@
           return e;
         }
         function O(e, t) {
-          const r = w(t),
+          const r = j(t),
             s = r.pop();
-          null !== (e = j(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, s) && delete e[s];
+          null !== (e = w(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, s) && delete e[s];
         }
-        function $() {}
-        function x(e, t) {
+        function x() {}
+        function $(e, t) {
           e.destroyed ||
             ('beforeExit' === t
               ? (e.flush(),
@@ -1411,7 +1448,7 @@
             return n;
           },
           prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: r = p, prettifier: s, customLevels: o, customLevelNames: a }) {
-            const n = j(e, r);
+            const n = w(e, r);
             return void 0 === n ? void 0 : s ? s(n) : t(n, { customLevels: o, customLevelNames: a });
           },
           prettifyMessage: function ({
@@ -1427,7 +1464,7 @@
             if (t && 'string' == typeof t) {
               const r = String(t).replace(/{([^{}]+)}/g, function (t, r) {
                 let s;
-                return r === o && void 0 !== (s = j(e, a)) ? ((i ? void 0 === n : void 0 === n[s]) ? h[s] : n[s]) : j(e, r) || '';
+                return r === o && void 0 !== (s = w(e, a)) ? ((i ? void 0 === n : void 0 === n[s]) ? h[s] : n[s]) : w(e, r) || '';
               });
               return s.message(r);
             }
@@ -1459,7 +1496,7 @@
             const t = new a(e);
             return (
               t.on('error', function e(r) {
-                if ('EPIPE' === r.code) return (t.write = $), (t.end = $), (t.flushSync = $), void (t.destroy = $);
+                if ('EPIPE' === r.code) return (t.write = x), (t.end = x), (t.flushSync = x), void (t.destroy = x);
                 t.removeListener('error', e);
               }),
               !e.sync &&
@@ -1467,7 +1504,7 @@
                 (function (e) {
                   if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
                     const t = r(2067);
-                    t.register(e, x),
+                    t.register(e, $),
                       e.on('close', function () {
                         t.unregister(e);
                       });
@@ -1526,9 +1563,9 @@
             formatTime: _,
             joinLinesWithIndentation: E,
             prettifyError: M,
-            getPropertyValue: j,
+            getPropertyValue: w,
             deleteLogProperty: O,
-            splitPropertyKey: w,
+            splitPropertyKey: j,
             createDate: b,
             isValidDate: P,
           });
