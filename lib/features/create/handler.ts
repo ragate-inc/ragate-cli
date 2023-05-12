@@ -3,7 +3,7 @@ import config from 'config';
 import { getLocaleLang } from 'features/create/utils/getLocale';
 import _ from 'lodash';
 import inquirerPrompt from 'inquirer-autocomplete-prompt';
-import { cleanUpTmpDirectory, gitClone, isExistsDirectory, copyDirectory, processCurrent, tmpPath } from 'utils/cli';
+import { gitClone, isExistsDirectory, moveDirectory } from 'utils/cli';
 import Logger from 'utils/logger';
 import { FeatureHandlerAbstract, FeatureHandlerAbstractArgs } from 'types/index';
 
@@ -46,15 +46,11 @@ export default class extends FeatureHandlerAbstract {
     logger.info(`template : ${template}`);
     logger.info(`projectName : ${projectName}`);
 
-    if (isExistsDirectory(`${processCurrent}/${projectName}`)) {
-      throw new Error(`${locale.error.alreadyExistsDirectory} : ${processCurrent}/${projectName}`);
+    if (isExistsDirectory(`${config.currentPath}/${projectName}`)) {
+      throw new Error(`${locale.error.alreadyExistsDirectory} : ${config.currentPath}/${projectName}`);
     }
 
-    if (isExistsDirectory(tmpPath)) {
-      cleanUpTmpDirectory();
-    }
-
-    gitClone(config.repositoyUrl, tmpPath);
-    copyDirectory(`${tmpPath}/${template}`, `${processCurrent}/${projectName}`);
+    await gitClone(config.repositoyUrl, config.tmpPath);
+    moveDirectory(`${config.tmpPath}/${template}`, `${config.currentPath}/${projectName}`);
   }
 }

@@ -9,6 +9,7 @@ import createFeature from 'features/create/index';
 import addFeature from 'features/add/index';
 import { FeatureBuilderAbstractArgs, FeatureHandlerAbstractArgs, awsRegions } from 'types/index';
 import _ from 'lodash';
+import { cleanUpTmpDirectory } from 'utils/cli';
 
 /**
  * yargs typescript : https://github.com/yargs/yargs/blob/main/docs/typescript.md
@@ -18,35 +19,39 @@ import _ from 'lodash';
 
 export default class {
   constructor() {
-    yargonautInit();
-    this.chalk = chalk;
-    const argv = yargs(process.argv.slice(2))
-      .options({
-        lang: {
-          default: this.langRef.default,
-          type: this.langRef.type,
-        },
-        verbose: {
-          type: this.verboseRef.type,
-        },
-        region: {
-          default: this.regionRef.default,
-          type: this.regionRef.type,
-        },
-      })
-      .check((argv) => {
-        argv.verbose = _.hasIn(argv, 'verbose');
-        return true;
-      })
-      .help(false)
-      .version(false)
-      .parseSync();
-    this.lang = argv.lang;
-    this.verbose = argv.verbose as boolean;
-    this.region = argv.region;
-    this.locale = getLocaleLang(argv.lang);
-    this.logger = Logger.getLogger(this.verbose ? 'debug' : 'info');
-    this.npmVersion = config.npmVersion;
+    try {
+      yargonautInit();
+      this.chalk = chalk;
+      const argv = yargs(process.argv.slice(2))
+        .options({
+          lang: {
+            default: this.langRef.default,
+            type: this.langRef.type,
+          },
+          verbose: {
+            type: this.verboseRef.type,
+          },
+          region: {
+            default: this.regionRef.default,
+            type: this.regionRef.type,
+          },
+        })
+        .check((argv) => {
+          argv.verbose = _.hasIn(argv, 'verbose');
+          return true;
+        })
+        .help(false)
+        .version(false)
+        .parseSync();
+      this.lang = argv.lang;
+      this.verbose = argv.verbose as boolean;
+      this.region = argv.region;
+      this.locale = getLocaleLang(argv.lang);
+      this.logger = Logger.getLogger(this.verbose ? 'debug' : 'info');
+      this.npmVersion = config.npmVersion;
+    } finally {
+      cleanUpTmpDirectory();
+    }
   }
 
   private readonly chalk: YargonautChalk;
