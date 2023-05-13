@@ -64,7 +64,7 @@ export const generateCloudFormation = (resourceName: string, resource: (c: Const
   const cfn = SynthUtils.toCloudFormation(stack) as Record<string, unknown>;
   logger.debug('generated cloudFormation template:');
   logger.debug(cfn);
-  return cfn;
+  return cfn.Resources as Record<string, unknown>;
 };
 
 export const generateServerlessConfig = (config?: ServerlessConfigInput) => {

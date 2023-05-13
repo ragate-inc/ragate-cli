@@ -11,6 +11,12 @@ import transformer from 'utils/inquirer/transformer';
 import filter from 'utils/inquirer/filter';
 import { SnsType } from 'features/add/features/sns/types';
 import { chalk } from 'yargonaut';
+import { generateCloudFormation } from 'utils/yaml';
+import * as sns from '@aws-cdk/aws-sns';
+import * as sqs from '@aws-cdk/aws-sqs';
+import * as subs from '@aws-cdk/aws-sns-subscriptions';
+import * as lambda from '@aws-cdk/aws-lambda';
+import * as cdk from 'aws-cdk-lib';
 
 export default class extends FeatureHandlerAbstract {
   constructor(argv: yargs.ArgumentsCamelCase<{ region: AWS_REGION }>) {
@@ -25,6 +31,27 @@ export default class extends FeatureHandlerAbstract {
     return `serverless/${this.argv.region}/serverless.yml`;
   }
 
+  private generateSnsCf(topicName: string, subscriptions: string[]) {
+    return generateCloudFormation(topicName, (c) => {
+      const topic = new sns.Topic(c, topicName, {
+        topicName: topicName,
+      });
+      subscriptions.forEach((s) => {
+        if (s === 'email') topic.addSubscription(new subs.EmailSubscription('****@****.com'));
+        else if (s === 'lambda')
+          topic.addSubscription(
+            new subs.LambdaSubscription(
+              lambda.Function.fromFunctionArn(c, `${topicName}Lambda`, `arn:aws:lambda:${this.argv.region}:${cdk.Fn.ref('AWS::AccountId')}:function:*****`)
+            )
+          );
+        else if (s === 'sms') topic.addSubscription(new subs.SmsSubscription(`0000000000`));
+        else if (s === 'url') topic.addSubscription(new subs.UrlSubscription('https://*****.com'));
+        else if (s === 'sqs') topic.addSubscription(new subs.SqsSubscription(new sqs.Queue(c, `${topicName}SubscribeQueue`)));
+      });
+      return topic;
+    });
+  }
+
   public async run(): Promise<void> {
     const logger = Logger.getLogger();
     const locale = getLocaleLang(this.lang);
@@ -37,13 +64,13 @@ export default class extends FeatureHandlerAbstract {
           message: 'input a sns resource name',
           filter: (input: string) => input.replace(/\s+/g, ''),
           transformer: (input: string) => input.replace(/\s+/g, ''),
-          validate: (value: string) => new Validator(value, this.lang).required().mustNoIncludeZenkaku().value,
+          validate: (value: string) => new Validator(value, this.lang).required().mustNoIncludeZenkaku().value(),
         },
         {
           type: 'checkbox',
           name: 'subscriptions',
           message: 'select a sns subscriptions',
-          choices: ['email', 'lambda'],
+          choices: ['email', 'lambda', 'sms', 'url', 'sqs'],
           validate: (value: string[]) => {
             if (_.isEmpty(value)) return locale.error.reqiredSubscriptions;
             return true;
@@ -54,7 +81,7 @@ export default class extends FeatureHandlerAbstract {
           name: 'filePath',
           message: 'input a cloudformation file path',
           default: () => this.defaultResourcePath,
-          validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value,
+          validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
           transformer: (input: string) => transformer.filePath(input),
           filter: (input: string) => filter.filePath(input),
         },
@@ -63,7 +90,7 @@ export default class extends FeatureHandlerAbstract {
           name: 'serverlessConfigPath',
           message: 'input a serverless config file path',
           default: () => this.defaultServerlessConfigPath,
-          validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value,
+          validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
           transformer: (input: string) => transformer.removeAllSpace(input),
           filter: (input: string) => filter.removeAllSpace(input),
         },
@@ -76,18 +103,7 @@ export default class extends FeatureHandlerAbstract {
 
     const { resourceName, filePath, subscriptions, serverlessConfigPath } = res;
 
-    const subscription = subscriptions.map((sub) => ({
-      Endpoint: sub === 'email' ? 'Your email address' : 'Your lambda Arn',
-      Protocol: sub,
-    }));
-
-    const resource: SnsType = {
-      Type: 'AWS::SNS::Topic',
-      Properties: {
-        TopicName: resourceName,
-        Subscription: subscription,
-      },
-    };
+    const resource = this.generateSnsCf(resourceName, subscriptions);
 
     try {
       const doc = loadYaml<AwsResource<SnsType>>(filePath) ?? {};
@@ -103,7 +119,7 @@ export default class extends FeatureHandlerAbstract {
         ...doc,
         Resources: {
           ...doc.Resources,
-          [resourceName]: resource,
+          ...resource,
         },
       });
       logger.info(filePath);
@@ -113,7 +129,7 @@ export default class extends FeatureHandlerAbstract {
       if ((e as Error).name === 'DuplicatedPropertyError') throw e;
       const yamlText = writeYaml(filePath, {
         Resources: {
-          [resourceName]: resource,
+          ...resource,
         },
       });
       logger.info(filePath);

@@ -11,6 +11,14 @@ import transformer from 'utils/inquirer/transformer';
 import filter from 'utils/inquirer/filter';
 import { StandardQueueType, StandardDeadLetterQueueType, FifoDeadLetterQueueType, FifoQueueType } from 'features/add/features/sqs/types';
 import { chalk } from 'yargonaut';
+import { generateCloudFormation } from 'utils/yaml';
+import * as sqs from '@aws-cdk/aws-sqs';
+
+type generateSqsCfInput = {
+  queueType: 'Standard' | 'Fifo';
+  useDeadLetterQueue: boolean;
+  contentBasedDeduplication: boolean;
+};
 
 export default class extends FeatureHandlerAbstract {
   constructor(argv: yargs.ArgumentsCamelCase<{ region: AWS_REGION }>) {
@@ -25,6 +33,57 @@ export default class extends FeatureHandlerAbstract {
     return `serverless/${this.argv.region}/serverless.yml`;
   }
 
+  private readonly defaultMaxMessageSizeBytes = 262144;
+  private readonly defaultMaxReceiveCount = 3;
+
+  private generateSqsCf(queueName: string, input: generateSqsCfInput) {
+    return generateCloudFormation(queueName, (c) => {
+      const isFifo = input.queueType === 'Fifo';
+      if (input.useDeadLetterQueue) {
+        const dlqParams = {
+          queueName: `${queueName}DeadLetter`,
+        };
+        if (isFifo) {
+          _.assign(dlqParams, {
+            queueName: `${queueName}DeadLetter.fifo`,
+            fifo: true,
+          });
+        }
+        const dlq = new sqs.Queue(c, `${queueName}DeadLetter`, dlqParams);
+        const params = {
+          queueName: queueName,
+          fifo: isFifo,
+          maxMessageSizeBytes: this.defaultMaxMessageSizeBytes,
+          deadLetterQueue: {
+            maxReceiveCount: this.defaultMaxReceiveCount,
+            queue: dlq,
+          },
+        };
+        if (isFifo) {
+          _.assign(params, {
+            queueName: `${queueName}.fifo`,
+            contentBasedDeduplication: input.contentBasedDeduplication,
+          });
+        }
+        const queue = new sqs.Queue(c, queueName, params);
+        return queue;
+      }
+      const params = {
+        queueName: queueName,
+        fifo: isFifo,
+        maxMessageSizeBytes: this.defaultMaxMessageSizeBytes,
+      };
+      if (isFifo) {
+        _.assign(params, {
+          queueName: `${queueName}.fifo`,
+          contentBasedDeduplication: input.contentBasedDeduplication,
+        });
+      }
+      const queue = new sqs.Queue(c, queueName, params);
+      return queue;
+    });
+  }
+
   public async run(): Promise<void> {
     const logger = Logger.getLogger();
     const locale = getLocaleLang(this.lang);
@@ -37,7 +96,7 @@ export default class extends FeatureHandlerAbstract {
           message: 'input a sqs resource name',
           filter: (input: string) => input.replace(/\s+/g, ''),
           transformer: (input: string) => input.replace(/\s+/g, ''),
-          validate: (value: string) => new Validator(value, this.lang).required().mustNoIncludeZenkaku().value,
+          validate: (value: string) => new Validator(value, this.lang).required().mustNoIncludeZenkaku().value(),
         },
         {
           type: 'list',
@@ -85,7 +144,7 @@ export default class extends FeatureHandlerAbstract {
           name: 'filePath',
           message: 'input a cloudformation file path',
           default: () => this.defaultResourcePath,
-          validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value,
+          validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
           transformer: (input: string) => transformer.filePath(input),
           filter: (input: string) => filter.filePath(input),
         },
@@ -94,7 +153,7 @@ export default class extends FeatureHandlerAbstract {
           name: 'serverlessConfigPath',
           message: 'input a serverless config file path',
           default: () => this.defaultServerlessConfigPath,
-          validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value,
+          validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
           transformer: (input: string) => transformer.removeAllSpace(input),
           filter: (input: string) => filter.removeAllSpace(input),
         },
@@ -114,75 +173,11 @@ export default class extends FeatureHandlerAbstract {
 
     const { resourceName, queueType, useDeadLetterQueue, contentBasedDeduplication, filePath, serverlessConfigPath } = res;
 
-    const resources: AwsResource<StandardQueueType | StandardDeadLetterQueueType | FifoDeadLetterQueueType | FifoQueueType> = {
-      Resources: {},
-    };
-
-    if (queueType === 'Standard') {
-      const queue: StandardQueueType = {
-        Type: 'AWS::SQS::Queue',
-        Properties: {
-          ContentBasedDeduplication: contentBasedDeduplication,
-          DelaySeconds: 0,
-          MaximumMessageSize: 262144,
-          MessageRetentionPeriod: 240,
-          QueueName: resourceName,
-          VisibilityTimeout: 40,
-        },
-      };
-      if (useDeadLetterQueue) {
-        const deadLetterQueueName = `${resourceName}DeadLetter`;
-        const deadLetterQueue: StandardDeadLetterQueueType = {
-          Type: 'AWS::SQS::Queue',
-          Properties: {
-            DelaySeconds: 0,
-            MaximumMessageSize: 262144,
-            MessageRetentionPeriod: 240,
-            QueueName: deadLetterQueueName,
-            VisibilityTimeout: 40,
-          },
-        };
-        queue.Properties.RedrivePolicy = {
-          deadLetterTargetArn: { 'Fn::GetAtt': [deadLetterQueueName, 'Arn'] },
-          maxReceiveCount: 5,
-        };
-        resources.Resources = { ...resources.Resources, [deadLetterQueueName]: deadLetterQueue };
-      }
-      resources.Resources = { ...resources.Resources, [resourceName]: queue };
-    } else if (queueType === 'Fifo') {
-      const queue: FifoQueueType = {
-        Type: 'AWS::SQS::Queue',
-        Properties: {
-          ContentBasedDeduplication: contentBasedDeduplication,
-          DelaySeconds: 0,
-          FifoQueue: true,
-          MaximumMessageSize: 262144,
-          MessageRetentionPeriod: 240,
-          QueueName: resourceName,
-          VisibilityTimeout: 40,
-        },
-      };
-      if (useDeadLetterQueue) {
-        const deadLetterQueueName = `${resourceName}DeadLetter`;
-        const deadLetterQueue: FifoDeadLetterQueueType = {
-          Type: 'AWS::SQS::Queue',
-          Properties: {
-            DelaySeconds: 0,
-            FifoQueue: true,
-            MaximumMessageSize: 262144,
-            MessageRetentionPeriod: 345600,
-            QueueName: deadLetterQueueName,
-            VisibilityTimeout: 60,
-          },
-        };
-        queue.Properties.RedrivePolicy = {
-          deadLetterTargetArn: { 'Fn::GetAtt': [deadLetterQueueName, 'Arn'] },
-          maxReceiveCount: 5,
-        };
-        resources.Resources = { ...resources.Resources, [deadLetterQueueName]: deadLetterQueue };
-      }
-      resources.Resources = { ...resources.Resources, [resourceName]: queue };
-    }
+    const resources = this.generateSqsCf(resourceName, {
+      queueType,
+      useDeadLetterQueue,
+      contentBasedDeduplication,
+    });
 
     try {
       const doc = loadYaml<AwsResource<StandardQueueType | StandardDeadLetterQueueType | FifoDeadLetterQueueType | FifoQueueType>>(filePath) ?? {};
@@ -199,7 +194,7 @@ export default class extends FeatureHandlerAbstract {
         ...doc,
         Resources: {
           ...doc.Resources,
-          ...resources.Resources,
+          ...resources,
         },
       });
       logger.info(filePath);
@@ -208,7 +203,11 @@ export default class extends FeatureHandlerAbstract {
     } catch (e) {
       if ((e as Error).name === 'DuplicatedPropertyError') throw e;
       logger.debug('create a new yaml file');
-      const yamlText = writeYaml(filePath, resources);
+      const yamlText = writeYaml(filePath, {
+        Resources: {
+          ...resources,
+        },
+      });
       logger.info(filePath);
       logger.info(`${locale.outputFile} : ${filePath}`);
       logger.info(chalk().green(yamlText));

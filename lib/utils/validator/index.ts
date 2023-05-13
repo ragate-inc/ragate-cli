@@ -4,59 +4,68 @@ import { Locale } from './types';
 
 export default class Validator {
   constructor(input: string | number, lang: string) {
-    this._value = true;
     this._input = input;
     this._lang = lang;
     this._locale = getLocaleLang(this._lang);
   }
 
   private _input: string | number;
-  private _value: string | boolean;
   private _lang: string;
   private _locale: Locale;
+  private validations: (() => string | boolean)[] = [];
 
   private get locale(): Locale {
     return this._locale;
   }
+
   private get input(): string | number {
     return this._input;
   }
 
   public required = (): Validator => {
-    if (this._value) return this;
-    if (_.isUndefined(this.input) || _.isNull(this.input)) this._value = this.locale.required;
+    this.validations.push((): string | boolean => {
+      if (_.isUndefined(this.input) || _.isNull(this.input)) return this.locale.required;
+      if (_.isString(this.input) && _.isEmpty(this.input)) return this.locale.required;
+      return true;
+    });
     return this;
   };
 
   public mustNoIncludeZenkaku = (): Validator => {
-    if (this._value) return this;
-    // eslint-disable-next-line no-control-regex
-    const containsFullWidthCharacter = /[^\x01-\x7E]/.test(this.input.toString());
-    if (containsFullWidthCharacter) {
-      this._value = this.locale.mustNoIncludeZenkaku;
-    }
+    this.validations.push((): string | boolean => {
+      if (!_.isString(this.input)) return true;
+      // eslint-disable-next-line no-control-regex
+      const containsFullWidthCharacter = /[^\x01-\x7E]/.test(this.input.toString());
+      if (containsFullWidthCharacter) return this.locale.mustNoIncludeZenkaku;
+      return true;
+    });
     return this;
   };
 
   public mustBeYamlFilePath = (): Validator => {
-    if (this._value) return this;
-    if (!_.isString(this.input)) return this;
-    if (!this.input.endsWith('.yml') && !this.input.endsWith('.yaml')) {
-      this._value = this.locale.mustBeYamlFilePath;
-    }
+    this.validations.push((): string | boolean => {
+      if (!_.isString(this.input)) return true;
+      if (!this.input.endsWith('.yml') && !this.input.endsWith('.yaml')) return this.locale.mustBeYamlFilePath;
+      return true;
+    });
     return this;
   };
 
-  public mustBeExtension = () => {
-    const pattern = /\.[^.]*$/;
-    if (!_.isString(this.input)) return this;
-    if (!pattern.test(this.input)) {
-      this._value = this.locale.mustBeExtension;
-    }
+  public mustBeExtension = (): Validator => {
+    this.validations.push((): string | boolean => {
+      const pattern = /\.[^.]*$/;
+      if (!_.isString(this.input)) return true;
+      if (!pattern.test(this.input)) return this.locale.mustBeExtension;
+      return true;
+    });
     return this;
   };
 
-  public get value(): string | boolean {
-    return this._value;
+  public value(): string | boolean {
+    for (let i = 0; i < this.validations.length; i++) {
+      const result = this.validations[i]();
+      if (_.isString(result)) return result;
+    }
+    return true;
   }
 }
