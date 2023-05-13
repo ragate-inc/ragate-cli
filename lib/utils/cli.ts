@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 import config from 'config';
 import git from 'isomorphic-git';
 import http from 'isomorphic-git/http/node';
+import path from 'path';
 
 export async function gitClone(repositoryUrl: string, destinationPath: string): Promise<void> {
   const logger = Logger.getLogger();
@@ -62,3 +63,25 @@ export function isExistsDirectory(directoryPath: string) {
     }
   }
 }
+
+export function isFileExists(filePath: string): boolean {
+  try {
+    fs.accessSync(filePath);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+export const createDirectories = (filePath: string): void => {
+  const directories = filePath.split(path.sep).slice(0, -1);
+  directories.reduce((currentPath: string, directory: string) => {
+    currentPath = path.join(currentPath, directory);
+    if (!fs.existsSync(currentPath)) {
+      fs.mkdirSync(currentPath);
+    }
+    return currentPath;
+  }, '');
+};
+
+export const asFullPath = (destinationPath: string) => path.join(config.currentPath, destinationPath);

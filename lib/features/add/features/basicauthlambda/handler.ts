@@ -2,7 +2,7 @@ import Logger from 'utils/logger';
 import { AWS_REGION, AwsResource, FeatureHandlerAbstract, ServerlessConfig, ServerlessFunctionsYaml } from 'types/index';
 import yargs from 'yargs';
 import _ from 'lodash';
-import { loadYaml, generateCloudFormation, writeYaml, generateServerlessConfig, generateFunctionYamlProperty, getPathFromRecursivelyReference } from 'utils/yaml';
+import { loadYaml, generateCloudFormation, writeYaml, generateServerlessConfig, generateFunctionYamlProperty } from 'utils/yaml';
 import { getLocaleLang } from 'features/add/features/basicauthlambda/utils/getLocale';
 import inquirer from 'inquirer';
 import Validator from 'utils/validator';
@@ -11,6 +11,8 @@ import filter from 'utils/inquirer/filter';
 import { chalk } from 'yargonaut';
 import * as iam from '@aws-cdk/aws-iam';
 import * as cdk from 'aws-cdk-lib';
+import parser from 'utils/parser';
+import Code from 'utils/code';
 
 export default class extends FeatureHandlerAbstract {
   constructor(argv: yargs.ArgumentsCamelCase<{ region: AWS_REGION }>) {
@@ -148,7 +150,7 @@ export default class extends FeatureHandlerAbstract {
           name: 'lambdaHandler',
           message: 'input a lambda handler path',
           default: () => this.defaultBasicLambdaPath,
-          validate: (value: string) => new Validator(value, this.lang).required().value,
+          validate: (value: string) => new Validator(value, this.lang).required().mustBeExtension().value,
           transformer: (input: string) => transformer.removeAllSpace(input),
           filter: (input: string) => filter.removeAllSpace(input),
         },
@@ -201,7 +203,7 @@ export default class extends FeatureHandlerAbstract {
         logger.info('write functions property');
         logger.info(chalk().green(yamlText));
       } else if (_.isString(doc.functions)) {
-        const filePath = getPathFromRecursivelyReference(doc.functions);
+        const filePath = parser.parseSlsRecursivelyReference(doc.functions);
         if (filePath) functionsYamlPath = filePath;
       } else if (_.isObject(doc.functions)) {
         if (Object.keys(doc.functions).every((k) => !k.includes(functionsYamlPath))) {
@@ -230,6 +232,6 @@ export default class extends FeatureHandlerAbstract {
       this.writeIamRoleCf(lamndaRoleCfPath, lamndaRoleName);
     }
 
-    // TODO: typescriptファイルを出力
+    new Code({ handlerPath: lambdaHandler, code: Code.templates.basicauthlambda }).write();
   }
 }

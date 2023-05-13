@@ -47,6 +47,15 @@ export default class Validator {
     return this;
   };
 
+  public mustBeExtension = () => {
+    const pattern = /\.[^.]*$/;
+    if (!_.isString(this.input)) return this;
+    if (!pattern.test(this.input)) {
+      this._value = this.locale.mustBeExtension;
+    }
+    return this;
+  };
+
   public get value(): string | boolean {
     return this._value;
   }

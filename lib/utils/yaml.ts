@@ -1,28 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import Logger from 'utils/logger';
-import config from 'config';
 import jsyaml from 'js-yaml';
-import _ from 'lodash';
 import { schema } from 'yaml-cfn';
 import { chalk } from 'yargonaut';
 import { ServerlessConfig, ServerlessConfigInput, ServerlessFunctionsYaml, ServerlessFunctionsYamlInput } from 'types/index';
 import { Stack, Construct, StackProps, App, CfnResource } from '@aws-cdk/core';
 import { Resource } from '@aws-cdk/core';
 import { SynthUtils } from '@aws-cdk/assert';
-
-const asFullPath = (destinationPath: string) => path.join(config.currentPath, destinationPath);
-
-const createDirectories = (filePath: string): void => {
-  const directories = filePath.split(path.sep).slice(0, -1);
-  directories.reduce((currentPath: string, directory: string) => {
-    currentPath = path.join(currentPath, directory);
-    if (!fs.existsSync(currentPath)) {
-      fs.mkdirSync(currentPath);
-    }
-    return currentPath;
-  }, '');
-};
+import { asFullPath, createDirectories } from 'utils/cli';
 
 export const writeYaml = (destinationPath: string, data: Record<string, unknown> | Record<string, unknown>[]): string => {
   const yamlText = jsyaml.dump(data, { schema });
@@ -131,13 +117,4 @@ export const generateFunctionYamlProperty = (resourceName: string, input?: Serve
       timeout: input?.timeout ?? 10,
     },
   };
-};
-
-export const getPathFromRecursivelyReference = (str: string): string | undefined => {
-  const regex = /\${file\((.*?)\)}/;
-  const match = str.match(regex);
-  if (match) {
-    const pathInfo = match[1];
-    return pathInfo;
-  }
 };
