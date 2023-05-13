@@ -4,7 +4,7 @@ export default class {
     return res;
   };
 
-  static serverlessConfigPath = (str: string): string => {
+  static removeAllSpace = (str: string): string => {
     const res = str.replace(/\s+/g, '');
     return res;
   };

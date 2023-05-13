@@ -6,7 +6,7 @@ import { loadYaml, writeServerlessConfig, writeYaml } from 'utils/yaml';
 import { getLocaleLang } from 'features/add/features/sns/utils/getLocale';
 import { DuplicatedPropertyError } from 'exceptions/index';
 import inquirer from 'inquirer';
-import validator from 'utils/validator';
+import Validator from 'utils/validator';
 import transformer from 'utils/transformer';
 import filter from 'utils/filter';
 import { SnsType } from 'features/add/features/sns/types';
@@ -37,10 +37,7 @@ export default class extends FeatureHandlerAbstract {
           message: 'input a sns resource name',
           filter: (input: string) => input.replace(/\s+/g, ''),
           transformer: (input: string) => input.replace(/\s+/g, ''),
-          validate: (value: string) => {
-            if (_.isEmpty(value)) return locale.error.reqiredResourceName;
-            return validator.resourceName(value, this.lang);
-          },
+          validate: (value: string) => new Validator(value, this.lang).required().mustNoIncludeZenkaku().value,
         },
         {
           type: 'checkbox',
@@ -57,7 +54,7 @@ export default class extends FeatureHandlerAbstract {
           name: 'filePath',
           message: 'input a cloudformation file path',
           default: () => this.defaultResourcePath,
-          validate: (value: string) => validator.filePath(value, this.lang),
+          validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value,
           transformer: (input: string) => transformer.filePath(input),
           filter: (input: string) => filter.filePath(input),
         },
@@ -66,9 +63,9 @@ export default class extends FeatureHandlerAbstract {
           name: 'serverlessConfigPath',
           message: 'input a serverless config file path',
           default: () => this.defaultServerlessConfigPath,
-          validate: (value: string) => validator.serverlessConfigPath(value, this.lang),
-          transformer: (input: string) => transformer.serverlessConfigPath(input),
-          filter: (input: string) => filter.serverlessConfigPath(input),
+          validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value,
+          transformer: (input: string) => transformer.removeAllSpace(input),
+          filter: (input: string) => filter.removeAllSpace(input),
         },
       ])
       .then((answers) => {

@@ -3,6 +3,7 @@ export type Locale = {
     description: {
       sqs: string;
       sns: string;
+      basicAuthLambda: string;
     };
   };
   unProcessed: string;

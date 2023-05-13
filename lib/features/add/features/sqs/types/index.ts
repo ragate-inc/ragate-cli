@@ -1,6 +1,5 @@
 export type Locale = {
   error: {
-    reqiredResourceName: string;
     mustByYamlFilePath: string;
     alreadyExistResource: string;
   };
