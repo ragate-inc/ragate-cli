@@ -7,8 +7,8 @@ import { getLocaleLang } from 'features/add/features/sqs/utils/getLocale';
 import { DuplicatedPropertyError } from 'exceptions/index';
 import inquirer from 'inquirer';
 import Validator from 'utils/validator';
-import transformer from 'utils/transformer';
-import filter from 'utils/filter';
+import transformer from 'utils/inquirer/transformer';
+import filter from 'utils/inquirer/filter';
 import { StandardQueueType, StandardDeadLetterQueueType, FifoDeadLetterQueueType, FifoQueueType } from 'features/add/features/sqs/types';
 import { chalk } from 'yargonaut';
 

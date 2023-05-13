@@ -6,8 +6,8 @@ import { loadYaml, generateCloudFormation, writeYaml, generateServerlessConfig, 
 import { getLocaleLang } from 'features/add/features/basicauthlambda/utils/getLocale';
 import inquirer from 'inquirer';
 import Validator from 'utils/validator';
-import transformer from 'utils/transformer';
-import filter from 'utils/filter';
+import transformer from 'utils/inquirer/transformer';
+import filter from 'utils/inquirer/filter';
 import { chalk } from 'yargonaut';
 import * as iam from '@aws-cdk/aws-iam';
 import * as cdk from 'aws-cdk-lib';

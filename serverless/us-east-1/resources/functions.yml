@@ -1,5 +1,0 @@
-BasicAuth:
-  handler: src/functions/events/lambdaedge/basicAuth.handler
-  name: BasicAuth
-  memorySize: 128
-  timeout: 5
