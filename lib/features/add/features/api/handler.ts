@@ -133,13 +133,14 @@ export default class extends FeatureHandlerAbstract {
 
     const slsConfig = loadYaml<ServerlessConfig>(info.serverlessConfigPath);
 
-    if ((slsConfig.plugins ?? []).includes('serverless-appsync-plugin')) {
+    if (!(slsConfig.plugins ?? []).includes('serverless-appsync-plugin')) {
       throw new Error('serverless-appsync-pluginがインストールされていません');
     }
 
-    const appSyncStackPath: string = Parser.parseSlsRecursivelyReference(slsConfig.custom?.appsync as string) as string;
-    if (!_.isString(appSyncStackPath) || !_.isEmpty(Parser.parseSlsRecursivelyReference(appSyncStackPath))) {
-      throw new Error('serverless.ymlのcustom.appsyncが不正です、custom.appsyncには、以下のような文字列が設定されている必要があります。\n\n${file(./appsync/stack.yml)}');
+    const appSyncStackPath: string = Parser.parseSlsRecursivelyReference(slsConfig.custom?.appSync as string) as string;
+
+    if (_.isEmpty(appSyncStackPath)) {
+      throw new Error('serverless.ymlのcustom.appsyncが不正です、custom.appsyncには、以下のような文字列が設定されている必要があります。\n${file(./appsync/stack.yml)}');
     }
 
     const appSyncStack = Parser.parseAppSyncStack(appSyncStackPath);

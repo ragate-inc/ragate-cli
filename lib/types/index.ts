@@ -135,6 +135,7 @@ export type ServerlessConfig = {
   };
   custom: {
     modules?: Record<string, unknown>;
+    appSync?: string;
   } & Record<string, unknown>;
 };
 

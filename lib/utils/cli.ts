@@ -84,4 +84,6 @@ export const createDirectories = (filePath: string): void => {
   }, '');
 };
 
-export const asFullPath = (destinationPath: string) => path.join(config.currentPath, destinationPath);
+export const asFullPath = (destinationPath: string) => {
+  return path.join(config.currentPath, destinationPath);
+};
