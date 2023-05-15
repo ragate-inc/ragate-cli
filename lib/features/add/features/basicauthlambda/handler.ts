@@ -6,8 +6,8 @@ import { loadYaml, generateCloudFormation, writeYaml, generateServerlessConfig, 
 import { getLocaleLang } from 'features/add/features/basicauthlambda/utils/getLocale';
 import inquirer from 'inquirer';
 import Validator from 'utils/validator';
-import transformer from 'utils/inquirer/transformer';
-import filter from 'utils/inquirer/filter';
+import Transformer from 'utils/inquirer/transformer';
+import Filter from 'utils/inquirer/filter';
 import { chalk } from 'yargonaut';
 import * as iam from '@aws-cdk/aws-iam';
 import * as cdk from 'aws-cdk-lib';
@@ -133,8 +133,8 @@ export default class extends FeatureHandlerAbstract {
           message: 'input a functions name',
           default: 'BasicAuth',
           validate: (value: string) => new Validator(value, this.lang).required().mustNoIncludeZenkaku().value(),
-          transformer: (input: string) => transformer.removeAllSpace(input),
-          filter: (input: string) => filter.removeAllSpace(input),
+          transformer: (input: string) => new Transformer(input).removeAllSpace().value(),
+          filter: (input: string) => new Filter(input).removeAllSpace().value(),
         },
         {
           type: 'input',
@@ -142,8 +142,8 @@ export default class extends FeatureHandlerAbstract {
           message: 'input a lambda iam role cloudformation path',
           default: () => this.defaultIamRolePath,
           validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
-          transformer: (input: string) => transformer.removeAllSpace(input),
-          filter: (input: string) => filter.removeAllSpace(input),
+          transformer: (input: string) => new Transformer(input).removeAllSpace().value(),
+          filter: (input: string) => new Filter(input).removeAllSpace().value(),
         },
         {
           type: 'input',
@@ -151,8 +151,8 @@ export default class extends FeatureHandlerAbstract {
           message: 'input a lambda handler path',
           default: () => this.defaultBasicLambdaPath,
           validate: (value: string) => new Validator(value, this.lang).required().mustBeExtension().value(),
-          transformer: (input: string) => transformer.removeAllSpace(input),
-          filter: (input: string) => filter.removeAllSpace(input),
+          transformer: (input: string) => new Transformer(input).removeAllSpace().value(),
+          filter: (input: string) => new Filter(input).removeAllSpace().value(),
         },
         {
           type: 'input',
@@ -160,8 +160,8 @@ export default class extends FeatureHandlerAbstract {
           message: 'input a lambda iam role name',
           default: () => this.defaultLambdaRoleName,
           validate: (value: string) => new Validator(value, this.lang).required().value(),
-          transformer: (input: string) => transformer.removeAllSpace(input),
-          filter: (input: string) => filter.removeAllSpace(input),
+          transformer: (input: string) => new Transformer(input).removeAllSpace().value(),
+          filter: (input: string) => new Filter(input).removeAllSpace().value(),
         },
         {
           type: 'input',
@@ -169,8 +169,8 @@ export default class extends FeatureHandlerAbstract {
           message: 'input a serverless config file path',
           default: () => this.defaultServerlessConfigPath,
           validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
-          transformer: (input: string) => transformer.removeAllSpace(input),
-          filter: (input: string) => filter.removeAllSpace(input),
+          transformer: (input: string) => new Transformer(input).removeAllSpace().value(),
+          filter: (input: string) => new Filter(input).removeAllSpace().value(),
         },
       ])
       .then((answers) => {

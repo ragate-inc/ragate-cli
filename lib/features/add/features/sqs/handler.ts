@@ -7,8 +7,8 @@ import { getLocaleLang } from 'features/add/features/sqs/utils/getLocale';
 import { DuplicatedPropertyError } from 'exceptions/index';
 import inquirer from 'inquirer';
 import Validator from 'utils/validator';
-import transformer from 'utils/inquirer/transformer';
-import filter from 'utils/inquirer/filter';
+import Filter from 'utils/inquirer/filter';
+import Transformer from 'utils/inquirer/transformer';
 import { StandardQueueType, StandardDeadLetterQueueType, FifoDeadLetterQueueType, FifoQueueType } from 'features/add/features/sqs/types';
 import { chalk } from 'yargonaut';
 import { generateCloudFormation } from 'utils/yaml';
@@ -157,8 +157,8 @@ export default class extends FeatureHandlerAbstract {
             message: 'input a cloudformation file path',
             default: () => this.defaultResourcePath(answers.resourceName),
             validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
-            transformer: (input: string) => transformer.filePath(input),
-            filter: (input: string) => filter.filePath(input),
+            transformer: (input: string) => new Transformer(input).filePath().value(),
+            filter: (input: string) => new Filter(input).filePath().value(),
           },
           {
             type: 'input',
@@ -166,8 +166,8 @@ export default class extends FeatureHandlerAbstract {
             message: 'input a serverless config file path',
             default: () => this.defaultServerlessConfigPath,
             validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
-            transformer: (input: string) => transformer.removeAllSpace(input),
-            filter: (input: string) => filter.removeAllSpace(input),
+            transformer: (input: string) => new Transformer(input).removeAllSpace().value(),
+            filter: (input: string) => new Filter(input).removeAllSpace().value(),
           },
         ])) as Omit<Prompt, 'resourceName'>;
         return {

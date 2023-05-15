@@ -329,8 +329,8 @@
           f = o(r(3290)),
           p = o(r(7973)),
           m = o(r(1092)),
-          g = o(r(5837)),
-          h = r(7347),
+          h = o(r(5837)),
+          g = r(7347),
           y = n(r(7808)),
           v = n(r(2e3)),
           b = o(r(3448)),
@@ -384,10 +384,10 @@
               const s = (0, c.loadYaml)(e) ?? {};
               if (u.default.hasIn(s, `Resources.${t}`)) return a.info(`resource name : ${t}`), void a.info(`already exists resource file path : ${e}`);
               const n = (0, c.writeYaml)(e, { ...s, Resources: { ...s.Resources, ...this.generateLambdaIamRoleCf(this.argv.region) } });
-              a.info(e), a.info(`${r.overrightFile} : ${e}`), a.info((0, h.chalk)().green(n));
+              a.info(e), a.info(`${r.overrightFile} : ${e}`), a.info((0, g.chalk)().green(n));
             } catch (t) {
               const s = (0, c.writeYaml)(e, this.generateLambdaIamRoleCf(this.argv.region));
-              a.info(`${r.outputFile} : ${e}`), a.info((0, h.chalk)().green(s));
+              a.info(`${r.outputFile} : ${e}`), a.info((0, g.chalk)().green(s));
             }
           }
           writeFunctionsYaml = (e, t, r) => {
@@ -399,10 +399,10 @@
                 ...s,
                 ...(0, c.generateFunctionYamlProperty)(e, { handler: r, memorySize: this.lambdaEdgeMemorySize, timeout: this.lambdaEdgeTimeout }),
               });
-              a.info('write functions property'), a.info((0, h.chalk)().green(n));
+              a.info('write functions property'), a.info((0, g.chalk)().green(n));
             } catch (s) {
               const n = (0, c.writeYaml)(t, { ...(0, c.generateFunctionYamlProperty)(e, { handler: r, memorySize: this.lambdaEdgeMemorySize, timeout: this.lambdaEdgeTimeout }) });
-              a.info('write functions property'), a.info((0, h.chalk)().green(n));
+              a.info('write functions property'), a.info((0, g.chalk)().green(n));
             }
           };
           async prompt() {
@@ -414,8 +414,8 @@
                   message: 'input a functions name',
                   default: 'BasicAuth',
                   validate: (e) => new p.default(e, this.lang).required().mustNoIncludeZenkaku().value(),
-                  transformer: (e) => m.default.removeAllSpace(e),
-                  filter: (e) => g.default.removeAllSpace(e),
+                  transformer: (e) => new m.default(e).removeAllSpace().value(),
+                  filter: (e) => new h.default(e).removeAllSpace().value(),
                 },
                 {
                   type: 'input',
@@ -423,8 +423,8 @@
                   message: 'input a lambda iam role cloudformation path',
                   default: () => this.defaultIamRolePath,
                   validate: (e) => new p.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                  transformer: (e) => m.default.removeAllSpace(e),
-                  filter: (e) => g.default.removeAllSpace(e),
+                  transformer: (e) => new m.default(e).removeAllSpace().value(),
+                  filter: (e) => new h.default(e).removeAllSpace().value(),
                 },
                 {
                   type: 'input',
@@ -432,8 +432,8 @@
                   message: 'input a lambda handler path',
                   default: () => this.defaultBasicLambdaPath,
                   validate: (e) => new p.default(e, this.lang).required().mustBeExtension().value(),
-                  transformer: (e) => m.default.removeAllSpace(e),
-                  filter: (e) => g.default.removeAllSpace(e),
+                  transformer: (e) => new m.default(e).removeAllSpace().value(),
+                  filter: (e) => new h.default(e).removeAllSpace().value(),
                 },
                 {
                   type: 'input',
@@ -441,8 +441,8 @@
                   message: 'input a lambda iam role name',
                   default: () => this.defaultLambdaRoleName,
                   validate: (e) => new p.default(e, this.lang).required().value(),
-                  transformer: (e) => m.default.removeAllSpace(e),
-                  filter: (e) => g.default.removeAllSpace(e),
+                  transformer: (e) => new m.default(e).removeAllSpace().value(),
+                  filter: (e) => new h.default(e).removeAllSpace().value(),
                 },
                 {
                   type: 'input',
@@ -450,8 +450,8 @@
                   message: 'input a serverless config file path',
                   default: () => this.defaultServerlessConfigPath,
                   validate: (e) => new p.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                  transformer: (e) => m.default.removeAllSpace(e),
-                  filter: (e) => g.default.removeAllSpace(e),
+                  transformer: (e) => new m.default(e).removeAllSpace().value(),
+                  filter: (e) => new h.default(e).removeAllSpace().value(),
                 },
               ])
               .then((e) => e);
@@ -468,7 +468,7 @@
               if ('us-east-1' !== t.provider.region) throw new Error('lambda edge must be in us-east-1');
               if (u.default.isEmpty(t.functions)) {
                 const a = (0, c.writeYaml)(s, { ...t, functions: `\${file(./${r})}` });
-                e.info('write functions property'), e.info((0, h.chalk)().green(a));
+                e.info('write functions property'), e.info((0, g.chalk)().green(a));
               } else if (u.default.isString(t.functions)) {
                 const e = b.default.parseSlsRecursivelyReference(t.functions);
                 e && (r = e);
@@ -477,12 +477,12 @@
                   ...t,
                   functions: { ...t.functions, ...(0, c.generateFunctionYamlProperty)(a, { handler: l, memorySize: this.lambdaEdgeMemorySize, timeout: this.lambdaEdgeTimeout }) },
                 });
-                e.info('write functions property'), e.info((0, h.chalk)().green(r));
+                e.info('write functions property'), e.info((0, g.chalk)().green(r));
               }
               this.writeFunctionsYaml(a, r, l), this.writeIamRoleCf(n, o);
             } catch (r) {
               const i = (0, c.writeYaml)(s, this.defaultServerlessConfig);
-              e.info(`${t.outputFile} : ${s}`), e.info((0, h.chalk)().green(i)), this.writeFunctionsYaml(a, this.defaultFunctionYamlPath, l), this.writeIamRoleCf(n, o);
+              e.info(`${t.outputFile} : ${s}`), e.info((0, g.chalk)().green(i)), this.writeFunctionsYaml(a, this.defaultFunctionYamlPath, l), this.writeIamRoleCf(n, o);
             }
             new _.default({ handlerPath: l, code: _.default.templates.basicauthlambda }).write();
           }
@@ -582,8 +582,8 @@
           f = r(5033),
           p = o(r(3290)),
           m = o(r(7973)),
-          g = o(r(1092)),
           h = o(r(5837)),
+          g = o(r(1092)),
           y = r(7347),
           v = r(3462),
           b = n(r(8890)),
@@ -651,8 +651,8 @@
                       message: 'input a cloudformation file path',
                       default: () => this.defaultResourcePath(e.resourceName),
                       validate: (e) => new m.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                      transformer: (e) => g.default.filePath(e),
-                      filter: (e) => h.default.filePath(e),
+                      transformer: (e) => new g.default(e).filePath().value(),
+                      filter: (e) => new h.default(e).filePath().value(),
                     },
                     {
                       type: 'input',
@@ -660,8 +660,8 @@
                       message: 'input a serverless config file path',
                       default: () => this.defaultServerlessConfigPath,
                       validate: (e) => new m.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                      transformer: (e) => g.default.removeAllSpace(e),
-                      filter: (e) => h.default.removeAllSpace(e),
+                      transformer: (e) => new g.default(e).removeAllSpace().value(),
+                      filter: (e) => new h.default(e).removeAllSpace().value(),
                     },
                   ])),
                   ...e,
@@ -794,8 +794,8 @@
           f = r(5033),
           p = o(r(3290)),
           m = o(r(7973)),
-          g = o(r(1092)),
           h = o(r(5837)),
+          g = o(r(1092)),
           y = r(7347),
           v = r(3462),
           b = n(r(9087));
@@ -866,8 +866,8 @@
                       message: 'input a cloudformation file path',
                       default: () => this.defaultResourcePath(e.resourceName),
                       validate: (e) => new m.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                      transformer: (e) => g.default.filePath(e),
-                      filter: (e) => h.default.filePath(e),
+                      transformer: (e) => new g.default(e).filePath().value(),
+                      filter: (e) => new h.default(e).filePath().value(),
                     },
                     {
                       type: 'input',
@@ -875,8 +875,8 @@
                       message: 'input a serverless config file path',
                       default: () => this.defaultServerlessConfigPath,
                       validate: (e) => new m.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                      transformer: (e) => g.default.removeAllSpace(e),
-                      filter: (e) => h.default.removeAllSpace(e),
+                      transformer: (e) => new g.default(e).removeAllSpace().value(),
+                      filter: (e) => new h.default(e).removeAllSpace().value(),
                     },
                   ])),
                   ...e,
@@ -1298,19 +1298,47 @@
         const s = a(r(5665));
         t.default = { basicauthlambda: s.default };
       },
-      5837: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = class {
-            static filePath = (e) => e.replace(/\s+/g, '');
-            static removeAllSpace = (e) => e.replace(/\s+/g, '');
-          });
+      5837: function (e, t, r) {
+        var a =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const s = a(r(6517));
+        t.default = class {
+          constructor(e) {
+            this.input = e;
+          }
+          input;
+          filters = [];
+          filePath = () => (s.default.isString(this.input) && this.filters.push((e) => e.replace(/\s+/g, '')), this);
+          removeAllSpace = () => (s.default.isString(this.input) && this.filters.push((e) => e.replace(/\s+/g, '')), this);
+          value() {
+            return s.default.isEmpty(this.filters) ? this.input : s.default.reduce(this.filters, (e, t) => t(e), this.input);
+          }
+        };
       },
-      1092: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = class {
-            static filePath = (e) => e.replace(/\s+/g, '');
-            static removeAllSpace = (e) => e.replace(/\s+/g, '');
-          });
+      1092: function (e, t, r) {
+        var a =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const s = a(r(6517));
+        t.default = class {
+          constructor(e) {
+            this.input = e;
+          }
+          input;
+          transforms = [];
+          filePath = () => (s.default.isString(this.input) && this.transforms.push((e) => e.replace(/\s+/g, '')), this);
+          removeAllSpace = () => (s.default.isString(this.input) && this.transforms.push((e) => e.replace(/\s+/g, '')), this);
+          value() {
+            return s.default.isEmpty(this.transforms) ? this.input : s.default.reduce(this.transforms, (e, t) => t(e), this.input);
+          }
+        };
       },
       6444: function (e, t, r) {
         var a =
@@ -1650,8 +1678,8 @@
           { ERROR_LIKE_KEYS: u, MESSAGE_KEY: c, TIMESTAMP_KEY: d, LEVEL_KEY: f, LEVEL_NAMES: p } = r(7318),
           {
             isObject: m,
-            prettifyErrorLog: g,
-            prettifyLevel: h,
+            prettifyErrorLog: h,
+            prettifyLevel: g,
             prettifyMessage: y,
             prettifyMetadata: v,
             prettifyObject: b,
@@ -1690,7 +1718,7 @@
             include: void 0,
             singleLine: !1,
           };
-        function j(e) {
+        function M(e) {
           const t = Object.assign({}, O, e),
             r = t.crlf ? '\r\n' : '\n',
             a = '    ',
@@ -1702,25 +1730,25 @@
             c = t.timestampKey,
             d = t.errorLikeObjectKeys,
             w = t.errorProps.split(','),
-            j = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
-            M = L(t.customLevels),
+            M = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
+            j = L(t.customLevels),
             x = S(t.customLevels),
             k = t.customColors
               ? t.customColors.split(',').reduce((e, r) => {
                   const [a, s] = r.split(':'),
-                    n = (j ? t.customLevels : void 0 !== x[a]) ? x[a] : p[a],
+                    n = (M ? t.customLevels : void 0 !== x[a]) ? x[a] : p[a],
                     o = void 0 !== n ? n : a;
                   return e.push([o, s]), e;
                 }, [])
               : void 0,
-            $ = { customLevels: M, customLevelNames: x };
-          j && !t.customLevels && (($.customLevels = void 0), ($.customLevelNames = void 0));
+            $ = { customLevels: j, customLevelNames: x };
+          M && !t.customLevels && (($.customLevels = void 0), ($.customLevelNames = void 0));
           const R = t.customPrettifiers,
             F = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
             q = !F && t.ignore ? new Set(t.ignore.split(',')) : void 0,
             C = t.hideObject,
             D = t.singleLine,
-            A = l(t.colorize, k, j),
+            A = l(t.colorize, k, M),
             N = t.colorizeObjects ? A : l(!1, [], !1);
           return function (e) {
             let l;
@@ -1731,18 +1759,18 @@
               l = t.value;
             }
             if (i) {
-              const e = ((j ? t.customLevels : void 0 !== x[i]) ? x[i] : p[i]) || Number(i);
+              const e = ((M ? t.customLevels : void 0 !== x[i]) ? x[i] : p[i]) || Number(i);
               if (l[void 0 === n ? f : n] < e) return;
             }
-            const L = y({ log: l, messageKey: s, colorizer: A, messageFormat: u, levelLabel: o, ...$, useOnlyCustomProps: j });
+            const L = y({ log: l, messageKey: s, colorizer: A, messageFormat: u, levelLabel: o, ...$, useOnlyCustomProps: M });
             (q || F) && (l = P({ log: l, ignoreKeys: q, includeKeys: F }));
-            const S = h({ log: l, colorizer: A, levelKey: n, prettifier: R.level, ...$ }),
+            const S = g({ log: l, colorizer: A, levelKey: n, prettifier: R.level, ...$ }),
               O = v({ log: l, prettifiers: R }),
-              M = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: R.time });
+              j = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: R.time });
             let k = '';
             if (
               (t.levelFirst && S && (k = `${S}`),
-              M && '' === k ? (k = `${M}`) : M && (k = `${k} ${M}`),
+              j && '' === k ? (k = `${j}`) : j && (k = `${k} ${j}`),
               !t.levelFirst && S && (k = k.length > 0 ? `${k} ${S}` : S),
               O && (k = k.length > 0 ? `${k} ${O}:` : O),
               !1 === k.endsWith(':') && '' !== k && (k += ':'),
@@ -1750,7 +1778,7 @@
               k.length > 0 && !D && (k += r),
               'Error' === l.type && l.stack)
             ) {
-              const e = g({ log: l, errorLikeKeys: d, errorProperties: w, ident: a, eol: r });
+              const e = h({ log: l, errorLikeKeys: d, errorProperties: w, ident: a, eol: r });
               D && (k += r), (k += e);
             } else if (!C) {
               const e = [s, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
@@ -1760,8 +1788,8 @@
             return k;
           };
         }
-        function M(e = {}) {
-          const t = j(e);
+        function j(e = {}) {
+          const t = M(e);
           return o(
             function (r) {
               const a = new n({
@@ -1787,7 +1815,7 @@
             { parse: 'lines' }
           );
         }
-        (e.exports = M), (e.exports.prettyFactory = j), (e.exports.colorizerFactory = l), (e.exports.default = M);
+        (e.exports = j), (e.exports.prettyFactory = M), (e.exports.colorizerFactory = l), (e.exports.default = j);
       },
       903: (e, t, r) => {
         const { LEVELS: a, LEVEL_NAMES: s } = r(7318),
@@ -1795,8 +1823,8 @@
           o = { default: n, 60: n, 50: n, 40: n, 30: n, 20: n, 10: n, message: n, greyMessage: n },
           { createColors: i } = r(8387),
           l = i({ useColor: !0 }),
-          { white: u, bgRed: c, red: d, yellow: f, green: p, blue: m, gray: g, cyan: h } = l,
-          y = { default: u, 60: c, 50: d, 40: f, 30: p, 20: m, 10: g, message: h, greyMessage: g };
+          { white: u, bgRed: c, red: d, yellow: f, green: p, blue: m, gray: h, cyan: g } = l,
+          y = { default: u, 60: c, 50: d, 40: f, 30: p, 20: m, 10: h, message: g, greyMessage: h };
         function v(e) {
           return function (t, r, { customLevels: n, customLevelNames: o } = {}) {
             const i = e ? n || a : Object.assign({}, a, n),
@@ -1815,7 +1843,7 @@
                       function (e, [t, r]) {
                         return (e[t] = 'function' == typeof l[r] ? l[r] : u), e;
                       },
-                      { default: u, message: h, greyMessage: g }
+                      { default: u, message: g, greyMessage: h }
                     );
                   })(e),
                   a = t ? r : Object.assign({}, y, r),
@@ -1863,7 +1891,7 @@
           o = r(5376),
           { isMainThread: i } = r(1267),
           l = r(903)(),
-          { DATE_FORMAT: u, ERROR_LIKE_KEYS: c, MESSAGE_KEY: d, LEVEL_KEY: f, LEVEL_LABEL: p, TIMESTAMP_KEY: m, LOGGER_KEYS: g, LEVELS: h, DATE_FORMAT_SIMPLE: y } = r(7318),
+          { DATE_FORMAT: u, ERROR_LIKE_KEYS: c, MESSAGE_KEY: d, LEVEL_KEY: f, LEVEL_LABEL: p, TIMESTAMP_KEY: m, LOGGER_KEYS: h, LEVELS: g, DATE_FORMAT_SIMPLE: y } = r(7318),
           v = a({});
         function b(e, t = !1) {
           if (!1 === t) return e;
@@ -1902,9 +1930,9 @@
           colorizer: d = l,
         }) {
           const f = [].concat(a);
-          !0 === i && Array.prototype.push.apply(f, g);
+          !0 === i && Array.prototype.push.apply(f, h);
           let p = '';
-          const { plain: m, errors: h } = Object.entries(e).reduce(
+          const { plain: m, errors: g } = Object.entries(e).reduce(
             ({ plain: t, errors: r }, [a, o]) => {
               if (!1 === f.includes(a)) {
                 const i = 'function' == typeof s[a] ? s[a](o, a, e) : o;
@@ -1924,7 +1952,7 @@
                   const i = L({ input: n, ident: t, eol: r });
                   p += `${t}${e}:${i.startsWith(r) ? '' : ' '}${i}${r}`;
                 }),
-            Object.entries(h).forEach(([e, a]) => {
+            Object.entries(g).forEach(([e, a]) => {
               const n = 'function' == typeof s[e] ? a : o(a, null, 2);
               void 0 !== n && (p += E({ keyName: e, lines: n, eol: r, ident: t }));
             }),
@@ -1959,7 +1987,7 @@
           }
           return a.length && t.push(a), t;
         }
-        function j(e, t) {
+        function M(e, t) {
           const r = Array.isArray(t) ? t : O(t);
           for (const t of r) {
             if (!Object.prototype.hasOwnProperty.call(e, t)) return;
@@ -1967,10 +1995,10 @@
           }
           return e;
         }
-        function M(e, t) {
+        function j(e, t) {
           const r = O(t),
             a = r.pop();
-          null !== (e = j(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, a) && delete e[a];
+          null !== (e = M(e, r)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, a) && delete e[a];
         }
         function x() {}
         function k(e, t) {
@@ -1987,7 +2015,7 @@
           prettifyErrorLog: function ({ log: e, messageKey: t = d, ident: r = '    ', eol: a = '\n', errorLikeKeys: s = c, errorProperties: n = [] }) {
             let o = `${r}${L({ input: e.stack, ident: r, eol: a })}${a}`;
             if (n.length > 0) {
-              const i = g.concat(t, 'type', 'stack');
+              const i = h.concat(t, 'type', 'stack');
               let l;
               l = '*' === n[0] ? Object.keys(e).filter((e) => !1 === i.includes(e)) : n.filter((e) => !1 === i.includes(e));
               for (let t = 0; t < l.length; t += 1) {
@@ -1999,7 +2027,7 @@
             return o;
           },
           prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: r = f, prettifier: a, customLevels: s, customLevelNames: n }) {
-            const o = j(e, r);
+            const o = M(e, r);
             return void 0 === o ? void 0 : a ? a(o) : t(o, { customLevels: s, customLevelNames: n });
           },
           prettifyMessage: function ({
@@ -2015,7 +2043,7 @@
             if (t && 'string' == typeof t) {
               const r = String(t).replace(/{([^{}]+)}/g, function (t, r) {
                 let a;
-                return r === s && void 0 !== (a = j(e, n)) ? ((i ? void 0 === o : void 0 === o[a]) ? h[a] : o[a]) : j(e, r) || '';
+                return r === s && void 0 !== (a = M(e, n)) ? ((i ? void 0 === o : void 0 === o[a]) ? g[a] : o[a]) : M(e, r) || '';
               });
               return a.message(r);
             }
@@ -2077,7 +2105,7 @@
             }
             return (
               t.forEach((e) => {
-                M(a, e);
+                j(a, e);
               }),
               a
             );
@@ -2114,8 +2142,8 @@
             formatTime: b,
             joinLinesWithIndentation: L,
             prettifyError: E,
-            getPropertyValue: j,
-            deleteLogProperty: M,
+            getPropertyValue: M,
+            deleteLogProperty: j,
             splitPropertyKey: O,
             createDate: _,
             isValidDate: w,

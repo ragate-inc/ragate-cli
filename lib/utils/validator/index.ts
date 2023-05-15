@@ -9,8 +9,8 @@ export default class Validator {
     this._locale = getLocaleLang(this._lang);
   }
 
-  private _input: string | number;
-  private _lang: string;
+  private readonly _input: string | number;
+  private readonly _lang: string;
   private _locale: Locale;
   private validations: (() => string | boolean)[] = [];
 
