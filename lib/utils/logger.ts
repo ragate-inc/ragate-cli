@@ -7,7 +7,8 @@ const stream = pretty({
   colorize: true, // --colorize
   messageFormat: (log: pino.LogDescriptor, messageKey: string): string => {
     const adjust = (msg: string): string => {
-      if (log.level <= 30) return chalk.grey(msg);
+      if (log.level === 30) return chalk.white(msg);
+      if (log.level < 30) return chalk.grey(msg);
       if (log.level === 40) return chalk.yellow(msg);
       if (log.level >= 50) return chalk.red(msg);
       return msg;
@@ -40,36 +41,23 @@ export default class {
 
   private static logger: pino.Logger;
 
-  public static getLogger(logLevel: LogLevel = 'info'): pino.Logger {
+  public static getLogger(logLevel?: LogLevel): pino.Logger {
     if (logLevel) {
       this.logger = pino(
         {
-          level: logLevel,
+          level: logLevel ?? 'info',
         },
         stream
       );
       return this.logger;
     }
-    if (this.logger) {
-      return this.logger;
-    }
+    if (this.logger) return this.logger;
     this.logger = pino(
       {
-        level: logLevel,
+        level: logLevel ?? 'info',
       },
       stream
     );
     return this.logger;
-  }
-
-  public static handleFaildLog(args: { msg: string; err: Error }): void {
-    const { msg, err } = args;
-    const logger = this.getLogger();
-    if (msg) logger.error(chalk.red(msg));
-    if (err) {
-      if (err.stack) logger.error(chalk.red(err.stack));
-      else logger.error(chalk.red(err.message));
-    }
-    process.exit(1);
   }
 }

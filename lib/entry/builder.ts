@@ -8,6 +8,8 @@ import { Locale } from 'entry/types';
 import createFeature from 'features/create/index';
 import addFeature from 'features/add/index';
 import { FeatureBuilderAbstractArgs, FeatureHandlerAbstractArgs, awsRegions } from 'types/index';
+import _ from 'lodash';
+import { cleanUpTmpDirectory } from 'utils/cli';
 
 /**
  * yargs typescript : https://github.com/yargs/yargs/blob/main/docs/typescript.md
@@ -17,32 +19,39 @@ import { FeatureBuilderAbstractArgs, FeatureHandlerAbstractArgs, awsRegions } fr
 
 export default class {
   constructor() {
-    yargonautInit();
-    this.chalk = chalk;
-    const argv = yargs(process.argv.slice(2))
-      .options({
-        lang: {
-          default: this.langRef.default,
-          type: this.langRef.type,
-        },
-        verbose: {
-          default: this.verboseRef.default,
-          type: this.verboseRef.type,
-        },
-        region: {
-          default: this.regionRef.default,
-          type: this.regionRef.type,
-        },
-      })
-      .help(false)
-      .version(false)
-      .parseSync();
-    this.lang = argv.lang;
-    this.verbose = argv.verbose;
-    this.region = argv.region;
-    this.locale = getLocaleLang(argv.lang);
-    this.logger = Logger.getLogger(this.verbose ? 'debug' : 'info');
-    this.npmVersion = config.npmVersion;
+    try {
+      yargonautInit();
+      this.chalk = chalk;
+      const argv = yargs(process.argv.slice(2))
+        .options({
+          lang: {
+            default: this.langRef.default,
+            type: this.langRef.type,
+          },
+          verbose: {
+            type: this.verboseRef.type,
+          },
+          region: {
+            default: this.regionRef.default,
+            type: this.regionRef.type,
+          },
+        })
+        .check((argv) => {
+          argv.verbose = _.hasIn(argv, 'verbose');
+          return true;
+        })
+        .help(false)
+        .version(false)
+        .parseSync();
+      this.lang = argv.lang;
+      this.verbose = argv.verbose as boolean;
+      this.region = argv.region;
+      this.locale = getLocaleLang(argv.lang);
+      this.logger = Logger.getLogger(this.verbose ? 'debug' : 'info');
+      this.npmVersion = config.npmVersion;
+    } finally {
+      cleanUpTmpDirectory();
+    }
   }
 
   private readonly chalk: YargonautChalk;
@@ -57,8 +66,7 @@ export default class {
 
   private readonly verbose: boolean;
   private readonly verboseRef = {
-    default: false,
-    type: 'string' as 'boolean' | 'string' | 'array' | 'count' | undefined,
+    type: 'flag' as 'boolean' | 'string' | 'array' | 'count' | undefined,
   };
 
   private readonly npmVersion: string;
@@ -72,6 +80,14 @@ export default class {
     type: 'string' as 'boolean' | 'string' | 'array' | 'count' | undefined,
   };
 
+  private handleError(err: Error): void {
+    const logger = Logger.getLogger();
+    if (err.name) logger.debug(err.name);
+    if (err.stack) logger.debug(err.stack);
+    console.error('\n', chalk.red(err.message));
+    process.exit(1);
+  }
+
   private cli() {
     const { version, chalk, locale, lang } = this;
     return yargs(process.argv.slice(2))
@@ -79,7 +95,6 @@ export default class {
       .options({
         verbose: {
           describe: chalk.grey(locale.options.describe.verbose),
-          default: this.verboseRef.default,
           type: this.verboseRef.type,
         },
         lang: {
@@ -100,6 +115,10 @@ export default class {
       .alias('h', 'help')
       .version('version', chalk.grey(locale.version), version)
       .alias('v', 'version')
+      .check((argv) => {
+        if (argv._.length === 0) throw new Error(this.locale.unProcessed.required);
+        return true;
+      })
       .command(
         'create',
         chalk.grey(locale.command.description.create),
@@ -117,16 +136,20 @@ export default class {
         '*',
         '',
         () => ({}),
-        (argv) => {
-          if (argv._.length === 0) this.logger.error(chalk.red(this.locale.unProcessed.required));
-          else this.logger.error(chalk.red(this.locale.unProcessed.notFound));
+        () => {
+          throw new Error(this.locale.unProcessed.notFound);
         }
       )
       .wrap(Math.max(yargs().terminalWidth() - 5, 60))
-      .locale(lang);
+      .locale(lang)
+      .fail((msg, err) => this.handleError(err));
   }
 
   public async run() {
-    await this.cli().parseAsync();
+    try {
+      await this.cli().parseAsync();
+    } catch (e) {
+      this.handleError(e as Error);
+    }
   }
 }

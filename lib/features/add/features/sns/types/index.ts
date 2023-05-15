@@ -1,9 +1,20 @@
 export type Locale = {
   error: {
-    reqiredResourceName: string;
+    reqiredSubscriptions: string;
     mustByYamlFilePath: string;
     alreadyExistResource: string;
   };
   overrightFile: string;
   outputFile: string;
+};
+
+export type SnsType = {
+  Type: 'AWS::SNS::Topic';
+  Properties: {
+    TopicName: string;
+    Subscription: {
+      Endpoint: string;
+      Protocol: string;
+    }[];
+  };
 };

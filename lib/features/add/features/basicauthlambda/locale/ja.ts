@@ -1,8 +1,7 @@
-import { Locale } from 'features/add/features/sqs/types/index';
+import { Locale } from 'features/add/features/basicauthlambda/types/index';
 
 const locale: Locale = {
   error: {
-    mustByYamlFilePath: 'Yamlファイルのパスを指定して下さい',
     alreadyExistResource: '指定のリソース名は既に存在します',
   },
   overrightFile: 'Yamlファイルを上書き',

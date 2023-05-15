@@ -1,6 +1,6 @@
-import ja from 'features/add/features/sqs/locale/ja';
-import en from 'features/add/features/sqs/locale/en';
-import { Locale } from 'features/add/features/sqs/types/index';
+import ja from 'utils/validator/locale/ja';
+import en from 'utils/validator/locale/en';
+import { Locale } from 'utils/validator/types/index';
 
 export const getLocaleLang = (locale: string): Locale => {
   switch (locale) {

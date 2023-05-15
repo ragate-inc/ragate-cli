@@ -6,6 +6,6 @@ export default class extends FeatureBuilderAbstract {
     super(args);
   }
   public build(_yargs: yargs.Argv): yargs.Argv {
-    return _yargs.version(false).usage('Usage: $0 sqs');
+    return _yargs.version(false).usage('Usage: $0 basic-auth-lambda');
   }
 }

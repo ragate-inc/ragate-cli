@@ -1,5 +1,6 @@
 import p from 'package.json';
 import _ from 'lodash';
+import path from 'path';
 
 type Template = {
   name: string; // User-friendly template name
@@ -9,6 +10,8 @@ type Template = {
 type Config = {
   npmVersion: string;
   repositoyUrl: string;
+  tmpPath: string;
+  currentPath: string;
   templates: Template[];
 };
 
@@ -28,6 +31,12 @@ const config: Config = {
 
   // repository of template
   repositoyUrl: 'https://github.com/ragate-inc/serverless-starter',
+
+  // working directory
+  tmpPath: `${path.dirname(process.argv[1])}/../tmp`,
+
+  // current directory
+  currentPath: path.resolve(),
 
   // templates at repository
   templates: _.chain(templates)

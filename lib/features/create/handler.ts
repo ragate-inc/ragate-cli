@@ -3,9 +3,10 @@ import config from 'config';
 import { getLocaleLang } from 'features/create/utils/getLocale';
 import _ from 'lodash';
 import inquirerPrompt from 'inquirer-autocomplete-prompt';
-import { cleanUpTmpDirectory, gitClone, isExistsDirectory, copyDirectory, processCurrent, tmpPath } from 'utils/cli';
+import { gitClone, isExistsDirectory, moveDirectory } from 'utils/cli';
 import Logger from 'utils/logger';
 import { FeatureHandlerAbstract, FeatureHandlerAbstractArgs } from 'types/index';
+import path from 'path';
 
 export default class extends FeatureHandlerAbstract {
   constructor(argv: FeatureHandlerAbstractArgs) {
@@ -46,15 +47,12 @@ export default class extends FeatureHandlerAbstract {
     logger.info(`template : ${template}`);
     logger.info(`projectName : ${projectName}`);
 
-    if (isExistsDirectory(`${processCurrent}/${projectName}`)) {
-      throw new Error(`${locale.error.alreadyExistsDirectory} : ${processCurrent}/${projectName}`);
+    logger.debug(`check exists directory : ${path.join(config.currentPath, projectName)}`);
+    if (isExistsDirectory(path.join(config.currentPath, projectName))) {
+      throw new Error(`${locale.error.alreadyExistsDirectory} : ${path.join(config.currentPath, projectName)}`);
     }
 
-    if (isExistsDirectory(tmpPath)) {
-      cleanUpTmpDirectory();
-    }
-
-    gitClone(config.repositoyUrl, tmpPath);
-    copyDirectory(`${tmpPath}/${template}`, `${processCurrent}/${projectName}`);
+    await gitClone(config.repositoyUrl, config.tmpPath);
+    moveDirectory(path.join(config.tmpPath, template), path.join(config.currentPath, projectName));
   }
 }

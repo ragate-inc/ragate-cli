@@ -107,3 +107,74 @@ export const awsRegions: AWS_REGION[] = [
   'us-gov-east-1',
   'us-gov-west-1',
 ];
+
+export type AwsResource<T> = {
+  Resources?: Record<string, T>;
+};
+
+export type ServerlessConfig = {
+  service: string;
+  resources: string[];
+  useDotenv: boolean;
+  provider: {
+    name: 'aws';
+    deploymentMethod?: 'direct';
+    runtime: string;
+    stage: string;
+    region: AWS_REGION;
+    iam: Record<string, string>;
+    environment: Record<string, unknown>;
+  };
+  plugins: string[];
+  functions: string | Record<string, unknown>;
+  package: {
+    individually: boolean;
+    includeModules: boolean;
+    patterns: string[];
+  };
+  custom: {
+    modules?: Record<string, unknown>;
+  } & Record<string, unknown>;
+};
+
+export type ServerlessConfigInput = {
+  service?: string;
+  resources?: string[];
+  useDotenv?: boolean;
+  provider?: {
+    name?: 'aws';
+    deploymentMethod?: 'direct';
+    runtime?: string;
+    stage?: string;
+    region?: AWS_REGION;
+    iam?: Record<string, string>;
+    environment?: Record<string, unknown>;
+  };
+  plugins?: string[];
+  functions?: string | Record<string, unknown>;
+  package?: {
+    individually?: boolean;
+    includeModules?: boolean;
+    patterns?: string[];
+  };
+  custom?: {
+    modules?: Record<string, unknown>;
+  } & Record<string, unknown>;
+};
+
+export type ServerlessFunctionsYaml = Record<
+  string,
+  {
+    handler: string;
+    name: string;
+    memorySize: number;
+    timeout: number;
+  }
+>;
+
+export type ServerlessFunctionsYamlInput = {
+  handler?: string;
+  name?: string;
+  memorySize?: number;
+  timeout?: number;
+};
