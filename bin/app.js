@@ -93,8 +93,8 @@
           region;
           regionRef = { default: 'ap-northeast-1', type: 'string' };
           handleError(e) {
-            const t = [];
-            e && (e.stack ? t.push(e.stack) : t.push(e.message)), console.error('\n', o.chalk.red(t.join('\n\n'))), process.exit(1);
+            const t = s.default.getLogger();
+            e.name && t.debug(e.name), e.stack && t.debug(e.stack), console.error('\n', o.chalk.red(e.message)), process.exit(1);
           }
           cli() {
             const { version: e, chalk: t, locale: r, lang: a } = this;

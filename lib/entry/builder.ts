@@ -81,12 +81,10 @@ export default class {
   };
 
   private handleError(err: Error): void {
-    const res = [];
-    if (err) {
-      if (err.stack) res.push(err.stack);
-      else res.push(err.message);
-    }
-    console.error('\n', chalk.red(res.join('\n\n')));
+    const logger = Logger.getLogger();
+    if (err.name) logger.debug(err.name);
+    if (err.stack) logger.debug(err.stack);
+    console.error('\n', chalk.red(err.message));
     process.exit(1);
   }
 
