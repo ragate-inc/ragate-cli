@@ -18,13 +18,20 @@ import * as subs from '@aws-cdk/aws-sns-subscriptions';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as cdk from 'aws-cdk-lib';
 
+type Prompt = {
+  resourceName: string;
+  filePath: string;
+  subscriptions: string[];
+  serverlessConfigPath: string;
+};
+
 export default class extends FeatureHandlerAbstract {
   constructor(argv: yargs.ArgumentsCamelCase<{ region: AWS_REGION }>) {
     super(argv);
   }
 
-  private get defaultResourcePath(): string {
-    return `serverless/${this.argv.region}/resources/sns.yml`;
+  private defaultResourcePath(resourceName: string): string {
+    return `serverless/${this.argv.region}/resources/sns/${resourceName}.yml`;
   }
 
   private get defaultServerlessConfigPath(): string {
@@ -56,7 +63,7 @@ export default class extends FeatureHandlerAbstract {
     const logger = Logger.getLogger();
     const locale = getLocaleLang(this.lang);
 
-    const res = (await inquirer
+    const res = await inquirer
       .prompt([
         {
           type: 'input',
@@ -66,38 +73,43 @@ export default class extends FeatureHandlerAbstract {
           transformer: (input: string) => input.replace(/\s+/g, ''),
           validate: (value: string) => new Validator(value, this.lang).required().mustNoIncludeZenkaku().value(),
         },
-        {
-          type: 'checkbox',
-          name: 'subscriptions',
-          message: 'select a sns subscriptions',
-          choices: ['email', 'lambda', 'sms', 'url', 'sqs'],
-          validate: (value: string[]) => {
-            if (_.isEmpty(value)) return locale.error.reqiredSubscriptions;
-            return true;
-          },
-        },
-        {
-          type: 'input',
-          name: 'filePath',
-          message: 'input a cloudformation file path',
-          default: () => this.defaultResourcePath,
-          validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
-          transformer: (input: string) => transformer.filePath(input),
-          filter: (input: string) => filter.filePath(input),
-        },
-        {
-          type: 'input',
-          name: 'serverlessConfigPath',
-          message: 'input a serverless config file path',
-          default: () => this.defaultServerlessConfigPath,
-          validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
-          transformer: (input: string) => transformer.removeAllSpace(input),
-          filter: (input: string) => filter.removeAllSpace(input),
-        },
       ])
-      .then((answers) => {
-        return answers as Record<string, unknown>;
-      })) as { resourceName: string; filePath: string; subscriptions: string[]; serverlessConfigPath: string };
+      .then(async (answers: { resourceName: string }) => {
+        const res = (await inquirer.prompt([
+          {
+            type: 'checkbox',
+            name: 'subscriptions',
+            message: 'select a sns subscriptions',
+            choices: ['email', 'lambda', 'sms', 'url', 'sqs'],
+            validate: (value: string[]) => {
+              if (_.isEmpty(value)) return locale.error.reqiredSubscriptions;
+              return true;
+            },
+          },
+          {
+            type: 'input',
+            name: 'filePath',
+            message: 'input a cloudformation file path',
+            default: () => this.defaultResourcePath(answers.resourceName),
+            validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
+            transformer: (input: string) => transformer.filePath(input),
+            filter: (input: string) => filter.filePath(input),
+          },
+          {
+            type: 'input',
+            name: 'serverlessConfigPath',
+            message: 'input a serverless config file path',
+            default: () => this.defaultServerlessConfigPath,
+            validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
+            transformer: (input: string) => transformer.removeAllSpace(input),
+            filter: (input: string) => filter.removeAllSpace(input),
+          },
+        ])) as Omit<Prompt, 'resourceName'>;
+        return {
+          ...res,
+          ...answers,
+        } as Prompt;
+      });
 
     logger.debug(`input values : ${JSON.stringify(res)}}`);
 

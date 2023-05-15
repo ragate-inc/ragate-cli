@@ -595,8 +595,8 @@
           constructor(e) {
             super(e);
           }
-          get defaultResourcePath() {
-            return `serverless/${this.argv.region}/resources/sns.yml`;
+          defaultResourcePath(e) {
+            return `serverless/${this.argv.region}/resources/sns/${e}.yml`;
           }
           get defaultServerlessConfigPath() {
             return `serverless/${this.argv.region}/serverless.yml`;
@@ -635,33 +635,37 @@
                     transformer: (e) => e.replace(/\s+/g, ''),
                     validate: (e) => new m.default(e, this.lang).required().mustNoIncludeZenkaku().value(),
                   },
-                  {
-                    type: 'checkbox',
-                    name: 'subscriptions',
-                    message: 'select a sns subscriptions',
-                    choices: ['email', 'lambda', 'sms', 'url', 'sqs'],
-                    validate: (e) => !u.default.isEmpty(e) || t.error.reqiredSubscriptions,
-                  },
-                  {
-                    type: 'input',
-                    name: 'filePath',
-                    message: 'input a cloudformation file path',
-                    default: () => this.defaultResourcePath,
-                    validate: (e) => new m.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                    transformer: (e) => g.default.filePath(e),
-                    filter: (e) => h.default.filePath(e),
-                  },
-                  {
-                    type: 'input',
-                    name: 'serverlessConfigPath',
-                    message: 'input a serverless config file path',
-                    default: () => this.defaultServerlessConfigPath,
-                    validate: (e) => new m.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                    transformer: (e) => g.default.removeAllSpace(e),
-                    filter: (e) => h.default.removeAllSpace(e),
-                  },
                 ])
-                .then((e) => e);
+                .then(async (e) => ({
+                  ...(await p.default.prompt([
+                    {
+                      type: 'checkbox',
+                      name: 'subscriptions',
+                      message: 'select a sns subscriptions',
+                      choices: ['email', 'lambda', 'sms', 'url', 'sqs'],
+                      validate: (e) => !u.default.isEmpty(e) || t.error.reqiredSubscriptions,
+                    },
+                    {
+                      type: 'input',
+                      name: 'filePath',
+                      message: 'input a cloudformation file path',
+                      default: () => this.defaultResourcePath(e.resourceName),
+                      validate: (e) => new m.default(e, this.lang).required().mustBeYamlFilePath().value(),
+                      transformer: (e) => g.default.filePath(e),
+                      filter: (e) => h.default.filePath(e),
+                    },
+                    {
+                      type: 'input',
+                      name: 'serverlessConfigPath',
+                      message: 'input a serverless config file path',
+                      default: () => this.defaultServerlessConfigPath,
+                      validate: (e) => new m.default(e, this.lang).required().mustBeYamlFilePath().value(),
+                      transformer: (e) => g.default.removeAllSpace(e),
+                      filter: (e) => h.default.removeAllSpace(e),
+                    },
+                  ])),
+                  ...e,
+                }));
             e.debug(`input values : ${JSON.stringify(r)}}`);
             const { resourceName: a, filePath: s, subscriptions: n, serverlessConfigPath: o } = r,
               l = this.generateSnsCf(a, n);
@@ -799,8 +803,8 @@
           constructor(e) {
             super(e);
           }
-          get defaultResourcePath() {
-            return `serverless/${this.argv.region}/resources/sqs.yml`;
+          defaultResourcePath(e) {
+            return `serverless/${this.argv.region}/resources/sqs/${e}.yml`;
           }
           get defaultServerlessConfigPath() {
             return `serverless/${this.argv.region}/serverless.yml`;
@@ -834,45 +838,49 @@
                     transformer: (e) => e.replace(/\s+/g, ''),
                     validate: (e) => new m.default(e, this.lang).required().mustNoIncludeZenkaku().value(),
                   },
-                  { type: 'list', name: 'queueType', default: 'Standard', choices: ['Standard', 'Fifo'], message: 'Is it a FIFO queue?' },
-                  {
-                    type: 'expand',
-                    name: 'useDeadLetterQueue',
-                    message: 'Do you use dead letter queue?',
-                    choices: [
-                      { key: 'y', name: 'yes', value: !0 },
-                      { key: 'n', name: 'no', value: !1 },
-                    ],
-                  },
-                  {
-                    type: 'expand',
-                    name: 'contentBasedDeduplication',
-                    message: 'Do you use content-based deduplication?',
-                    choices: [
-                      { key: 'y', name: 'yes', value: !0 },
-                      { key: 'n', name: 'no', value: !1 },
-                    ],
-                  },
-                  {
-                    type: 'input',
-                    name: 'filePath',
-                    message: 'input a cloudformation file path',
-                    default: () => this.defaultResourcePath,
-                    validate: (e) => new m.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                    transformer: (e) => g.default.filePath(e),
-                    filter: (e) => h.default.filePath(e),
-                  },
-                  {
-                    type: 'input',
-                    name: 'serverlessConfigPath',
-                    message: 'input a serverless config file path',
-                    default: () => this.defaultServerlessConfigPath,
-                    validate: (e) => new m.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                    transformer: (e) => g.default.removeAllSpace(e),
-                    filter: (e) => h.default.removeAllSpace(e),
-                  },
                 ])
-                .then((e) => e);
+                .then(async (e) => ({
+                  ...(await p.default.prompt([
+                    { type: 'list', name: 'queueType', default: 'Standard', choices: ['Standard', 'Fifo'], message: 'Is it a FIFO queue?' },
+                    {
+                      type: 'expand',
+                      name: 'useDeadLetterQueue',
+                      message: 'Do you use dead letter queue?',
+                      choices: [
+                        { key: 'y', name: 'yes', value: !0 },
+                        { key: 'n', name: 'no', value: !1 },
+                      ],
+                    },
+                    {
+                      type: 'expand',
+                      name: 'contentBasedDeduplication',
+                      message: 'Do you use content-based deduplication?',
+                      choices: [
+                        { key: 'y', name: 'yes', value: !0 },
+                        { key: 'n', name: 'no', value: !1 },
+                      ],
+                    },
+                    {
+                      type: 'input',
+                      name: 'filePath',
+                      message: 'input a cloudformation file path',
+                      default: () => this.defaultResourcePath(e.resourceName),
+                      validate: (e) => new m.default(e, this.lang).required().mustBeYamlFilePath().value(),
+                      transformer: (e) => g.default.filePath(e),
+                      filter: (e) => h.default.filePath(e),
+                    },
+                    {
+                      type: 'input',
+                      name: 'serverlessConfigPath',
+                      message: 'input a serverless config file path',
+                      default: () => this.defaultServerlessConfigPath,
+                      validate: (e) => new m.default(e, this.lang).required().mustBeYamlFilePath().value(),
+                      transformer: (e) => g.default.removeAllSpace(e),
+                      filter: (e) => h.default.removeAllSpace(e),
+                    },
+                  ])),
+                  ...e,
+                }));
             e.debug(`input values : ${JSON.stringify(r)}}`);
             const { resourceName: a, queueType: s, useDeadLetterQueue: n, contentBasedDeduplication: o, filePath: l, serverlessConfigPath: v } = r,
               b = this.generateSqsCf(a, { queueType: s, useDeadLetterQueue: n, contentBasedDeduplication: o });
