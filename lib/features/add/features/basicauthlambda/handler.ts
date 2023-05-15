@@ -23,7 +23,7 @@ export default class extends FeatureHandlerAbstract {
   private readonly defaultServerlessConfigPath: string = `serverless/us-east-1/serverless.yml`;
   private readonly defaultFunctionYamlPath: string = `serverless/us-east-1/resources/functions.yml`;
   private readonly defaultIamRolePath: string = `serverless/us-east-1/resources/iam-role.yml`;
-  private readonly defaultBasicLambdaPath: string = `src/functions/events/lambdaedge/basicAuth.handler`;
+  private readonly defaultBasicLambdaPath: string = `src/functions/lambdaedge/basicAuth.handler`;
   private readonly defaultLambdaRoleName = 'DefaultLambdaRole';
   private readonly lambdaEdgeTimeout = 5;
   private readonly lambdaEdgeMemorySize = 128;
@@ -198,7 +198,7 @@ export default class extends FeatureHandlerAbstract {
       if (_.isEmpty(doc.functions)) {
         const yamlText = writeYaml(serverlessConfigPath, {
           ...doc,
-          functions: `\${./file(${functionsYamlPath})}`,
+          functions: `\${file(./${functionsYamlPath})}`,
         });
         logger.info('write functions property');
         logger.info(chalk().green(yamlText));

@@ -11,7 +11,7 @@ import { SynthUtils } from '@aws-cdk/assert';
 import { asFullPath, createDirectories } from 'utils/cli';
 
 export const writeYaml = (destinationPath: string, data: Record<string, unknown> | Record<string, unknown>[]): string => {
-  const yamlText = jsyaml.dump(data, { schema });
+  const yamlText = jsyaml.dump(data, { schema, indent: 2, lineWidth: -1 });
   createDirectories(destinationPath);
   fs.writeFileSync(asFullPath(destinationPath), yamlText, 'utf8');
   return yamlText;
@@ -32,7 +32,7 @@ export const writeServerlessConfig = (args: { serverlessConfigPath: string; reso
       logger.debug(`already exists resource file path : ${destinationPath}`);
       return;
     }
-    resources.push(`\${./file(${destinationPath})}`);
+    resources.push(`\${file(./${destinationPath})}`);
     const yamlText = writeYaml(serverlessConfigPath, {
       ...doc,
       resources,
