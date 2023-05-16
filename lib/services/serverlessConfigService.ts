@@ -7,6 +7,9 @@ import { loadYaml, writeYaml } from 'utils/yaml';
 import Parser from 'utils/parser';
 import CodeService from 'services/codeService';
 import { pino } from 'pino';
+import CfService from 'services/cloudformationService';
+import * as iam from '@aws-cdk/aws-iam';
+import * as cdk from 'aws-cdk-lib';
 
 export default class {
   constructor(args: { serverlessConfigPath: string; region: AWS_REGION; lang: string }) {
@@ -47,7 +50,7 @@ export default class {
     return this._defaultFunctionYamlPath;
   }
 
-  private readonly _region?: AWS_REGION;
+  private readonly _region: AWS_REGION;
   public get region() {
     return this._region;
   }
@@ -97,7 +100,7 @@ export default class {
     const { filePath, resourceName, cf } = args;
     // update serverless.yml
     const updateServerlessYaml = () => {
-      const doc: ServerlessConfig = loadYaml(this.serverlessConfigPath) ?? {};
+      const doc: ServerlessConfig = this.serverlessConfig as ServerlessConfig;
       const destinationPath = path.join('./', filePath);
       const resources = doc.resources ?? [];
       if (resources.some((v) => v.includes(destinationPath))) {
@@ -157,7 +160,7 @@ export default class {
     logger.debug(`functionsYamlPath', functionsYamlPath`);
     // update serverless.yml
     const updateServerlessYaml = () => {
-      const serverlessConfig: ServerlessConfig = loadYaml(this.serverlessConfigPath) ?? {};
+      const serverlessConfig: ServerlessConfig = this.serverlessConfig as ServerlessConfig;
       if (_.isEmpty(serverlessConfig.functions)) {
         const yamlText = writeYaml(this.serverlessConfigPath, {
           ...serverlessConfig,
@@ -202,9 +205,18 @@ export default class {
     const createHandlerFile = () => {
       new CodeService({ handlerPath: lambdaHandler, code }).write();
     };
+    // write iam role
+    const updateIamRole = () => {
+      this.addResource({
+        filePath: `serverless/${this.region}/resources/iam-role.yml`,
+        resourceName: 'DefaultLambdaRole',
+        cf: this.generateDefaultLambdaRoleCf(lambdaFunctionName),
+      });
+    };
     updateServerlessYaml();
     updateCloudFormationYaml();
     createHandlerFile();
+    updateIamRole();
   };
 
   private generateFunctionYamlProperty = (resourceName: string, input?: ServerlessFunctionsYamlInput): ServerlessFunctionsYaml => {
@@ -232,6 +244,29 @@ export default class {
       this.logger.warn(`please check a input path : ${filePath}`);
       return false;
     }
+  }
+
+  private generateDefaultLambdaRoleCf(roleName: string): Record<string, unknown> {
+    return CfService.generateCloudFormation(roleName, (c) => {
+      const role = new iam.Role(c, roleName, {
+        assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),
+      });
+      role.addToPolicy(
+        new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          resources: [cdk.Fn.join(':', ['arn:aws:logs', cdk.Fn.ref('AWS::Region'), cdk.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],
+          actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
+        })
+      );
+      role.addToPolicy(
+        new iam.PolicyStatement({
+          effect: iam.Effect.ALLOW,
+          resources: [cdk.Fn.join(':', ['arn:aws:logs', this.region as string, cdk.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],
+          actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
+        })
+      );
+      return role;
+    });
   }
 
   public static generateServerlessConfig = (config?: ServerlessConfigInput) => {

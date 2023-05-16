@@ -20,7 +20,7 @@ export default class extends FeatureHandlerAbstract {
   // lambda edge must be in us-east-1
   private readonly defaultServerlessConfigPath: string = `serverless/us-east-1/serverless.yml`;
   private readonly defaultFunctionYamlPath: string = `serverless/us-east-1/resources/functions.yml`;
-  private readonly defaultIamRolePath: string = `serverless/us-east-1/resources/iam-role.yml`;
+  private readonly defaultIamRolePath: string = `serverless/us-east-1/resources/iamrole/defaultLambdarole.yml`;
   private readonly defaultBasicLambdaPath: string = `src/functions/lambdaedge/basicAuth.handler`;
   private readonly defaultLambdaRoleName = 'DefaultLambdaRole';
   private readonly lambdaEdgeTimeout = 5;

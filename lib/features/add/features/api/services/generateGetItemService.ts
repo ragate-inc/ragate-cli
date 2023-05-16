@@ -1,9 +1,11 @@
-import { AppSyncStack } from 'types/index';
 import Logger from 'utils/logger';
+import ServerlessConfigService from 'services/serverlessConfigService';
+import * as Type from 'features/add/features/api/types/';
+import AppSyncStackService from 'services/appSyncStackService';
 // import { getLocaleLang } from 'features/add/features/api/utils/getLocale';
 
-export default async (args: { appSyncStack: AppSyncStack; lang: string }): Promise<void> => {
-  const { appSyncStack, lang } = args;
+export default async (args: { appSyncStackService: AppSyncStackService; lang: string; slsConfig: ServerlessConfigService; info: Type.PromptApiInfo }): Promise<void> => {
+  const { appSyncStackService: appSyncStack } = args;
   // const locale = getLocaleLang(lang);
   const logger = Logger.getLogger();
   logger.debug(`appsyncStack : ${JSON.stringify(appSyncStack)}`);

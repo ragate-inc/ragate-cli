@@ -184,20 +184,22 @@ export type GraphqlApiType = 'Mutation' | 'Query' | 'Subscription';
 
 export type AppSyncResolverType = 'UNIT' | 'PIPELINE';
 
+export type AppSyncDataSourceType = 'AMAZON_DYNAMODB' | 'RELATIONAL_DATABASE' | 'AMAZON_ELASTICSEARCH' | 'AWS_LAMBDA' | 'HTTP';
 export type AppSyncDataSource = {
-  type: 'AMAZON_DYNAMODB' | 'RELATIONAL_DATABASE' | 'AMAZON_ELASTICSEARCH' | 'AWS_LAMBDA' | 'HTTP';
+  type: AppSyncDataSourceType;
   name: string;
   description: string;
-  config: { tableName: string; serviceRoleArn: string };
+  config: Record<string, unknown>;
 };
 
 export type AppSyncMappingTemplate = {
   type: GraphqlApiType;
   field: string;
-  kind: AppSyncResolverType;
   request: string;
   response: string;
-  functions: string[];
+  dataSource?: string;
+  kind?: AppSyncResolverType;
+  functions?: string[];
 };
 
 export type AppSyncFunctionConfiguration = {

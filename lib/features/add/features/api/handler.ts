@@ -12,6 +12,7 @@ import Parser from 'utils/parser';
 import generateMutationService from 'features/add/features/api/services/generateMutationService';
 import generateQueryService from 'features/add/features/api/services/generateQueryService';
 import generateGetItemService from 'features/add/features/api/services/generateGetItemService';
+import AppSyncStackService from 'services/appSyncStackService';
 
 export default class extends FeatureHandlerAbstract {
   constructor(argv: yargs.ArgumentsCamelCase<{ region: AWS_REGION }>) {
@@ -83,7 +84,8 @@ export default class extends FeatureHandlerAbstract {
       throw new Error('serverless.ymlのcustom.appsyncが不正です、custom.appsyncには、以下のような文字列が設定されている必要があります。\n${file(./appsync/stack.yml)}');
     }
 
-    const appSyncStack = Parser.parseAppSyncStack(appSyncStackPath);
+    const appSyncStackService = new AppSyncStackService({ stackFilePath: appSyncStackPath, lang: this.lang, region: this.argv.region as AWS_REGION });
+    const appSyncStack = appSyncStackService.appSyncStack;
 
     if (appSyncStack.mappingTemplates.some((m) => m.type === info.apiType && m.field === info.apiName)) {
       throw new Error('既にマッピングテンプレートに定義が存在します');
@@ -95,7 +97,7 @@ export default class extends FeatureHandlerAbstract {
 
     if (info.apiType === 'Mutation') {
       if (appSyncStack.schema.isExistsMutationApi(info.apiName)) throw new Error('既にschemeにAPI定義が存在します');
-      return generateMutationService({ appSyncStack, lang: this.lang });
+      return generateMutationService({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });
     }
 
     if (info.apiType === 'Query') {
@@ -109,8 +111,8 @@ export default class extends FeatureHandlerAbstract {
           validate: (value: string) => new Validator(value, this.lang).required().value(),
         },
       ])) as { operation: 'Query' | 'GetItem' };
-      if (operation === 'Query') return generateQueryService({ appSyncStack, lang: this.lang });
-      if (operation === 'GetItem') return generateGetItemService({ appSyncStack, lang: this.lang });
+      if (operation === 'Query') return generateQueryService({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });
+      if (operation === 'GetItem') return generateGetItemService({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });
     }
   }
 }
