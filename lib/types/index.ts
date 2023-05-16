@@ -207,12 +207,6 @@ export type AppSyncFunctionConfiguration = {
   response: string;
 };
 
-type Scheme = {
-  Mutation: Record<string, unknown>;
-  Query: Record<string, unknown>;
-  Subscription: Record<string, unknown>;
-};
-
 export type AppSyncStack = {
   mappingTemplatesLocation: string;
   functionConfigurationsLocation: string;

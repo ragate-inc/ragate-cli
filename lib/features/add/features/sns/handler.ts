@@ -1,22 +1,19 @@
 import Logger from 'utils/logger';
-import { AWS_REGION, AwsResource, FeatureHandlerAbstract } from 'types/index';
+import { AWS_REGION, FeatureHandlerAbstract } from 'types/index';
 import yargs from 'yargs';
 import _ from 'lodash';
-import { loadYaml, writeServerlessConfig, writeYaml } from 'utils/yaml';
 import { getLocaleLang } from 'features/add/features/sns/utils/getLocale';
-import { DuplicatedPropertyError } from 'exceptions/index';
 import inquirer from 'inquirer';
 import Validator from 'utils/validator';
 import Filter from 'utils/inquirer/filter';
 import Transformer from 'utils/inquirer/transformer';
-import { SnsType } from 'features/add/features/sns/types';
-import { chalk } from 'yargonaut';
-import { generateCloudFormation } from 'utils/yaml';
+import CfService from 'services/cloudformationService';
 import * as sns from '@aws-cdk/aws-sns';
 import * as sqs from '@aws-cdk/aws-sqs';
 import * as subs from '@aws-cdk/aws-sns-subscriptions';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as cdk from 'aws-cdk-lib';
+import ServerlessConfigService from 'services/serverlessConfigService';
 
 type Prompt = {
   resourceName: string;
@@ -39,7 +36,7 @@ export default class extends FeatureHandlerAbstract {
   }
 
   private generateSnsCf(topicName: string, subscriptions: string[]) {
-    return generateCloudFormation(topicName, (c) => {
+    return CfService.generateCloudFormation(topicName, (c) => {
       const topic = new sns.Topic(c, topicName, {
         topicName: topicName,
       });
@@ -115,40 +112,10 @@ export default class extends FeatureHandlerAbstract {
 
     const { resourceName, filePath, subscriptions, serverlessConfigPath } = res;
 
+    const sls = new ServerlessConfigService({ region: this.argv.region as AWS_REGION, serverlessConfigPath, lang: this.lang });
+
     const resource = this.generateSnsCf(resourceName, subscriptions);
 
-    try {
-      const doc = loadYaml<AwsResource<SnsType>>(filePath) ?? {};
-
-      if (_.hasIn(doc, `Resources.${resourceName}`)) {
-        logger.error(`${locale.error.alreadyExistResource}`);
-        logger.error(`ResourceName : ${resourceName}`);
-        logger.error(doc);
-        throw new DuplicatedPropertyError(locale.error.alreadyExistResource);
-      }
-
-      const yamlText = writeYaml(filePath, {
-        ...doc,
-        Resources: {
-          ...doc.Resources,
-          ...resource,
-        },
-      });
-      logger.info(filePath);
-      logger.info(`${locale.overrightFile} : ${filePath}`);
-      logger.info(chalk().green(yamlText));
-    } catch (e) {
-      if ((e as Error).name === 'DuplicatedPropertyError') throw e;
-      const yamlText = writeYaml(filePath, {
-        Resources: {
-          ...resource,
-        },
-      });
-      logger.info(filePath);
-      logger.info(`${locale.outputFile} : ${filePath}`);
-      logger.info(chalk().green(yamlText));
-    }
-
-    writeServerlessConfig({ serverlessConfigPath, resourceFilePath: filePath });
+    sls.addResource({ filePath, resourceName, cf: resource });
   }
 }

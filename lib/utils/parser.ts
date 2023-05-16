@@ -5,7 +5,6 @@ import * as Type from 'types/index';
 import fs from 'fs';
 import path from 'path';
 import config from 'config';
-import { asFullPath } from './cli';
 
 export default class {
   public static parseLambdaHandlerPath(input: string): [string[], string] {

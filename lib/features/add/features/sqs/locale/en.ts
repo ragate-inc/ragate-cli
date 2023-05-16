@@ -1,12 +1,5 @@
 import { Locale } from 'features/add/features/sqs/types/index';
 
-const locale: Locale = {
-  error: {
-    mustByYamlFilePath: 'path is not yaml file',
-    alreadyExistResource: 'resource name is already exists',
-  },
-  overrightFile: 'overright yaml file',
-  outputFile: 'output yaml file',
-};
+const locale: Locale = {};
 
 export default locale;

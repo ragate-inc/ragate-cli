@@ -1,4 +1,4 @@
-import basicauthlambda from 'lib/utils/code/templates/basicauthlambda';
+import basicauthlambda from 'services/codeService/templates/basicauthlambda';
 
 export type Template = {
   basicauthlambda: string;

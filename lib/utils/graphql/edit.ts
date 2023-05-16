@@ -1,6 +1,5 @@
 import { ObjectTypeComposerArgumentConfigMapDefinition, SchemaComposer, printSchema } from 'graphql-compose';
 import { GraphQLInputObjectType, GraphQLNonNull, GraphQLObjectType, GraphQLSchema } from 'graphql';
-import _ from 'lodash';
 
 export default class Edit {
   constructor(scheme?: string) {
@@ -42,7 +41,7 @@ export default class Edit {
     return this;
   }
 
-  public addQueryField(_args: { apiName: string; args: ObjectTypeComposerArgumentConfigMapDefinition<any>; type: GraphQLObjectType }): Edit {
+  public addQueryField(_args: { apiName: string; args: ObjectTypeComposerArgumentConfigMapDefinition<unknown>; type: GraphQLObjectType }): Edit {
     const { apiName, args, type } = _args;
     this.schemaComposer.Mutation.addFields({
       [apiName]: {

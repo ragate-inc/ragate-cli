@@ -1,18 +1,17 @@
 import Logger from 'utils/logger';
-import { AWS_REGION, FeatureHandlerAbstract, ServerlessConfig, AppSyncStack } from 'types/index';
+import { AWS_REGION, FeatureHandlerAbstract, ServerlessConfig } from 'types/index';
 import yargs from 'yargs';
 import _ from 'lodash';
-import { loadYaml } from 'utils/yaml';
-import { getLocaleLang } from 'features/add/features/api/utils/getLocale';
+import ServerlessConfigService from 'services/serverlessConfigService';
 import inquirer from 'inquirer';
 import Validator from 'utils/validator';
 import Filter from 'utils/inquirer/filter';
 import Transformer from 'utils/inquirer/transformer';
 import * as Type from 'features/add/features/api/types/';
-import { isFileExists } from 'utils/cli';
 import Parser from 'utils/parser';
-import path from 'path';
-import config from 'config';
+import generateMutationService from 'features/add/features/api/services/generateMutationService';
+import generateQueryService from 'features/add/features/api/services/generateQueryService';
+import generateGetItemService from 'features/add/features/api/services/generateGetItemService';
 
 export default class extends FeatureHandlerAbstract {
   constructor(argv: yargs.ArgumentsCamelCase<{ region: AWS_REGION }>) {
@@ -27,69 +26,8 @@ export default class extends FeatureHandlerAbstract {
     return `serverless/${this.argv.region}/serverless.yml`;
   }
 
-  private runMutationPrompts(appsyncStack: AppSyncStack): void {
-    const logger = Logger.getLogger();
-    const locale = getLocaleLang(this.lang);
-    logger.debug(`appsyncStack : ${JSON.stringify(appsyncStack)}`);
-    logger.debug('TODO runMutationPrompts');
-
-    /**
-     * ### Mutationの場合
-     * データソース選択または新規にLambda生成を選択
-     * functions.yml更新
-     * dataSource.yml更新
-     * mappingtemplateは、customMappingtemplate.ymlを指定すること（存在しない場合は新規作成）
-     * customMappingtemplate.ymlをstack.ymlへ書き込み
-     * functionConfigurations更新（更新先のfunctionConfigurations.ymlを選択）
-     * scheme.graphqlは、customScheme.graphqlを指定すること（存在しない場合は新規作成）
-     * customScheme.graphqlをstack.ymlへ書き込み
-     * レスポンスの型情報を選択 Example | 全Typeから選択（先にExampleにするか？を質問）
-     */
-  }
-
-  private runQueryPrompts(appsyncStack: AppSyncStack): void {
-    const logger = Logger.getLogger();
-    const locale = getLocaleLang(this.lang);
-    logger.debug(`appsyncStack : ${JSON.stringify(appsyncStack)}`);
-    logger.debug('TODO runQueryPrompts');
-
-    /**
-     * ### Queryの場合
-     * データソース選択
-     * 適用するVTLテンプレートを選択 Query | QueryWithGSI | LocalResolver
-     * resolver.vtl作成
-     * mappingtemplateは、customMappingtemplate.ymlを指定すること（存在しない場合は新規作成）
-     * customMappingtemplate.ymlをstack.ymlへ書き込み
-     * functionConfigurations更新（更新先のfunctionConfigurations.ymlを選択）
-     * scheme.graphqlは、customScheme.graphqlを指定すること（存在しない場合は新規作成）
-     * customScheme.graphqlをstack.ymlへ書き込み
-     * レスポンスの型情報を選択 Example | 全Typeから選択（先にExampleにするか？を質問）
-     */
-  }
-
-  private runGetItemPrompts(appsyncStack: AppSyncStack): void {
-    const logger = Logger.getLogger();
-    const locale = getLocaleLang(this.lang);
-    logger.debug(`appsyncStack : ${JSON.stringify(appsyncStack)}`);
-    logger.debug('TODO runGetItemPrompts');
-
-    /**
-     * ### Getの場合
-     * データソース選択
-     * Getの場合、適用するVTLテンプレートを選択 GetItem | GetItemConsistentRead | LocalResolver
-     * resolver.vtl作成
-     * mappingtemplateは、customMappingtemplate.ymlを指定すること（存在しない場合は新規作成）
-     * customMappingtemplate.ymlをstack.ymlへ書き込み
-     * functionConfigurations更新（更新先のfunctionConfigurations.ymlを選択）
-     * scheme.graphqlは、customScheme.graphqlを指定すること（存在しない場合は新規作成）
-     * customScheme.graphqlをstack.ymlへ書き込み
-     * レスポンスの型情報を選択 Example | 全Typeから選択（先にExampleにするか？を質問）
-     */
-  }
-
   public async run(): Promise<void> {
     const logger = Logger.getLogger();
-    const locale = getLocaleLang(this.lang);
 
     const info = (await inquirer.prompt([
       {
@@ -127,11 +65,13 @@ export default class extends FeatureHandlerAbstract {
 
     logger.debug(`input info values : ${JSON.stringify(info)}}`);
 
-    if (!isFileExists(path.join(config.currentPath, info.serverlessConfigPath))) {
+    const sls = new ServerlessConfigService({ region: this.argv.region as AWS_REGION, serverlessConfigPath: info.serverlessConfigPath, lang: this.lang });
+
+    if (!sls.isExistsServelessConfig) {
       throw new Error('serverless.ymlが存在しません');
     }
 
-    const slsConfig = loadYaml<ServerlessConfig>(info.serverlessConfigPath);
+    const slsConfig = sls.serverlessConfig as ServerlessConfig;
 
     if (!(slsConfig.plugins ?? []).includes('serverless-appsync-plugin')) {
       throw new Error('serverless-appsync-pluginがインストールされていません');
@@ -155,7 +95,7 @@ export default class extends FeatureHandlerAbstract {
 
     if (info.apiType === 'Mutation') {
       if (appSyncStack.schema.isExistsMutationApi(info.apiName)) throw new Error('既にschemeにAPI定義が存在します');
-      return this.runMutationPrompts(appSyncStack);
+      return generateMutationService({ appSyncStack, lang: this.lang });
     }
 
     if (info.apiType === 'Query') {
@@ -169,8 +109,8 @@ export default class extends FeatureHandlerAbstract {
           validate: (value: string) => new Validator(value, this.lang).required().value(),
         },
       ])) as { operation: 'Query' | 'GetItem' };
-      if (operation === 'Query') return this.runQueryPrompts(appSyncStack);
-      if (operation === 'GetItem') return this.runGetItemPrompts(appSyncStack);
+      if (operation === 'Query') return generateQueryService({ appSyncStack, lang: this.lang });
+      if (operation === 'GetItem') return generateGetItemService({ appSyncStack, lang: this.lang });
     }
   }
 }

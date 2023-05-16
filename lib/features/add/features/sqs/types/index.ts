@@ -1,10 +1,5 @@
 export type Locale = {
-  error: {
-    mustByYamlFilePath: string;
-    alreadyExistResource: string;
-  };
-  overrightFile: string;
-  outputFile: string;
+  //
 };
 
 export type StandardQueueType = {

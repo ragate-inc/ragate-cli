@@ -1,10 +1,10 @@
 import parser from 'utils/parser';
-import templates from 'lib/utils/code/templates';
+import templates from 'services/codeService/templates';
 import { asFullPath, createDirectories, isFileExists } from 'utils/cli';
 import fs from 'fs';
 import Logger from 'utils/logger';
 
-export default class Code {
+export default class CodeService {
   public static get templates() {
     return templates;
   }

@@ -7,6 +7,7 @@
     "paths": {
       "exceptions/*": ["./lib/exceptions/*"],
       "utils/*": ["./lib/utils/*"],
+      "services/*": ["./lib/services/*"],
       "types/*": ["./lib/types/*"],
       "features/*": ["./lib/features/*"],
       "entry/*": ["./lib/entry/*"],
