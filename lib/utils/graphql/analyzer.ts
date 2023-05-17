@@ -6,7 +6,7 @@ import _ from 'lodash';
 /**
  * Parsing existing Graphql syntax
  */
-export default class Graphql {
+export default class GraphqlAnalyzer {
   constructor(scheme: string[]) {
     this._scheme = scheme;
     this._schemaComposer = _.isEmpty(scheme) ? [new SchemaComposer()] : scheme.map((s) => new SchemaComposer(s));

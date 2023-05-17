@@ -87,21 +87,21 @@ export default class extends FeatureHandlerAbstract {
     const appSyncStackService = new AppSyncStackService({ stackFilePath: appSyncStackPath, lang: this.lang, region: this.argv.region as AWS_REGION });
     const appSyncStack = appSyncStackService.appSyncStack;
 
-    if (appSyncStack.mappingTemplates.some((m) => m.type === info.apiType && m.field === info.apiName)) {
+    if (appSyncStack?.mappingTemplates.some((m) => m.type === info.apiType && m.field === info.apiName)) {
       throw new Error('既にマッピングテンプレートに定義が存在します');
     }
 
-    if (info.resolverType === 'PIPELINE' && appSyncStack.functionConfigurations.some((m) => m.name === `Mutation${info.apiName}`)) {
+    if (info.resolverType === 'PIPELINE' && appSyncStack?.functionConfigurations.some((m) => m.name === `Mutation${info.apiName}`)) {
       throw new Error('既にリゾルバー関数がAPIが存在します');
     }
 
     if (info.apiType === 'Mutation') {
-      if (appSyncStack.schema.isExistsMutationApi(info.apiName)) throw new Error('既にschemeにAPI定義が存在します');
+      if (appSyncStack?.schema.isExistsMutationApi(info.apiName)) throw new Error('既にschemeにAPI定義が存在します');
       return generateMutationService({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });
     }
 
     if (info.apiType === 'Query') {
-      if (appSyncStack.schema.isExistsQueryApi(info.apiName)) throw new Error('既にschemeにAPI定義が存在します');
+      if (appSyncStack?.schema.isExistsQueryApi(info.apiName)) throw new Error('既にschemeにAPI定義が存在します');
       const { operation } = (await inquirer.prompt([
         {
           type: 'list',

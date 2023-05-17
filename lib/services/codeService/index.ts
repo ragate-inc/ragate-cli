@@ -3,6 +3,7 @@ import templates from 'services/codeService/templates';
 import { asFullPath, createDirectories, isFileExists } from 'utils/cli';
 import fs from 'fs';
 import Logger from 'utils/logger';
+import { chalk } from 'yargonaut';
 
 export default class CodeService {
   public static get templates() {
@@ -34,6 +35,6 @@ export default class CodeService {
     this.logger.info(`create directories : ${this.handlerPath}`);
     fs.writeFileSync(destination, this.code, 'utf8');
     this.logger.info(`write : ${destination}`);
-    this.logger.debug(this.code);
+    this.logger.info(chalk().green(this.code));
   }
 }

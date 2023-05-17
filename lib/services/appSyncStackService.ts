@@ -13,15 +13,22 @@ import * as iam from '@aws-cdk/aws-iam';
 import * as cdk from 'aws-cdk-lib';
 import { pino } from 'pino';
 import { chalk } from 'yargonaut';
+import GraphqlEditor, { AddQueryFiledInput, AddMutationFieldInput } from 'utils/graphql/editor';
 
 export default class {
   constructor(args: { stackFilePath: string; lang: string; region: string }) {
     this.logger = Logger.getLogger();
     this._stackFilePath = args.stackFilePath;
     this._lang = args.lang;
-    this._appSyncStack = this.getAppSyncStackObject(args.stackFilePath);
     this._region = args.region;
     this._defaultIamRolePath = `serverless/${args.region}/resources/iamrole/appsync.yml`;
+    this._graphqlEditor = new GraphqlEditor();
+    this.setAppSyncStackObject();
+  }
+
+  public _graphqlEditor: GraphqlEditor;
+  public get graphqlEditor(): GraphqlEditor {
+    return this._graphqlEditor;
   }
 
   public readonly appSyncDynamoDBRoleName: string = 'AppSyncDynamoDBRole';
@@ -30,8 +37,8 @@ export default class {
   public readonly appSyncLambdaRoleName: string = 'AppSyncLambdaRole';
 
   private readonly defaultCustomDataSourcePath: string = 'appsync/custom_datasources.yml';
-  private readonly defaultCustomMappingtemplate: string = 'appsync/custom_mappingtemplate.yml';
-  private readonly defaultCustomFunctionConfigurations: string = 'appsync/custom_functionConfigurations.yml';
+  private readonly defaultCustomMappingtemplatePath: string = 'appsync/custom_mappingtemplate.yml';
+  private readonly defaultCustomFunctionConfigurationsPath: string = 'appsync/custom_functionConfigurations.yml';
   private readonly logger: pino.Logger;
 
   private readonly _defaultIamRolePath: string;
@@ -39,8 +46,8 @@ export default class {
     return this._defaultIamRolePath;
   }
 
-  private _appSyncStack: Type.AppSyncStack;
-  public get appSyncStack(): Type.AppSyncStack {
+  private _appSyncStack?: Type.AppSyncStack;
+  public get appSyncStack(): Type.AppSyncStack | undefined {
     return this._appSyncStack;
   }
 
@@ -59,10 +66,21 @@ export default class {
     return this._region;
   }
 
-  private getAppSyncStackObject(appSyncStackPath: string): Type.AppSyncStack {
-    const res = loadYaml<Type.AppSyncStackConfig[]>(appSyncStackPath);
-    const { schema, dataSources, mappingTemplates, mappingTemplatesLocation, functionConfigurationsLocation, functionConfigurations } = res[0];
+  private getAppSyncStackConfig(): Type.AppSyncStackConfig {
+    const stackDoc = loadYaml<Type.AppSyncStackConfig>(this.stackFilePath);
     return {
+      ...stackDoc,
+      functionConfigurations: stackDoc.functionConfigurations ?? [],
+      dataSources: stackDoc.dataSources ?? [],
+      mappingTemplates: stackDoc.mappingTemplates ?? [],
+      schema: stackDoc.schema ?? [],
+    };
+  }
+
+  private setAppSyncStackObject(): void {
+    const res = this.getAppSyncStackConfig();
+    const { schema, dataSources, mappingTemplates, mappingTemplatesLocation, functionConfigurationsLocation, functionConfigurations } = res;
+    this._appSyncStack = {
       mappingTemplatesLocation,
       functionConfigurationsLocation,
       functionConfigurations:
@@ -109,7 +127,7 @@ export default class {
   public addDataSource(dataSource: Type.AppSyncDataSource) {
     // update custom_datasources.yml
     let isWrite = false;
-    if (this.appSyncStack.dataSources.some((p) => p.name === dataSource.name)) {
+    if (this.appSyncStack?.dataSources.some((p) => p.name === dataSource.name)) {
       this.logger.warn(`DataSource ${dataSource.name} is already exists.`);
       isWrite = false;
     } else {
@@ -126,8 +144,8 @@ export default class {
     }
     // update appsync stack yml
     if (isWrite) {
-      const stackDoc = loadYaml<Type.AppSyncStackConfig>(this.stackFilePath);
-      if (!stackDoc.dataSources.includes(this.defaultCustomDataSourcePath)) {
+      const stackDoc = this.getAppSyncStackConfig();
+      if (stackDoc.dataSources.every((str) => !str.includes(this.defaultCustomDataSourcePath))) {
         const yamlText = writeYaml(this.stackFilePath, {
           ...stackDoc,
           dataSources: [...stackDoc.dataSources, `\${file(./${this.defaultCustomDataSourcePath})}`],
@@ -135,24 +153,24 @@ export default class {
         this.logger.info(chalk().green(yamlText));
       }
     }
-    this._appSyncStack = this.getAppSyncStackObject(this.stackFilePath);
+    this.setAppSyncStackObject();
   }
 
   public addMappingTemplate(args: { mappingTemplate: Type.AppSyncMappingTemplate }) {
     const { mappingTemplate } = args;
     // update custom_datasources.yml
     let isWrite = false;
-    if (this.appSyncStack.mappingTemplates.some((p) => p.type === mappingTemplate.type && p.field === mappingTemplate.field)) {
+    if (this.appSyncStack?.mappingTemplates.some((p) => p.type === mappingTemplate.type && p.field === mappingTemplate.field)) {
       this.logger.warn(`MappingTemplate ${mappingTemplate.type}.${mappingTemplate.field} is already exists.`);
       isWrite = false;
     } else {
       try {
-        const mappingTemplateDoc: Type.AppSyncMappingTemplate[] = loadYaml(this.defaultCustomMappingtemplate);
+        const mappingTemplateDoc: Type.AppSyncMappingTemplate[] = loadYaml(this.defaultCustomMappingtemplatePath);
         const newMappingTemplates: Type.AppSyncMappingTemplate[] = [...mappingTemplateDoc, mappingTemplate];
-        const yamlText = writeYaml(this.defaultCustomMappingtemplate, newMappingTemplates);
+        const yamlText = writeYaml(this.defaultCustomMappingtemplatePath, newMappingTemplates);
         this.logger.info(chalk().green(yamlText));
       } catch (e) {
-        const yamlText = writeYaml(this.defaultCustomMappingtemplate, [mappingTemplate]);
+        const yamlText = writeYaml(this.defaultCustomMappingtemplatePath, [mappingTemplate]);
         this.logger.info(chalk().green(yamlText));
       }
       isWrite = true;
@@ -166,33 +184,35 @@ export default class {
 
     // update appsync stack yml
     if (isWrite) {
-      const stackDoc = loadYaml<Type.AppSyncStackConfig>(this.stackFilePath);
-      if (!stackDoc.mappingTemplates.includes(this.defaultCustomMappingtemplate)) {
+      const stackDoc = this.getAppSyncStackConfig();
+      if (stackDoc.mappingTemplates.every((str) => !str.includes(this.defaultCustomMappingtemplatePath))) {
         const yamlText = writeYaml(this.stackFilePath, {
           ...stackDoc,
-          mappingTemplates: [...stackDoc.mappingTemplates, `\${file(./${this.defaultCustomMappingtemplate})}`],
+          mappingTemplates: [...stackDoc.mappingTemplates, `\${file(./${this.defaultCustomMappingtemplatePath})}`],
         });
         this.logger.info(chalk().green(yamlText));
       }
     }
-    this._appSyncStack = this.getAppSyncStackObject(this.stackFilePath);
+    this.setAppSyncStackObject();
   }
 
   public addFunctionConfiguration(args: { functionConfiguration: Type.AppSyncFunctionConfiguration }) {
     const { functionConfiguration } = args;
+
     // update custom_datasources.yml
     let isWrite = false;
-    if (this.appSyncStack.functionConfigurations.some((p) => p.name === functionConfiguration.name)) {
+
+    if (this.appSyncStack?.functionConfigurations.some((p) => p.name === functionConfiguration.name)) {
       this.logger.warn(`FunctionConfiguration ${functionConfiguration.name} is already exists.`);
       isWrite = false;
     } else {
       try {
-        const functionConfigurationDoc: Type.AppSyncFunctionConfiguration[] = loadYaml(this.defaultCustomFunctionConfigurations);
+        const functionConfigurationDoc: Type.AppSyncFunctionConfiguration[] = loadYaml(this.defaultCustomFunctionConfigurationsPath);
         const newFunctionConfigurationDoc: Type.AppSyncFunctionConfiguration[] = [...functionConfigurationDoc, functionConfiguration];
-        const yamlText = writeYaml(this.defaultCustomFunctionConfigurations, newFunctionConfigurationDoc);
+        const yamlText = writeYaml(this.defaultCustomFunctionConfigurationsPath, newFunctionConfigurationDoc);
         this.logger.info(chalk().green(yamlText));
       } catch (e) {
-        const yamlText = writeYaml(this.defaultCustomFunctionConfigurations, [functionConfiguration]);
+        const yamlText = writeYaml(this.defaultCustomFunctionConfigurationsPath, [functionConfiguration]);
         this.logger.info(chalk().green(yamlText));
       }
       isWrite = true;
@@ -206,16 +226,44 @@ export default class {
 
     // update appsync stack yml
     if (isWrite) {
-      const stackDoc = loadYaml<Type.AppSyncStackConfig>(this.stackFilePath);
-      if (!stackDoc.functionConfigurations.includes(this.defaultCustomFunctionConfigurations)) {
+      const stackDoc = this.getAppSyncStackConfig();
+      if (stackDoc.functionConfigurations.every((str) => !str.includes(this.defaultCustomFunctionConfigurationsPath))) {
         const yamlText = writeYaml(this.stackFilePath, {
           ...stackDoc,
-          functionConfiguration: [...stackDoc.functionConfigurations, `\${file(./${this.defaultCustomFunctionConfigurations})}`],
+          functionConfigurations: [...stackDoc.functionConfigurations, `\${file(./${this.defaultCustomFunctionConfigurationsPath})}`],
         });
         this.logger.info(chalk().green(yamlText));
       }
     }
-    this._appSyncStack = this.getAppSyncStackObject(this.stackFilePath);
+    this.setAppSyncStackObject();
+  }
+
+  public updateCustomSchemeGraphl(args: { query?: AddQueryFiledInput; mutation?: AddMutationFieldInput }) {
+    // update custom_scheme.graphql
+    const callback = (updated: boolean, opt: { schemePath: string }): void => {
+      if (updated) {
+        // update appsync stack yml
+        const { schemePath } = opt;
+        const stackDoc = this.getAppSyncStackConfig();
+        if (_.isString(stackDoc.schema) && !stackDoc.schema.includes(schemePath)) {
+          const yamlText = writeYaml(this.stackFilePath, {
+            ...stackDoc,
+            schema: [stackDoc.schema, schemePath],
+          });
+          this.logger.info(chalk().green(yamlText));
+        } else if (_.isArray(stackDoc.schema) && !stackDoc.schema.includes(schemePath)) {
+          const yamlText = writeYaml(this.stackFilePath, {
+            ...stackDoc,
+            schema: [...stackDoc.schema, schemePath],
+          });
+          this.logger.info(chalk().green(yamlText));
+        }
+        this.setAppSyncStackObject();
+      } else {
+        this.logger.warn('skip update custom_scheme.graphql.');
+      }
+    };
+    this.graphqlEditor.updateCustomSchemeGraphl({ ...args, callback });
   }
 
   public addIamRoleByDataSource(args: { dataSource: Type.AppSyncDataSourceType; sls: ServerlessConfigService }): void {

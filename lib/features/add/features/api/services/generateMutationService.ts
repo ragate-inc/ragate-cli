@@ -34,14 +34,12 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
             value: false,
           },
         ],
-        filter: (input: string) => input.replace(/\s+/g, ''),
-        transformer: (input: string) => input.replace(/\s+/g, ''),
         validate: (value: string) => new Validator(value, lang).required().value(),
       },
     ])) as { createDataSource: boolean };
     if (createDataSource) {
       return createDataSource;
-    } else if (appSyncStackService.appSyncStack.dataSources.length === 0) {
+    } else if (appSyncStackService.appSyncStack?.dataSources.length === 0) {
       console.log(chalk.red('データソースが存在しません、データソースを作成する必要があります'));
       return isCreateDataSource();
     } else {
@@ -99,16 +97,17 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
       {
         type: 'list',
         name: 'dataSource',
-        choices: appSyncStackService.appSyncStack.dataSources.map((d) => d.name),
+        choices: appSyncStackService.appSyncStack?.dataSources.map((d) => d.name),
         message: 'データソースを選択',
         validate: (value: string) => new Validator(value, lang).required().value(),
       },
     ])) as { dataSource: string };
-    const selectedDataSource = appSyncStackService.appSyncStack.dataSources.find((d) => d.name === dataSource) as AppSyncDataSource;
+    const selectedDataSource = appSyncStackService.appSyncStack?.dataSources.find((d) => d.name === dataSource) as AppSyncDataSource;
     appSyncStackService.addIamRoleByDataSource({
       dataSource: selectedDataSource.type,
       sls: slsConfig,
     });
+    logger.debug('finished dataSourceProcess');
     return selectedDataSource;
   };
 
@@ -125,11 +124,12 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
     appSyncStackService.addFunctionConfiguration({
       functionConfiguration,
     });
-    return Promise.resolve(functionConfigurations);
+    logger.debug('finished functionConfigurationsProcess');
+    return Promise.resolve(functionConfiguration);
   };
 
   const mappingTemplateProcess = async (args: { dataSource: AppSyncDataSource; functionConfigurations?: AppSyncFunctionConfiguration }): Promise<AppSyncMappingTemplate> => {
-    const { dataSource } = args;
+    const { dataSource, functionConfigurations } = args;
     const generateDataSource = (): AppSyncMappingTemplate => {
       if (info.resolverType === 'PIPELINE') {
         return {
@@ -155,16 +155,57 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
     appSyncStackService.addMappingTemplate({
       mappingTemplate,
     });
+    logger.debug('finished mappingTemplateProcess');
     return mappingTemplate;
   };
 
-  const dataSource: AppSyncDataSource = await dataSourceProcess();
-  const functionConfigurations = await functionConfigurationsProcess({ dataSource });
-  const mappingTemplate: AppSyncMappingTemplate = await mappingTemplateProcess({ dataSource, functionConfigurations });
+  const scheneGraphqlProcess = async (): Promise<string> => {
+    const graphqlEditor = appSyncStackService.graphqlEditor;
+    // const typesMap = graphqlEditor.getTypeMap();
+    // const types: string[] = Object.keys(typesMap);
+    // const { type } = (await inquirer.prompt([
+    //   {
+    //     type: 'autocomplete',
+    //     name: 'type',
+    //     emptyText: '入力するとリソースが表示されます',
+    //     message: 'レスポンスタイプを選択して下さい',
+    //     source: (answersSoFar: string, input: string) => (_.isEmpty(input) ? types : types.filter((item) => item.includes(input))),
+    //   },
+    // ])) as { type: string };
+    // const selectedType = typesMap[type];
+    // if (info.apiType === 'Mutation') {
+    //   appSyncStackService.updateCustomSchemeGraphl({
+    //     mutation: {
+    //       apiName: info.apiName,
+    //       type: {
+    //         name: selectedType.name,
+    //       },
+    //       input: {},
+    //     },
+    //   });
+    // }
+    // if (info.apiType === 'Query') {
+    //   appSyncStackService.updateCustomSchemeGraphl({
+    //     query: {
+    //       apiName: info.apiName,
+    //       type: selectedType,
+    //       args: {},
+    //     },
+    //   });
+    // }
+    logger.debug('finished scheneGraphqlProcess');
+    return Promise.resolve(graphqlEditor.scheme as string);
+  };
 
-  /**
-   * TODO: scheme.graphqlは、customScheme.graphqlを指定すること（存在しない場合は新規作成）
-   * TODO: customScheme.graphqlをstack.ymlへ書き込み
-   * TODO: レスポンスの型情報を選択 Example | 全Typeから選択（先にExampleにするか？を質問）
-   */
+  const resDataSource: AppSyncDataSource = await dataSourceProcess();
+  const resFunctionConfigurations = await functionConfigurationsProcess({ dataSource: resDataSource });
+  const resMappingTemplate: AppSyncMappingTemplate = await mappingTemplateProcess({ dataSource: resDataSource, functionConfigurations: resFunctionConfigurations });
+  const resSchemeGraphql: string = await scheneGraphqlProcess();
+
+  logger.debug({
+    dataSource: resDataSource,
+    functionConfigurations: resFunctionConfigurations,
+    mappingTemplate: resMappingTemplate,
+    schemeGraphql: resSchemeGraphql,
+  });
 };
