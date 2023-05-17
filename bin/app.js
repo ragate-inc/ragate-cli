@@ -476,12 +476,7 @@
             g = await ((e) => {
               const { dataSource: a } = e;
               if ('UNIT' === d.resolverType) return Promise.resolve(void 0);
-              const r = {
-                dataSource: a.name,
-                name: `${d.apiType}${d.apiName}`,
-                request: `functions/${d.apiType}${d.apiName}.request.vtl`,
-                response: `functions/${d.apiType}${d.apiName}.response.vtl`,
-              };
+              const r = { dataSource: a.name, name: `${d.apiType}${d.apiName}`, request: !1, response: !1 };
               return t.addFunctionConfiguration({ functionConfiguration: r }), f.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
             })({ dataSource: h }),
             y = await (async (e) => {
@@ -490,20 +485,13 @@
                   'PIPELINE' === d.resolverType
                     ? {
                         type: d.apiType,
-                        request: `queries/${d.apiType}.${d.apiName}.request.vtl`,
-                        response: `queries/${d.apiType}.${d.apiName}.response.vtl`,
+                        request: `functions/${d.apiType}.${d.apiName}.request.vtl`,
+                        response: `functions/${d.apiType}.${d.apiName}.response.vtl`,
                         field: d.apiName,
                         kind: d.resolverType,
                         functions: [r?.name],
                       }
-                    : {
-                        dataSource: a.name,
-                        type: d.apiType,
-                        field: d.apiName,
-                        kind: d.resolverType,
-                        request: `queries/${d.apiType}.${d.apiName}.request.vtl`,
-                        response: `queries/${d.apiType}.${d.apiName}.response.vtl`,
-                      };
+                    : { dataSource: a.name, type: d.apiType, field: d.apiName, kind: d.resolverType, request: !1, response: !1 };
               return t.addMappingTemplate({ mappingTemplate: s }), f.debug('finished mappingTemplateProcess'), s;
             })({ dataSource: h, functionConfigurations: g }),
             v = await (async () => {
@@ -1307,6 +1295,7 @@
           defaultCustomDataSourcePath = 'appsync/custom_datasources.yml';
           defaultCustomMappingtemplatePath = 'appsync/custom_mappingtemplate.yml';
           defaultCustomFunctionConfigurationsPath = 'appsync/custom_functionConfigurations.yml';
+          defaultAppSyncStackIndex = 0;
           logger;
           _defaultIamRolePath;
           get defaultIamRolePath() {
@@ -1329,14 +1318,21 @@
             return this._region;
           }
           getAppSyncStackConfig() {
-            const e = (0, u.loadYaml)(this.stackFilePath);
+            const e = (0, u.loadYaml)(this.stackFilePath),
+              t = this.defaultAppSyncStackIndex;
             return {
-              ...e,
-              functionConfigurations: e.functionConfigurations ?? [],
-              dataSources: e.dataSources ?? [],
-              mappingTemplates: e.mappingTemplates ?? [],
-              schema: e.schema ?? [],
+              ...e[t],
+              functionConfigurations: e[t].functionConfigurations ?? [],
+              dataSources: e[t].dataSources ?? [],
+              mappingTemplates: e[t].mappingTemplates ?? [],
+              schema: e[t].schema ?? [],
             };
+          }
+          writeAppSyncStackConfig(e) {
+            const t = (0, u.loadYaml)(this.stackFilePath);
+            t[this.defaultAppSyncStackIndex] = e;
+            const a = (0, u.writeYaml)(this.stackFilePath, t);
+            this.logger.info((0, v.chalk)().green(a));
           }
           setAppSyncStackObject() {
             const e = this.getAppSyncStackConfig(),
@@ -1401,10 +1397,8 @@
             }
             if (t) {
               const e = this.getAppSyncStackConfig();
-              if (e.dataSources.every((e) => !e.includes(this.defaultCustomDataSourcePath))) {
-                const t = (0, u.writeYaml)(this.stackFilePath, { ...e, dataSources: [...e.dataSources, `\${file(./${this.defaultCustomDataSourcePath})}`] });
-                this.logger.info((0, v.chalk)().green(t));
-              }
+              e.dataSources.every((e) => !e.includes(this.defaultCustomDataSourcePath)) &&
+                this.writeAppSyncStackConfig({ ...e, dataSources: [...e.dataSources, `\${file(./${this.defaultCustomDataSourcePath})}`] });
             }
             this.setAppSyncStackObject();
           }
@@ -1426,10 +1420,8 @@
             }
             if ((console.log({ request: t.request, response: t.response }), a)) {
               const e = this.getAppSyncStackConfig();
-              if (e.mappingTemplates.every((e) => !e.includes(this.defaultCustomMappingtemplatePath))) {
-                const t = (0, u.writeYaml)(this.stackFilePath, { ...e, mappingTemplates: [...e.mappingTemplates, `\${file(./${this.defaultCustomMappingtemplatePath})}`] });
-                this.logger.info((0, v.chalk)().green(t));
-              }
+              e.mappingTemplates.every((e) => !e.includes(this.defaultCustomMappingtemplatePath)) &&
+                this.writeAppSyncStackConfig({ ...e, mappingTemplates: [...e.mappingTemplates, `\${file(./${this.defaultCustomMappingtemplatePath})}`] });
             }
             this.setAppSyncStackObject();
           }
@@ -1450,13 +1442,8 @@
             }
             if ((console.log({ request: t.request, response: t.response }), a)) {
               const e = this.getAppSyncStackConfig();
-              if (e.functionConfigurations.every((e) => !e.includes(this.defaultCustomFunctionConfigurationsPath))) {
-                const t = (0, u.writeYaml)(this.stackFilePath, {
-                  ...e,
-                  functionConfigurations: [...e.functionConfigurations, `\${file(./${this.defaultCustomFunctionConfigurationsPath})}`],
-                });
-                this.logger.info((0, v.chalk)().green(t));
-              }
+              e.functionConfigurations.every((e) => !e.includes(this.defaultCustomFunctionConfigurationsPath)) &&
+                this.writeAppSyncStackConfig({ ...e, functionConfigurations: [...e.functionConfigurations, `\${file(./${this.defaultCustomFunctionConfigurationsPath})}`] });
             }
             this.setAppSyncStackObject();
           }
@@ -1467,14 +1454,10 @@
                 if (e) {
                   const { schemePath: e } = t,
                     a = this.getAppSyncStackConfig();
-                  if (d.default.isString(a.schema) && !a.schema.includes(e)) {
-                    const t = (0, u.writeYaml)(this.stackFilePath, { ...a, schema: [a.schema, e] });
-                    this.logger.info((0, v.chalk)().green(t));
-                  } else if (d.default.isArray(a.schema) && !a.schema.includes(e)) {
-                    const t = (0, u.writeYaml)(this.stackFilePath, { ...a, schema: [...a.schema, e] });
-                    this.logger.info((0, v.chalk)().green(t));
-                  }
-                  this.setAppSyncStackObject();
+                  d.default.isString(a.schema) && !a.schema.includes(e)
+                    ? this.writeAppSyncStackConfig({ ...a, schema: [a.schema, e] })
+                    : d.default.isArray(a.schema) && !a.schema.includes(e) && this.writeAppSyncStackConfig({ ...a, schema: [...a.schema, e] }),
+                    this.setAppSyncStackObject();
                 } else this.logger.warn('skip update custom_scheme.graphql.');
               },
             });
@@ -2055,9 +2038,27 @@
             (this._scheme = e),
               (this._schemaComposer = i.default.isEmpty(e) ? [new s.SchemaComposer()] : e.map((e) => new s.SchemaComposer(e))),
               (this._mergedSchema = (0, n.mergeSchemas)({ schemas: this._schemaComposer.map((e) => e.buildSchema()) })),
-              (this._mutations = this._schemaComposer.map((e) => e.getOTC('Mutation').getFields())),
-              (this._queries = this._schemaComposer.map((e) => e.getOTC('Query').getFields())),
-              (this._subscriptions = this._schemaComposer.map((e) => e.getOTC('Subscription').getFields()));
+              (this._mutations = this._schemaComposer.map((e) => {
+                try {
+                  return e.getOTC('Mutation').getFields();
+                } catch (e) {
+                  return {};
+                }
+              })),
+              (this._queries = this._schemaComposer.map((e) => {
+                try {
+                  return e.getOTC('Query').getFields();
+                } catch (e) {
+                  return {};
+                }
+              })),
+              (this._subscriptions = this._schemaComposer.map((e) => {
+                try {
+                  return e.getOTC('Subscription').getFields();
+                } catch (e) {
+                  return {};
+                }
+              }));
           }
           _mutations;
           get mutations() {
@@ -2528,7 +2529,7 @@
               return { err: e };
             }
           },
-          E = {
+          k = {
             colorize: r,
             colorizeObjects: !0,
             crlf: !1,
@@ -2550,8 +2551,8 @@
             include: void 0,
             singleLine: !1,
           };
-        function k(e) {
-          const t = Object.assign({}, E, e),
+        function E(e) {
+          const t = Object.assign({}, k, e),
             a = t.crlf ? '\r\n' : '\n',
             r = '    ',
             s = t.messageKey,
@@ -2562,25 +2563,25 @@
             c = t.timestampKey,
             d = t.errorLikeObjectKeys,
             S = t.errorProps.split(','),
-            k = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
+            E = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
             O = w(t.customLevels),
             M = L(t.customLevels),
-            R = t.customColors
+            A = t.customColors
               ? t.customColors.split(',').reduce((e, a) => {
                   const [r, s] = a.split(':'),
-                    n = (k ? t.customLevels : void 0 !== M[r]) ? M[r] : p[r],
+                    n = (E ? t.customLevels : void 0 !== M[r]) ? M[r] : p[r],
                     i = void 0 !== n ? n : r;
                   return e.push([i, s]), e;
                 }, [])
               : void 0,
-            j = { customLevels: O, customLevelNames: M };
-          k && !t.customLevels && ((j.customLevels = void 0), (j.customLevelNames = void 0));
-          const A = t.customPrettifiers,
+            R = { customLevels: O, customLevelNames: M };
+          E && !t.customLevels && ((R.customLevels = void 0), (R.customLevelNames = void 0));
+          const j = t.customPrettifiers,
             F = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
             x = !F && t.ignore ? new Set(t.ignore.split(',')) : void 0,
-            $ = t.hideObject,
-            q = t.singleLine,
-            N = l(t.colorize, R, k),
+            q = t.hideObject,
+            $ = t.singleLine,
+            N = l(t.colorize, A, E),
             D = t.colorizeObjects ? N : l(!1, [], !1);
           return function (e) {
             let l;
@@ -2591,37 +2592,37 @@
               l = t.value;
             }
             if (o) {
-              const e = ((k ? t.customLevels : void 0 !== M[o]) ? M[o] : p[o]) || Number(o);
+              const e = ((E ? t.customLevels : void 0 !== M[o]) ? M[o] : p[o]) || Number(o);
               if (l[void 0 === n ? f : n] < e) return;
             }
-            const w = y({ log: l, messageKey: s, colorizer: N, messageFormat: u, levelLabel: i, ...j, useOnlyCustomProps: k });
+            const w = y({ log: l, messageKey: s, colorizer: N, messageFormat: u, levelLabel: i, ...R, useOnlyCustomProps: E });
             (x || F) && (l = P({ log: l, ignoreKeys: x, includeKeys: F }));
-            const L = g({ log: l, colorizer: N, levelKey: n, prettifier: A.level, ...j }),
-              E = v({ log: l, prettifiers: A }),
-              O = b({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: A.time });
-            let R = '';
+            const L = g({ log: l, colorizer: N, levelKey: n, prettifier: j.level, ...R }),
+              k = v({ log: l, prettifiers: j }),
+              O = b({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: j.time });
+            let A = '';
             if (
-              (t.levelFirst && L && (R = `${L}`),
-              O && '' === R ? (R = `${O}`) : O && (R = `${R} ${O}`),
-              !t.levelFirst && L && (R = R.length > 0 ? `${R} ${L}` : L),
-              E && (R = R.length > 0 ? `${R} ${E}:` : E),
-              !1 === R.endsWith(':') && '' !== R && (R += ':'),
-              w && (R = R.length > 0 ? `${R} ${w}` : w),
-              R.length > 0 && !q && (R += a),
+              (t.levelFirst && L && (A = `${L}`),
+              O && '' === A ? (A = `${O}`) : O && (A = `${A} ${O}`),
+              !t.levelFirst && L && (A = A.length > 0 ? `${A} ${L}` : L),
+              k && (A = A.length > 0 ? `${A} ${k}:` : k),
+              !1 === A.endsWith(':') && '' !== A && (A += ':'),
+              w && (A = A.length > 0 ? `${A} ${w}` : w),
+              A.length > 0 && !$ && (A += a),
               'Error' === l.type && l.stack)
             ) {
               const e = h({ log: l, errorLikeKeys: d, errorProperties: S, ident: r, eol: a });
-              q && (R += a), (R += e);
-            } else if (!$) {
+              $ && (A += a), (A += e);
+            } else if (!q) {
               const e = [s, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = _({ input: l, skipKeys: e, customPrettifiers: A, errorLikeKeys: d, eol: a, ident: r, singleLine: q, colorizer: D });
-              q && !/^\s$/.test(t) && (R += ' '), (R += t);
+                t = _({ input: l, skipKeys: e, customPrettifiers: j, errorLikeKeys: d, eol: a, ident: r, singleLine: $, colorizer: D });
+              $ && !/^\s$/.test(t) && (A += ' '), (A += t);
             }
-            return R;
+            return A;
           };
         }
         function O(e = {}) {
-          const t = k(e);
+          const t = E(e);
           return i(
             function (a) {
               const r = new n({
@@ -2647,7 +2648,7 @@
             { parse: 'lines' }
           );
         }
-        (e.exports = O), (e.exports.prettyFactory = k), (e.exports.colorizerFactory = l), (e.exports.default = O);
+        (e.exports = O), (e.exports.prettyFactory = E), (e.exports.colorizerFactory = l), (e.exports.default = O);
       },
       903: (e, t, a) => {
         const { LEVELS: r, LEVEL_NAMES: s } = a(7318),
@@ -2809,7 +2810,7 @@
           }
           return s;
         }
-        function E(e) {
+        function k(e) {
           const t = [];
           let a = !1,
             r = '';
@@ -2819,8 +2820,8 @@
           }
           return r.length && t.push(r), t;
         }
-        function k(e, t) {
-          const a = Array.isArray(t) ? t : E(t);
+        function E(e, t) {
+          const a = Array.isArray(t) ? t : k(t);
           for (const t of a) {
             if (!Object.prototype.hasOwnProperty.call(e, t)) return;
             e = e[t];
@@ -2828,12 +2829,12 @@
           return e;
         }
         function O(e, t) {
-          const a = E(t),
+          const a = k(t),
             r = a.pop();
-          null !== (e = k(e, a)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, r) && delete e[r];
+          null !== (e = E(e, a)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, r) && delete e[r];
         }
         function M() {}
-        function R(e, t) {
+        function A(e, t) {
           e.destroyed ||
             ('beforeExit' === t
               ? (e.flush(),
@@ -2859,7 +2860,7 @@
             return i;
           },
           prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: a = f, prettifier: r, customLevels: s, customLevelNames: n }) {
-            const i = k(e, a);
+            const i = E(e, a);
             return void 0 === i ? void 0 : r ? r(i) : t(i, { customLevels: s, customLevelNames: n });
           },
           prettifyMessage: function ({
@@ -2875,7 +2876,7 @@
             if (t && 'string' == typeof t) {
               const a = String(t).replace(/{([^{}]+)}/g, function (t, a) {
                 let r;
-                return a === s && void 0 !== (r = k(e, n)) ? ((o ? void 0 === i : void 0 === i[r]) ? g[r] : i[r]) : k(e, a) || '';
+                return a === s && void 0 !== (r = E(e, n)) ? ((o ? void 0 === i : void 0 === i[r]) ? g[r] : i[r]) : E(e, a) || '';
               });
               return r.message(a);
             }
@@ -2915,7 +2916,7 @@
                 (function (e) {
                   if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
                     const t = a(2067);
-                    t.register(e, R),
+                    t.register(e, A),
                       e.on('close', function () {
                         t.unregister(e);
                       });
@@ -2974,9 +2975,9 @@
             formatTime: _,
             joinLinesWithIndentation: w,
             prettifyError: C,
-            getPropertyValue: k,
+            getPropertyValue: E,
             deleteLogProperty: O,
-            splitPropertyKey: E,
+            splitPropertyKey: k,
             createDate: b,
             isValidDate: S,
           });

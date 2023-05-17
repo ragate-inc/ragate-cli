@@ -39,6 +39,7 @@ export default class {
   private readonly defaultCustomDataSourcePath: string = 'appsync/custom_datasources.yml';
   private readonly defaultCustomMappingtemplatePath: string = 'appsync/custom_mappingtemplate.yml';
   private readonly defaultCustomFunctionConfigurationsPath: string = 'appsync/custom_functionConfigurations.yml';
+  private readonly defaultAppSyncStackIndex = 0;
   private readonly logger: pino.Logger;
 
   private readonly _defaultIamRolePath: string;
@@ -67,14 +68,23 @@ export default class {
   }
 
   private getAppSyncStackConfig(): Type.AppSyncStackConfig {
-    const stackDoc = loadYaml<Type.AppSyncStackConfig>(this.stackFilePath);
+    const stackDoc = loadYaml<Type.AppSyncStackConfig[]>(this.stackFilePath);
+    const index = this.defaultAppSyncStackIndex;
     return {
-      ...stackDoc,
-      functionConfigurations: stackDoc.functionConfigurations ?? [],
-      dataSources: stackDoc.dataSources ?? [],
-      mappingTemplates: stackDoc.mappingTemplates ?? [],
-      schema: stackDoc.schema ?? [],
+      ...stackDoc[index],
+      functionConfigurations: stackDoc[index].functionConfigurations ?? [],
+      dataSources: stackDoc[index].dataSources ?? [],
+      mappingTemplates: stackDoc[index].mappingTemplates ?? [],
+      schema: stackDoc[index].schema ?? [],
     };
+  }
+
+  private writeAppSyncStackConfig(config: Type.AppSyncStackConfig): void {
+    const stackDoc = loadYaml<Type.AppSyncStackConfig[]>(this.stackFilePath);
+    const index = this.defaultAppSyncStackIndex;
+    stackDoc[index] = config;
+    const yamlText = writeYaml(this.stackFilePath, stackDoc);
+    this.logger.info(chalk().green(yamlText));
   }
 
   private setAppSyncStackObject(): void {
@@ -146,11 +156,10 @@ export default class {
     if (isWrite) {
       const stackDoc = this.getAppSyncStackConfig();
       if (stackDoc.dataSources.every((str) => !str.includes(this.defaultCustomDataSourcePath))) {
-        const yamlText = writeYaml(this.stackFilePath, {
+        this.writeAppSyncStackConfig({
           ...stackDoc,
           dataSources: [...stackDoc.dataSources, `\${file(./${this.defaultCustomDataSourcePath})}`],
         });
-        this.logger.info(chalk().green(yamlText));
       }
     }
     this.setAppSyncStackObject();
@@ -186,11 +195,10 @@ export default class {
     if (isWrite) {
       const stackDoc = this.getAppSyncStackConfig();
       if (stackDoc.mappingTemplates.every((str) => !str.includes(this.defaultCustomMappingtemplatePath))) {
-        const yamlText = writeYaml(this.stackFilePath, {
+        this.writeAppSyncStackConfig({
           ...stackDoc,
           mappingTemplates: [...stackDoc.mappingTemplates, `\${file(./${this.defaultCustomMappingtemplatePath})}`],
         });
-        this.logger.info(chalk().green(yamlText));
       }
     }
     this.setAppSyncStackObject();
@@ -228,11 +236,10 @@ export default class {
     if (isWrite) {
       const stackDoc = this.getAppSyncStackConfig();
       if (stackDoc.functionConfigurations.every((str) => !str.includes(this.defaultCustomFunctionConfigurationsPath))) {
-        const yamlText = writeYaml(this.stackFilePath, {
+        this.writeAppSyncStackConfig({
           ...stackDoc,
           functionConfigurations: [...stackDoc.functionConfigurations, `\${file(./${this.defaultCustomFunctionConfigurationsPath})}`],
         });
-        this.logger.info(chalk().green(yamlText));
       }
     }
     this.setAppSyncStackObject();
@@ -246,17 +253,15 @@ export default class {
         const { schemePath } = opt;
         const stackDoc = this.getAppSyncStackConfig();
         if (_.isString(stackDoc.schema) && !stackDoc.schema.includes(schemePath)) {
-          const yamlText = writeYaml(this.stackFilePath, {
+          this.writeAppSyncStackConfig({
             ...stackDoc,
             schema: [stackDoc.schema, schemePath],
           });
-          this.logger.info(chalk().green(yamlText));
         } else if (_.isArray(stackDoc.schema) && !stackDoc.schema.includes(schemePath)) {
-          const yamlText = writeYaml(this.stackFilePath, {
+          this.writeAppSyncStackConfig({
             ...stackDoc,
             schema: [...stackDoc.schema, schemePath],
           });
-          this.logger.info(chalk().green(yamlText));
         }
         this.setAppSyncStackObject();
       } else {

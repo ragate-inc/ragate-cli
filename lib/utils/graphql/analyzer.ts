@@ -11,9 +11,30 @@ export default class GraphqlAnalyzer {
     this._scheme = scheme;
     this._schemaComposer = _.isEmpty(scheme) ? [new SchemaComposer()] : scheme.map((s) => new SchemaComposer(s));
     this._mergedSchema = mergeSchemas({ schemas: this._schemaComposer.map((s) => s.buildSchema()) });
-    this._mutations = this._schemaComposer.map((s) => s.getOTC('Mutation').getFields());
-    this._queries = this._schemaComposer.map((s) => s.getOTC('Query').getFields());
-    this._subscriptions = this._schemaComposer.map((s) => s.getOTC('Subscription').getFields());
+    this._mutations = this._schemaComposer.map((s) => {
+      try {
+        const res = s.getOTC('Mutation').getFields();
+        return res;
+      } catch (e) {
+        return {};
+      }
+    });
+    this._queries = this._schemaComposer.map((s) => {
+      try {
+        const res = s.getOTC('Query').getFields();
+        return res;
+      } catch (e) {
+        return {};
+      }
+    });
+    this._subscriptions = this._schemaComposer.map((s) => {
+      try {
+        const res = s.getOTC('Subscription').getFields();
+        return res;
+      } catch (e) {
+        return {};
+      }
+    });
   }
   private readonly _mutations;
   private get mutations() {

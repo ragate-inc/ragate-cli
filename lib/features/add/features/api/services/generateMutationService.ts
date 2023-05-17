@@ -118,8 +118,8 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
     const functionConfiguration: AppSyncFunctionConfiguration = {
       dataSource: dataSource.name,
       name: `${info.apiType}${info.apiName}`,
-      request: `functions/${info.apiType}${info.apiName}.request.vtl`,
-      response: `functions/${info.apiType}${info.apiName}.response.vtl`,
+      request: false,
+      response: false,
     };
     appSyncStackService.addFunctionConfiguration({
       functionConfiguration,
@@ -134,8 +134,8 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
       if (info.resolverType === 'PIPELINE') {
         return {
           type: info.apiType,
-          request: `queries/${info.apiType}.${info.apiName}.request.vtl`,
-          response: `queries/${info.apiType}.${info.apiName}.response.vtl`,
+          request: `functions/${info.apiType}.${info.apiName}.request.vtl`,
+          response: `functions/${info.apiType}.${info.apiName}.response.vtl`,
           field: info.apiName,
           kind: info.resolverType,
           functions: [functionConfigurations?.name as string],
@@ -147,8 +147,8 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
         type: info.apiType,
         field: info.apiName,
         kind: info.resolverType,
-        request: `queries/${info.apiType}.${info.apiName}.request.vtl`,
-        response: `queries/${info.apiType}.${info.apiName}.response.vtl`,
+        request: false,
+        response: false,
       };
     };
     const mappingTemplate = generateDataSource();

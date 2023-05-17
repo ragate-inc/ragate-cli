@@ -195,8 +195,8 @@ export type AppSyncDataSource = {
 export type AppSyncMappingTemplate = {
   type: GraphqlApiType;
   field: string;
-  request: string;
-  response: string;
+  request: string | boolean;
+  response: string | boolean;
   dataSource?: string;
   kind?: AppSyncResolverType;
   functions?: string[];
@@ -205,8 +205,8 @@ export type AppSyncMappingTemplate = {
 export type AppSyncFunctionConfiguration = {
   dataSource: string;
   name: string;
-  request: string;
-  response: string;
+  request: string | boolean;
+  response: string | boolean;
 };
 
 export type AppSyncStack = {
