@@ -386,19 +386,6 @@
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6444));
-        t.default = async (e) => {
-          const { appSyncStackService: t } = e;
-          s.default.getLogger().debug(`appsyncStack : ${JSON.stringify(t)}`);
-        };
-      },
-      6849: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(6444)),
           n = r(a(3290)),
           i = r(a(7973)),
@@ -406,12 +393,14 @@
           l = r(a(5837)),
           u = r(a(2056)),
           c = a(6870),
-          d = r(a(1017));
+          d = r(a(1017)),
+          p = r(a(6517)),
+          f = a(7343);
         t.default = async (e) => {
-          const { appSyncStackService: t, lang: a, slsConfig: r, info: p } = e,
-            f = s.default.getLogger();
-          f.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const m = async () => {
+          const { appSyncStackService: t, lang: a, slsConfig: r, info: m } = e,
+            h = s.default.getLogger();
+          h.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
+          const g = async () => {
               const { createDataSource: e } = await n.default.prompt([
                 {
                   type: 'expand',
@@ -424,17 +413,35 @@
                   validate: (e) => new i.default(e, a).required().value(),
                 },
               ]);
-              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), m()));
+              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), g()));
             },
-            h = await m(),
-            g = await (async () => {
-              if (h) {
+            y = await g(),
+            v = async () => {
+              const { template: e } = await n.default.prompt([
+                {
+                  type: 'list',
+                  name: 'template',
+                  choices: ['getItem', 'getItemConsistentRead', 'localResolver'],
+                  message: 'テンプレートを選択',
+                  validate: (e) => new i.default(e, a).required().value(),
+                },
+              ]);
+              return 'getItem' === e
+                ? { before: u.default.templates.vtl.getItemRequest(!1), after: u.default.templates.vtl.getItemResponse }
+                : 'getItemConsistentRead' === e
+                ? { before: u.default.templates.vtl.getItemRequest(!0), after: u.default.templates.vtl.getItemResponse }
+                : 'localResolver' === e
+                ? { before: u.default.templates.vtl.localResolverRequest, after: u.default.templates.vtl.localResolverResponse }
+                : { before: '{}', after: '{}' };
+            },
+            S = await (async () => {
+              if (y) {
                 const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
                   {
                     type: 'input',
                     name: 'lambdaFunctionName',
                     message: 'Lambda関数名を入力',
-                    default: () => p.apiName,
+                    default: () => m.apiName,
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
                     validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
@@ -443,7 +450,7 @@
                     type: 'input',
                     name: 'lambdaHandler',
                     message: 'input a lambda handler path',
-                    default: () => `src/functions/appsync/${p.apiName}.handler`,
+                    default: () => `src/functions/appsync/${m.apiName}.handler`,
                     validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
                     transformer: (e) => new o.default(e).removeAllSpace().value(),
                     filter: (e) => new l.default(e).removeAllSpace().value(),
@@ -453,7 +460,7 @@
                 const c = {
                   type: 'AWS_LAMBDA',
                   name: e,
-                  description: `It is for ${p.apiType}.${p.apiName}`,
+                  description: `It is for ${m.apiType}.${m.apiName}`,
                   config: {
                     functionName: { Ref: `${e}LambdaFunction` },
                     lambdaFunctionArn: { 'Fn::GetAtt': [`${e}LambdaFunction`, 'Arn'] },
@@ -472,25 +479,36 @@
                   },
                 ]),
                 s = t.appSyncStack?.dataSources.find((t) => t.name === e);
-              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), f.debug('finished dataSourceProcess'), s;
+              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), h.debug('finished dataSourceProcess'), s;
             })(),
-            y = await ((e) => {
+            _ = await (async (e) => {
               const { dataSource: a } = e;
-              if ('UNIT' === p.resolverType) return Promise.resolve(void 0);
-              const r = { dataSource: a.name, name: `${p.apiType}${p.apiName}`, request: !1, response: !1 };
-              return t.addFunctionConfiguration({ functionConfiguration: r }), f.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
-            })({ dataSource: g }),
-            v = await (async (e) => {
+              if ('UNIT' === m.resolverType) return Promise.resolve(void 0);
+              const r = t.appSyncStack?.functionConfigurationsLocation ?? './',
+                s = {
+                  dataSource: a.name,
+                  name: `${m.apiType}${p.default.upperFirst(m.apiName)}`,
+                  request: 'AWS_LAMBDA' !== a.type && `functions/${m.apiType}.${m.apiName}.request.vtl`,
+                  response: 'AWS_LAMBDA' !== a.type && `functions/${m.apiType}.${m.apiName}.response.vtl`,
+                };
+              if ('AWS_LAMBDA' !== a.type) {
+                const { before: e, after: t } = await v();
+                p.default.isString(s.request) && new u.default({ filePath: d.default.join(r, s.request), code: e, type: 'vtl' }).write(),
+                  p.default.isString(s.response) && new u.default({ filePath: d.default.join(r, s.response), code: t, type: 'vtl' }).write();
+              }
+              return t.addFunctionConfiguration({ functionConfiguration: s }), h.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
+            })({ dataSource: S }),
+            b = await (async (e) => {
               const { dataSource: a, functionConfigurations: r } = e,
-                s = (() => {
-                  if ('PIPELINE' === p.resolverType) {
+                s = await (async () => {
+                  if ('PIPELINE' === m.resolverType) {
                     const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
                       a = {
-                        type: p.apiType,
-                        request: `mutations/${p.apiType}.${p.apiName}.request.vtl`,
-                        response: `mutations/${p.apiType}.${p.apiName}.response.vtl`,
-                        field: p.apiName,
-                        kind: p.resolverType,
+                        type: m.apiType,
+                        request: `queries/${m.apiType}.${m.apiName}.request.vtl`,
+                        response: `queries/${m.apiType}.${m.apiName}.response.vtl`,
+                        field: m.apiName,
+                        kind: m.resolverType,
                         functions: [r?.name],
                       };
                     return (
@@ -499,21 +517,159 @@
                       a
                     );
                   }
-                  return { dataSource: a.name, type: p.apiType, field: p.apiName, kind: p.resolverType, request: !1, response: !1 };
+                  const e = {
+                    dataSource: a.name,
+                    type: m.apiType,
+                    field: m.apiName,
+                    kind: m.resolverType,
+                    request: 'AWS_LAMBDA' !== a.type && `queries/${m.apiType}.${m.apiName}.request.vtl`,
+                    response: 'AWS_LAMBDA' !== a.type && `queries/${m.apiType}.${m.apiName}.response.vtl`,
+                  };
+                  if ('AWS_LAMBDA' !== a.type) {
+                    const a = t.appSyncStack?.mappingTemplatesLocation ?? './',
+                      { before: r, after: s } = await v();
+                    p.default.isString(e.request) && new u.default({ filePath: d.default.join(a, e.request), code: r, type: 'vtl' }).write(),
+                      p.default.isString(e.response) && new u.default({ filePath: d.default.join(a, e.response), code: s, type: 'vtl' }).write();
+                  }
+                  return e;
                 })();
-              return t.addMappingTemplate({ mappingTemplate: s }), f.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: g, functionConfigurations: y }),
-            S = await (async () => {
+              return t.addMappingTemplate({ mappingTemplate: s }), h.debug('finished mappingTemplateProcess'), s;
+            })({ dataSource: S, functionConfigurations: _ }),
+            P = await (async () => {
               const e = t.graphqlEditor,
-                a = t.graphqlEditor.addExampleType(p.apiName),
-                r = t.graphqlEditor.addExampleInput(p.apiName);
+                a = t.graphqlEditor.addExampleType(m.apiName);
               return (
-                t.updateCustomSchemaGraphl({ mutation: { apiName: p.apiName, type: a.getType(), input: r.getType() } }),
-                f.debug('finished scheneGraphqlProcess'),
+                t.updateCustomSchemaGraphl({ query: { apiName: m.apiName, type: a.getType(), args: { example: { type: f.GraphQLString } } } }),
+                h.debug('finished scheneGraphqlProcess'),
                 Promise.resolve(e.customSchema)
               );
             })();
-          f.debug({ dataSource: g, functionConfigurations: y, mappingTemplate: v, schemaGraphql: S });
+          h.debug({ dataSource: S, functionConfigurations: _, mappingTemplate: b, schemaGraphql: P });
+        };
+      },
+      6849: function (e, t, a) {
+        var r =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const s = r(a(6444)),
+          n = r(a(3290)),
+          i = r(a(7973)),
+          o = r(a(1092)),
+          l = r(a(5837)),
+          u = r(a(2056)),
+          c = a(6870),
+          d = r(a(1017)),
+          p = r(a(6517));
+        t.default = async (e) => {
+          const { appSyncStackService: t, lang: a, slsConfig: r, info: f } = e,
+            m = s.default.getLogger();
+          m.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
+          const h = async () => {
+              const { createDataSource: e } = await n.default.prompt([
+                {
+                  type: 'expand',
+                  name: 'createDataSource',
+                  message: 'データソースを新しく作成しますか？',
+                  choices: [
+                    { key: 'y', name: 'yes', value: !0 },
+                    { key: 'n', name: 'no', value: !1 },
+                  ],
+                  validate: (e) => new i.default(e, a).required().value(),
+                },
+              ]);
+              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), h()));
+            },
+            g = await h(),
+            y = await (async () => {
+              if (g) {
+                const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
+                  {
+                    type: 'input',
+                    name: 'lambdaFunctionName',
+                    message: 'Lambda関数名を入力',
+                    default: () => f.apiName,
+                    filter: (e) => e.replace(/\s+/g, ''),
+                    transformer: (e) => e.replace(/\s+/g, ''),
+                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
+                  },
+                  {
+                    type: 'input',
+                    name: 'lambdaHandler',
+                    message: 'input a lambda handler path',
+                    default: () => `src/functions/appsync/${f.apiName}.handler`,
+                    validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
+                    transformer: (e) => new o.default(e).removeAllSpace().value(),
+                    filter: (e) => new l.default(e).removeAllSpace().value(),
+                  },
+                ]);
+                r.addFunction({ lambdaFunctionName: e, lambdaHandler: s, code: u.default.templates.typescript.skeleton });
+                const c = {
+                  type: 'AWS_LAMBDA',
+                  name: e,
+                  description: `It is for ${f.apiType}.${f.apiName}`,
+                  config: {
+                    functionName: { Ref: `${e}LambdaFunction` },
+                    lambdaFunctionArn: { 'Fn::GetAtt': [`${e}LambdaFunction`, 'Arn'] },
+                    serviceRoleArn: { 'Fn::GetAtt': [t.appSyncLambdaRoleName, 'Arn'] },
+                  },
+                };
+                return t.addIamRoleByDataSource({ dataSource: 'AWS_LAMBDA', sls: r }), t.addDataSource(c), c;
+              }
+              const { dataSource: e } = await n.default.prompt([
+                  {
+                    type: 'list',
+                    name: 'dataSource',
+                    choices: t.appSyncStack?.dataSources.map((e) => e.name),
+                    message: 'データソースを選択',
+                    validate: (e) => new i.default(e, a).required().value(),
+                  },
+                ]),
+                s = t.appSyncStack?.dataSources.find((t) => t.name === e);
+              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), m.debug('finished dataSourceProcess'), s;
+            })(),
+            v = await ((e) => {
+              const { dataSource: a } = e;
+              if ('UNIT' === f.resolverType) return Promise.resolve(void 0);
+              const r = { dataSource: a.name, name: `${f.apiType}${p.default.upperFirst(f.apiName)}`, request: !1, response: !1 };
+              return t.addFunctionConfiguration({ functionConfiguration: r }), m.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
+            })({ dataSource: y }),
+            S = await (async (e) => {
+              const { dataSource: a, functionConfigurations: r } = e,
+                s = (() => {
+                  if ('PIPELINE' === f.resolverType) {
+                    const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
+                      a = {
+                        type: f.apiType,
+                        request: `mutations/${f.apiType}.${f.apiName}.request.vtl`,
+                        response: `mutations/${f.apiType}.${f.apiName}.response.vtl`,
+                        field: f.apiName,
+                        kind: f.resolverType,
+                        functions: [r?.name],
+                      };
+                    return (
+                      new u.default({ filePath: d.default.join(e, a.request), code: u.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
+                      new u.default({ filePath: d.default.join(e, a.response), code: u.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
+                      a
+                    );
+                  }
+                  return { dataSource: a.name, type: f.apiType, field: f.apiName, kind: f.resolverType, request: !1, response: !1 };
+                })();
+              return t.addMappingTemplate({ mappingTemplate: s }), m.debug('finished mappingTemplateProcess'), s;
+            })({ dataSource: y, functionConfigurations: v }),
+            _ = await (async () => {
+              const e = t.graphqlEditor,
+                a = t.graphqlEditor.addExampleType(f.apiName),
+                r = t.graphqlEditor.addExampleInput(f.apiName);
+              return (
+                t.updateCustomSchemaGraphl({ mutation: { apiName: f.apiName, type: a.getType(), input: r.getType() } }),
+                m.debug('finished scheneGraphqlProcess'),
+                Promise.resolve(e.customSchema)
+              );
+            })();
+          m.debug({ dataSource: y, functionConfigurations: v, mappingTemplate: S, schemaGraphql: _ });
         };
       },
       8391: function (e, t, a) {
@@ -1672,6 +1828,15 @@
           (t.default =
             "import { asyncHandlerWrapper } from 'functions/wrapper';\nimport { AppSyncResolverEvent, Context } from 'aws-lambda';\n\ntype Input = {\n  example: string;\n};\n\ntype Response = {\n  example: string;\n};\n\nexport const handler = asyncHandlerWrapper<AppSyncResolverEvent<Input>, Context, Response>(async (event) => {\n  console.log('It is skeleton 👻');\n});\n");
       },
+      7130: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = (e) =>
+            `\n## [Start] 共通設定\n#set( $primaryKey = "your primary key attribute name" )\n#set( $primaryValue = "your primary key value" )\n#set( $sortKeyName = "your sory key attribute name" )\n#set( $sortKeyValue = "your sort key value" )\n#set( $consistentRead = ${e.toString()} )\n## [End] 共通設定\n\n## [Start] バリデーション\n#set( $modelExpression = {\n    "version" : "2017-02-28",\n    "operation" : "GetItem",\n    "key" : {},\n    "consistentRead" : $consistentRead\n} )\n#if( $util.isNullOrEmpty($primaryValue) )\n  $util.error("PrimaryValue is null.", "InvalidIndexValueError")\n#else\n  $util.qr($modelExpression.key.put($primaryKey, $util.dynamodb.toDynamoDB($primaryValue)))\n#end\n#if( !$util.isNullOrEmpty($sortKeyName) && $util.isNullOrEmpty($sortKeyValue) )\n  $util.error("sortKeyValue is null.", "InvalidIndexValueError")\n#elseif( !$util.isNullOrEmpty($sortKeyName) && !$util.isNullOrEmpty($sortKeyValue) )\n  $util.qr($modelExpression.key.put($sortKeyName, $util.dynamodb.toDynamoDB($sortKeyValue)))\n#end\n## [End] バリデーション\n\n$util.toJson($modelExpression)\n`);
+      },
+      1266: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = '\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n');
+      },
       7112: function (e, t, a) {
         var r =
           (this && this.__importDefault) ||
@@ -1680,8 +1845,28 @@
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(4709)),
-          n = r(a(5951));
-        t.default = { pipelineAfter: s.default, pipelineBefore: n.default };
+          n = r(a(5951)),
+          i = r(a(7130)),
+          o = r(a(1266)),
+          l = r(a(8520)),
+          u = r(a(8382));
+        t.default = {
+          pipelineAfter: s.default,
+          pipelineBefore: n.default,
+          getItemRequest: i.default,
+          getItemResponse: o.default,
+          localResolverRequest: l.default,
+          localResolverResponse: u.default,
+        };
+      },
+      8520: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default =
+            '\n## [Start] 共通設定\n#set($payload = $ctx.args )\n#set($primaryValue = "your primary key value" )\n## [End] 共通設定\n\n#if( $util.isNullOrEmpty($primaryValue) )\n  #return\n#end\n\n{\n  "version": "2017-02-28",\n  "payload": $util.toJson($payload)\n}\n');
+      },
+      8382: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = '\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n');
       },
       4709: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }), (t.default = '$util.toJson($ctx.prev.result)');
@@ -2243,7 +2428,7 @@
           }
           addQueryField(e) {
             const { apiName: t, args: a, type: r } = e;
-            return this.customSchemaComposer.Mutation.addFields({ [t]: { type: r, args: a } }), this;
+            return this.customSchemaComposer.Query.addFields({ [t]: { type: r, args: a } }), this;
           }
           updateCustomSchemaGraphl(e) {
             const { query: t, mutation: a, callback: r } = e;
@@ -2617,9 +2802,9 @@
             buildSafeSonicBoom: b,
             filterLog: P,
             handleCustomlevelsOpts: w,
-            handleCustomlevelNamesOpts: C,
+            handleCustomlevelNamesOpts: L,
           } = a(385),
-          L = (e) => {
+          C = (e) => {
             try {
               return { value: o.parse(e, { protoAction: 'remove' }) };
             } catch (e) {
@@ -2661,64 +2846,64 @@
             d = t.errorLikeObjectKeys,
             b = t.errorProps.split(','),
             k = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
-            O = w(t.customLevels),
-            M = C(t.customLevels),
-            A = t.customColors
+            A = w(t.customLevels),
+            O = L(t.customLevels),
+            $ = t.customColors
               ? t.customColors.split(',').reduce((e, a) => {
                   const [r, s] = a.split(':'),
-                    n = (k ? t.customLevels : void 0 !== M[r]) ? M[r] : f[r],
+                    n = (k ? t.customLevels : void 0 !== O[r]) ? O[r] : f[r],
                     i = void 0 !== n ? n : r;
                   return e.push([i, s]), e;
                 }, [])
               : void 0,
-            j = { customLevels: O, customLevelNames: M };
-          k && !t.customLevels && ((j.customLevels = void 0), (j.customLevelNames = void 0));
+            M = { customLevels: A, customLevelNames: O };
+          k && !t.customLevels && ((M.customLevels = void 0), (M.customLevelNames = void 0));
           const R = t.customPrettifiers,
-            x = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
-            F = !x && t.ignore ? new Set(t.ignore.split(',')) : void 0,
-            $ = t.hideObject,
-            q = t.singleLine,
-            D = l(t.colorize, A, k),
-            N = t.colorizeObjects ? D : l(!1, [], !1);
+            j = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
+            x = !j && t.ignore ? new Set(t.ignore.split(',')) : void 0,
+            q = t.hideObject,
+            F = t.singleLine,
+            N = l(t.colorize, $, k),
+            D = t.colorizeObjects ? N : l(!1, [], !1);
           return function (e) {
             let l;
             if (m(e)) l = e;
             else {
-              const t = L(e);
+              const t = C(e);
               if (t.err || !m(t.value)) return e + a;
               l = t.value;
             }
             if (o) {
-              const e = ((k ? t.customLevels : void 0 !== M[o]) ? M[o] : f[o]) || Number(o);
+              const e = ((k ? t.customLevels : void 0 !== O[o]) ? O[o] : f[o]) || Number(o);
               if (l[void 0 === n ? p : n] < e) return;
             }
-            const w = y({ log: l, messageKey: s, colorizer: D, messageFormat: u, levelLabel: i, ...j, useOnlyCustomProps: k });
-            (F || x) && (l = P({ log: l, ignoreKeys: F, includeKeys: x }));
-            const C = g({ log: l, colorizer: D, levelKey: n, prettifier: R.level, ...j }),
+            const w = y({ log: l, messageKey: s, colorizer: N, messageFormat: u, levelLabel: i, ...M, useOnlyCustomProps: k });
+            (x || j) && (l = P({ log: l, ignoreKeys: x, includeKeys: j }));
+            const L = g({ log: l, colorizer: N, levelKey: n, prettifier: R.level, ...M }),
               E = v({ log: l, prettifiers: R }),
-              O = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: R.time });
-            let A = '';
+              A = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: R.time });
+            let $ = '';
             if (
-              (t.levelFirst && C && (A = `${C}`),
-              O && '' === A ? (A = `${O}`) : O && (A = `${A} ${O}`),
-              !t.levelFirst && C && (A = A.length > 0 ? `${A} ${C}` : C),
-              E && (A = A.length > 0 ? `${A} ${E}:` : E),
-              !1 === A.endsWith(':') && '' !== A && (A += ':'),
-              w && (A = A.length > 0 ? `${A} ${w}` : w),
-              A.length > 0 && !q && (A += a),
+              (t.levelFirst && L && ($ = `${L}`),
+              A && '' === $ ? ($ = `${A}`) : A && ($ = `${$} ${A}`),
+              !t.levelFirst && L && ($ = $.length > 0 ? `${$} ${L}` : L),
+              E && ($ = $.length > 0 ? `${$} ${E}:` : E),
+              !1 === $.endsWith(':') && '' !== $ && ($ += ':'),
+              w && ($ = $.length > 0 ? `${$} ${w}` : w),
+              $.length > 0 && !F && ($ += a),
               'Error' === l.type && l.stack)
             ) {
               const e = h({ log: l, errorLikeKeys: d, errorProperties: b, ident: r, eol: a });
-              q && (A += a), (A += e);
-            } else if (!$) {
+              F && ($ += a), ($ += e);
+            } else if (!q) {
               const e = [s, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = S({ input: l, skipKeys: e, customPrettifiers: R, errorLikeKeys: d, eol: a, ident: r, singleLine: q, colorizer: N });
-              q && !/^\s$/.test(t) && (A += ' '), (A += t);
+                t = S({ input: l, skipKeys: e, customPrettifiers: R, errorLikeKeys: d, eol: a, ident: r, singleLine: F, colorizer: D });
+              F && !/^\s$/.test(t) && ($ += ' '), ($ += t);
             }
-            return A;
+            return $;
           };
         }
-        function O(e = {}) {
+        function A(e = {}) {
           const t = k(e);
           return i(
             function (a) {
@@ -2745,7 +2930,7 @@
             { parse: 'lines' }
           );
         }
-        (e.exports = O), (e.exports.prettyFactory = k), (e.exports.colorizerFactory = l), (e.exports.default = O);
+        (e.exports = A), (e.exports.prettyFactory = k), (e.exports.colorizerFactory = l), (e.exports.default = A);
       },
       903: (e, t, a) => {
         const { LEVELS: r, LEVEL_NAMES: s } = a(7318),
@@ -2848,7 +3033,7 @@
           for (let e = 1; e < r.length; e += 1) r[e] = t + r[e];
           return r.join(a);
         }
-        function C({
+        function L({
           input: e,
           ident: t = '    ',
           eol: a = '\n',
@@ -2884,12 +3069,12 @@
                 }),
             Object.entries(g).forEach(([e, r]) => {
               const n = 'function' == typeof s[e] ? r : i(r, null, 2);
-              void 0 !== n && (f += L({ keyName: e, lines: n, eol: a, ident: t }));
+              void 0 !== n && (f += C({ keyName: e, lines: n, eol: a, ident: t }));
             }),
             f
           );
         }
-        function L({ keyName: e, lines: t, eol: a, ident: r }) {
+        function C({ keyName: e, lines: t, eol: a, ident: r }) {
           let s = '';
           const n = `${r}${e}: ${w({ input: t, ident: r, eol: a })}${a}`.split(a);
           for (let e = 0; e < n.length; e += 1) {
@@ -2925,13 +3110,13 @@
           }
           return e;
         }
-        function O(e, t) {
+        function A(e, t) {
           const a = E(t),
             r = a.pop();
           null !== (e = k(e, a)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, r) && delete e[r];
         }
-        function M() {}
-        function A(e, t) {
+        function O() {}
+        function $(e, t) {
           e.destroyed ||
             ('beforeExit' === t
               ? (e.flush(),
@@ -2951,7 +3136,7 @@
               for (let t = 0; t < l.length; t += 1) {
                 const n = l[t];
                 n in e != 0 &&
-                  (i = P(e[n]) ? `${i}${a}${n}: {${r}${C({ input: e[n], errorLikeKeys: s, excludeLoggerKeys: !1, eol: r, ident: a + a })}${a}}${r}` : `${i}${a}${n}: ${e[n]}${r}`);
+                  (i = P(e[n]) ? `${i}${a}${n}: {${r}${L({ input: e[n], errorLikeKeys: s, excludeLoggerKeys: !1, eol: r, ident: a + a })}${a}}${r}` : `${i}${a}${n}: ${e[n]}${r}`);
               }
             }
             return i;
@@ -2994,7 +3179,7 @@
             }
             return e.caller && (a += `${'' === a ? '' : ' '}<${t.caller ? t.caller(e.caller) : e.caller}>`), '' === a ? void 0 : a;
           },
-          prettifyObject: C,
+          prettifyObject: L,
           prettifyTime: function ({ log: e, timestampKey: t = m, translateFormat: a, prettifier: r }) {
             let s = null;
             if ((t in e ? (s = e[t]) : 'timestamp' in e && (s = e.timestamp), null === s)) return;
@@ -3005,7 +3190,7 @@
             const t = new n(e);
             return (
               t.on('error', function e(a) {
-                if ('EPIPE' === a.code) return (t.write = M), (t.end = M), (t.flushSync = M), void (t.destroy = M);
+                if ('EPIPE' === a.code) return (t.write = O), (t.end = O), (t.flushSync = O), void (t.destroy = O);
                 t.removeListener('error', e);
               }),
               !e.sync &&
@@ -3013,7 +3198,7 @@
                 (function (e) {
                   if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
                     const t = a(2067);
-                    t.register(e, A),
+                    t.register(e, $),
                       e.on('close', function () {
                         t.unregister(e);
                       });
@@ -3035,7 +3220,7 @@
             }
             return (
               t.forEach((e) => {
-                O(r, e);
+                A(r, e);
               }),
               r
             );
@@ -3071,9 +3256,9 @@
           (e.exports.internals = {
             formatTime: S,
             joinLinesWithIndentation: w,
-            prettifyError: L,
+            prettifyError: C,
             getPropertyValue: k,
-            deleteLogProperty: O,
+            deleteLogProperty: A,
             splitPropertyKey: E,
             createDate: _,
             isValidDate: b,

@@ -142,7 +142,7 @@ export default class GraphqlEditor {
 
   public addQueryField(_args: AddQueryFiledInput): GraphqlEditor {
     const { apiName, args, type } = _args;
-    this.customSchemaComposer.Mutation.addFields({
+    this.customSchemaComposer.Query.addFields({
       [apiName]: {
         type,
         args,

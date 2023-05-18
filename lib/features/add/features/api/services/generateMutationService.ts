@@ -11,6 +11,7 @@ import { chalk } from 'utils/yargonaut';
 import AppSyncStackService from 'services/appSyncStackService';
 import { AppSyncFunctionConfiguration } from 'types/index';
 import path from 'path';
+import _ from 'lodash';
 
 export default async (args: { appSyncStackService: AppSyncStackService; lang: string; slsConfig: ServerlessConfigService; info: Type.PromptApiInfo }): Promise<void> => {
   const { appSyncStackService, lang, slsConfig, info } = args;
@@ -118,7 +119,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
     // pipeline resolver
     const functionConfiguration: AppSyncFunctionConfiguration = {
       dataSource: dataSource.name,
-      name: `${info.apiType}${info.apiName}`,
+      name: `${info.apiType}${_.upperFirst(info.apiName)}`,
       request: false,
       response: false,
     };
