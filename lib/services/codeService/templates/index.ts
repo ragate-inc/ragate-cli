@@ -1,5 +1,5 @@
-import basicauthlambda from 'services/codeService/templates/code/basicauthlambda';
-import skeleton from 'services/codeService/templates/code/skeleton';
+import basicauthlambda from 'services/codeService/templates/typescript/basicauthlambda';
+import skeleton from 'services/codeService/templates/typescript/skeleton';
 
 export type Template = {
   basicauthlambda: string;

@@ -203,7 +203,7 @@ export default class {
     };
     // write a function handler file (typescript)
     const createHandlerFile = () => {
-      new CodeService({ handlerPath: lambdaHandler, code }).write();
+      new CodeService({ filePath: lambdaHandler, code, type: 'typescript' }).write();
     };
     // write iam role
     const updateIamRole = () => {

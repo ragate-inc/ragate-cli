@@ -1604,36 +1604,42 @@
             return n.default;
           }
           constructor(e) {
-            this.handlerPath = e.handlerPath;
-            const [t, a] = s.default.parseLambdaHandlerPath(e.handlerPath);
-            (this.destinationPath = t.join('/') + '/'), (this.handlerName = s.default.extractFilename(a)), (this.code = e.code), (this.logger = l.default.getLogger());
+            const { filePath: t, code: a, type: r } = e,
+              [n, i] = s.default.parseFilePath(t);
+            (this.type = r),
+              (this.filePath = t),
+              (this.code = a),
+              (this.destinationPath = n.join('/') + '/'),
+              (this.fileName = s.default.extractFilename(i)),
+              (this.logger = l.default.getLogger());
           }
-          handlerPath;
+          filePath;
+          type;
           destinationPath;
-          handlerName;
+          fileName;
           code;
           logger;
+          get extension() {
+            switch (this.type) {
+              case 'typescript':
+                return 'ts';
+              case 'vtl':
+                return 'vtl';
+              default:
+                throw (this.logger.error(`An unsupported file type was specified. : ${this.filePath}`), Error('An unsupported file type was specified.'));
+            }
+          }
           write() {
-            const e = `${(0, i.asFullPath)(this.destinationPath)}${this.handlerName}.ts`;
+            const e = `${(0, i.asFullPath)(this.destinationPath)}${this.fileName}.${this.extension}`;
             (0, i.isFileExists)(e)
               ? this.logger.info(`already exists file, skip write : ${e}`)
               : ((0, i.createDirectories)(this.destinationPath),
-                this.logger.info(`create directories : ${this.handlerPath}`),
+                this.logger.info(`create directories : ${this.filePath}`),
                 o.default.writeFileSync(e, this.code, 'utf8'),
                 this.logger.info(`write : ${e}`),
                 this.logger.info((0, u.chalk)().green(this.code)));
           }
         };
-      },
-      4136: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            "import { Context, CloudFrontRequest, Callback, CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda';\n\nexport const handler = (event: CloudFrontRequestEvent, _context: Context, callback: Callback): void => {\n  const request: CloudFrontRequest = event.Records[0].cf.request;\n  const headers = request.headers;\n\n  const authUser = 'ragate'; // Basic認証のユーザー名\n  const authPass = '20210525'; // Basic認証のパスワード\n\n  const authString = 'Basic ' + Buffer.from(authUser + ':' + authPass).toString('base64');\n  if (typeof headers.authorization === 'undefined' || headers.authorization[0].value !== authString) {\n    const body = 'Unauthorized';\n    const response: CloudFrontResultResponse = {\n      status: '401',\n      statusDescription: 'Unauthorized',\n      body: body,\n      headers: {\n        'www-authenticate': [{ key: 'WWW-Authenticate', value: 'Basic' }],\n      },\n    };\n    callback(null, response);\n  }\n  callback(null, request);\n};\n");
-      },
-      1875: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            "import { asyncHandlerWrapper } from 'functions/wrapper';\nimport { AppSyncResolverEvent, Context } from 'aws-lambda';\n\ntype Input = {\n  example: string;\n};\n\ntype Response = {\n  example: string;\n};\n\nexport const handler = asyncHandlerWrapper<AppSyncResolverEvent<Input>, Context, Response>(async (event) => {\n  console.log('It is skeleton 👻');\n});\n");
       },
       6698: function (e, t, a) {
         var r =
@@ -1642,9 +1648,19 @@
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(4136)),
-          n = r(a(1875));
+        const s = r(a(5955)),
+          n = r(a(146));
         t.default = { basicauthlambda: s.default, skeleton: n.default };
+      },
+      5955: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default =
+            "import { Context, CloudFrontRequest, Callback, CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda';\n\nexport const handler = (event: CloudFrontRequestEvent, _context: Context, callback: Callback): void => {\n  const request: CloudFrontRequest = event.Records[0].cf.request;\n  const headers = request.headers;\n\n  const authUser = 'ragate'; // Basic認証のユーザー名\n  const authPass = '20210525'; // Basic認証のパスワード\n\n  const authString = 'Basic ' + Buffer.from(authUser + ':' + authPass).toString('base64');\n  if (typeof headers.authorization === 'undefined' || headers.authorization[0].value !== authString) {\n    const body = 'Unauthorized';\n    const response: CloudFrontResultResponse = {\n      status: '401',\n      statusDescription: 'Unauthorized',\n      body: body,\n      headers: {\n        'www-authenticate': [{ key: 'WWW-Authenticate', value: 'Basic' }],\n      },\n    };\n    callback(null, response);\n  }\n  callback(null, request);\n};\n");
+      },
+      146: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default =
+            "import { asyncHandlerWrapper } from 'functions/wrapper';\nimport { AppSyncResolverEvent, Context } from 'aws-lambda';\n\ntype Input = {\n  example: string;\n};\n\ntype Response = {\n  example: string;\n};\n\nexport const handler = asyncHandlerWrapper<AppSyncResolverEvent<Input>, Context, Response>(async (event) => {\n  console.log('It is skeleton 👻');\n});\n");
       },
       1325: function (e, t, a) {
         var r =
@@ -1813,7 +1829,7 @@
                   i.info('write functions property'), i.info((0, u.chalk)().green(o));
                 }
               })(),
-              new f.default({ handlerPath: a, code: n }).write(),
+              new f.default({ filePath: a, code: n, type: 'typescript' }).write(),
               (() => {
                 this.addResource({ filePath: `serverless/${this.region}/resources/iam-role.yml`, resourceName: 'DefaultLambdaRole', cf: this.generateDefaultLambdaRoleCf(t) });
               })();
@@ -2330,7 +2346,7 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(6517));
         t.default = class {
-          static parseLambdaHandlerPath(e) {
+          static parseFilePath(e) {
             const t = e.split('/'),
               a = t.slice(0, -1),
               r = t[t.length - 1];
@@ -2632,8 +2648,8 @@
           const R = t.customPrettifiers,
             F = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
             x = !F && t.ignore ? new Set(t.ignore.split(',')) : void 0,
-            q = t.hideObject,
-            $ = t.singleLine,
+            $ = t.hideObject,
+            q = t.singleLine,
             N = l(t.colorize, A, k),
             D = t.colorizeObjects ? N : l(!1, [], !1);
           return function (e) {
@@ -2661,15 +2677,15 @@
               E && (A = A.length > 0 ? `${A} ${E}:` : E),
               !1 === A.endsWith(':') && '' !== A && (A += ':'),
               w && (A = A.length > 0 ? `${A} ${w}` : w),
-              A.length > 0 && !$ && (A += a),
+              A.length > 0 && !q && (A += a),
               'Error' === l.type && l.stack)
             ) {
               const e = h({ log: l, errorLikeKeys: d, errorProperties: b, ident: r, eol: a });
-              $ && (A += a), (A += e);
-            } else if (!q) {
+              q && (A += a), (A += e);
+            } else if (!$) {
               const e = [s, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = S({ input: l, skipKeys: e, customPrettifiers: R, errorLikeKeys: d, eol: a, ident: r, singleLine: $, colorizer: D });
-              $ && !/^\s$/.test(t) && (A += ' '), (A += t);
+                t = S({ input: l, skipKeys: e, customPrettifiers: R, errorLikeKeys: d, eol: a, ident: r, singleLine: q, colorizer: D });
+              q && !/^\s$/.test(t) && (A += ' '), (A += t);
             }
             return A;
           };

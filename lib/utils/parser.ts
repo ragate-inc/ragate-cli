@@ -1,6 +1,6 @@
 import _ from 'lodash';
 export default class {
-  public static parseLambdaHandlerPath(input: string): [string[], string] {
+  public static parseFilePath(input: string): [string[], string] {
     const parts = input.split('/');
     const path = parts.slice(0, -1);
     const filename = parts[parts.length - 1];
