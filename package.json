@@ -1,6 +1,6 @@
 {
   "name": "ragate-cli",
-  "version": "0.1.3",
+  "version": "0.2.0",
   "description": "Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.",
   "engines": {
     "node": ">=18.x"
