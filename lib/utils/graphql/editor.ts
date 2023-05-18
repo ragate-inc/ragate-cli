@@ -1,15 +1,18 @@
-import { ObjectTypeComposerArgumentConfigMapDefinition, SchemaComposer, printSchema } from 'graphql-compose';
-import { GraphQLInputObjectType, GraphQLNonNull, GraphQLObjectType } from 'graphql';
+import { InputTypeComposer, ObjectTypeComposer, ObjectTypeComposerArgumentConfigMapDefinition, printSchema, SchemaComposer } from 'graphql-compose';
+import { buildSchema, GraphQLInputObjectType, GraphQLNonNull, GraphQLObjectType } from 'graphql';
 import Logger from 'utils/logger';
 import { pino } from 'pino';
 import _ from 'lodash';
 import { asFullPath } from 'utils/cli';
 import fs from 'fs';
 import { chalk } from 'yargonaut';
+import { addScalrs, removeScalars } from 'utils/graphql/appsyncScalars';
+
+// Diffを出せるっぽいので検証したい : https://www.npmjs.com/package/graphql-schema-utils
 
 export type AddQueryFiledInput = {
   apiName: string;
-  args: ObjectTypeComposerArgumentConfigMapDefinition<unknown>;
+  args: ObjectTypeComposerArgumentConfigMapDefinition;
   type: GraphQLObjectType;
 };
 
@@ -20,59 +23,115 @@ export type AddMutationFieldInput = {
 };
 
 export default class GraphqlEditor {
-  constructor(schemePath?: string) {
+  constructor(opt?: { customSchemaPath?: string; defaultSchemaPath?: string }) {
+    const initAllSchemaComposer = () => {
+      if (this.customSchema) {
+        this.allSchemaComposer.merge(buildSchema(this.customSchema));
+      }
+      if (this.defaultSchema) {
+        this.allSchemaComposer.merge(buildSchema(this.defaultSchema));
+      }
+    };
+    const initCustomSchemaComposer = () => {
+      if (this.customSchema) {
+        this.customSchemaComposer.merge(buildSchema(this.customSchema));
+      }
+    };
     this.logger = Logger.getLogger();
-    this._schemePath = schemePath ?? this.defaultCustomSchemePath;
-    this.setScheme();
-    this._schemaComposer = new SchemaComposer(this.scheme);
-  }
-
-  private setScheme() {
-    try {
-      this._scheme = fs.readFileSync(asFullPath(this.schemePath), 'utf8');
-    } catch (e) {
-      this.logger.debug(e);
-      this.logger.warn(`custom_scheme.graphql is not found.`);
-    }
-  }
-
-  private readonly _schemePath: string;
-  private get schemePath(): string {
-    return this._schemePath;
+    this._customSchemaPath = opt?.customSchemaPath ?? this.defaultCustomSchemaPath;
+    this._defaultSchemaPath = opt?.defaultSchemaPath ?? this.defaultDefaultSchemaPath;
+    this.readOrSetCustomSchema();
+    this.readOrSetDefaultSchema();
+    initAllSchemaComposer();
+    initCustomSchemaComposer();
   }
 
   private readonly logger: pino.Logger;
-  private readonly defaultCustomSchemePath: string = 'appsync/custom_scheme.graphql';
+  private readonly defaultCustomSchemaPath: string = 'appsync/custom_schema.graphql';
+  private readonly defaultDefaultSchemaPath: string = 'appsync/schema.graphql';
+  private readonly _customSchemaPath: string;
+  private readonly _defaultSchemaPath: string;
+  private readonly _customSchemaComposer: SchemaComposer = new SchemaComposer();
+  private readonly _allSchemaComposer: SchemaComposer = new SchemaComposer();
+  private _defaultSchema?: string;
+  private _customSchema?: string;
 
-  private _scheme?: string;
-  public get scheme(): string | undefined {
-    return this._scheme;
+  private get defaultSchemaPath(): string {
+    return this._defaultSchemaPath;
+  }
+  private get customSchemaPath(): string {
+    return this._customSchemaPath;
+  }
+  public get defaultSchema(): string | undefined {
+    if (!this._defaultSchema) return;
+    return addScalrs(this._defaultSchema);
+  }
+  public get customSchema(): string | undefined {
+    if (!this._customSchema) return;
+    return addScalrs(this._customSchema);
+  }
+  public get customSchemaComposer(): SchemaComposer {
+    return this._customSchemaComposer;
+  }
+  public get allSchemaComposer(): SchemaComposer {
+    return this._allSchemaComposer;
   }
 
-  private _schemaComposer: SchemaComposer;
-  public get schemaComposer(): SchemaComposer {
-    return this._schemaComposer;
+  private readOrSetCustomSchema() {
+    try {
+      this._customSchema = fs.readFileSync(asFullPath(this.customSchemaPath), 'utf8');
+    } catch (e) {
+      this.logger.debug(e);
+      this.logger.warn(`custom_schema.graphql is not found.`);
+    }
+  }
+
+  private readOrSetDefaultSchema() {
+    try {
+      this._defaultSchema = fs.readFileSync(asFullPath(this.defaultSchemaPath), 'utf8');
+    } catch (e) {
+      this.logger.debug(e);
+      this.logger.warn(`schema.graphql is not found.`);
+    }
   }
 
   public listQueies() {
-    return this.schemaComposer.getOTC('Query').getFields();
+    return this.allSchemaComposer.getOTC('Query').getFields();
   }
 
   public listMutation() {
-    return this.schemaComposer.getOTC('Mutation').getFields();
+    return this.allSchemaComposer.getOTC('Mutation').getFields();
   }
 
   public listSubscription() {
-    return this.schemaComposer.getOTC('Subscription').getFields();
+    return this.allSchemaComposer.getOTC('Subscription').getFields();
   }
 
-  public getTypeMap() {
-    return this.schemaComposer.buildSchema().getTypeMap();
+  public addExampleInput(apiName: string): InputTypeComposer {
+    return InputTypeComposer.create(
+      `
+      input ${apiName}Input {
+        example: String!
+      },
+    `,
+      this.customSchemaComposer
+    );
+  }
+
+  public addExampleType(apiName: string): ObjectTypeComposer {
+    return ObjectTypeComposer.create(
+      `
+      type ${apiName}Response {
+        example: String!
+      }
+    `,
+      this.customSchemaComposer
+    );
   }
 
   public addMutationField(_args: AddMutationFieldInput): GraphqlEditor {
     const { apiName, input, type } = _args;
-    this.schemaComposer.Mutation.addFields({
+    this.customSchemaComposer.Mutation.addFields({
       [apiName]: {
         type,
         args: {
@@ -85,7 +144,7 @@ export default class GraphqlEditor {
 
   public addQueryField(_args: AddQueryFiledInput): GraphqlEditor {
     const { apiName, args, type } = _args;
-    this.schemaComposer.Mutation.addFields({
+    this.customSchemaComposer.Mutation.addFields({
       [apiName]: {
         type,
         args,
@@ -94,18 +153,18 @@ export default class GraphqlEditor {
     return this;
   }
 
-  public updateCustomSchemeGraphl(args: {
+  public updateCustomSchemaGraphl(args: {
     query?: AddQueryFiledInput;
     mutation?: AddMutationFieldInput;
     callback?: (
       updated: boolean,
       opt: {
-        schemePath: string;
+        schemaPath: string;
       }
     ) => void;
   }): void {
     const { query, mutation, callback } = args;
-    // update custom_scheme.graphql
+    // update custom_schema.graphql
     let updated = false;
     if (query || mutation) {
       if (query) {
@@ -130,19 +189,27 @@ export default class GraphqlEditor {
       this.logger.warn('query or mutation is empty.');
     }
     if (updated) {
-      const scheme = this.printSchema();
-      fs.writeFileSync(asFullPath(this.schemePath), scheme, 'utf8');
-      this.logger.info(chalk().green(scheme));
-      this.setScheme();
+      const schema = this.printSchema();
+      fs.writeFileSync(asFullPath(this.defaultCustomSchemaPath), schema, 'utf8');
+      this.logger.info(chalk().green(schema));
+      this.readOrSetCustomSchema();
     }
     if (callback) {
       callback(updated, {
-        schemePath: this.schemePath,
+        schemaPath: this.defaultCustomSchemaPath,
       });
     }
   }
 
+  private removeEmptyLines(schemaString: string) {
+    const lines = schemaString.split('\n');
+    const filteredLines = lines.filter((line) => !line.includes('""""""'));
+    return filteredLines.join('\n');
+  }
+
   public printSchema(): string {
-    return printSchema(this.schemaComposer.buildSchema());
+    const res = printSchema(this.customSchemaComposer.buildSchema());
+    const trimmedSchema = this.removeEmptyLines(res);
+    return removeScalars(trimmedSchema);
   }
 }

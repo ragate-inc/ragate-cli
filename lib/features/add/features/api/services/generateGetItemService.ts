@@ -18,8 +18,8 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
    * mappingtemplateは、customMappingtemplate.ymlを指定すること（存在しない場合は新規作成）
    * customMappingtemplate.ymlをstack.ymlへ書き込み
    * functionConfigurations更新（更新先のfunctionConfigurations.ymlを選択）
-   * scheme.graphqlは、customScheme.graphqlを指定すること（存在しない場合は新規作成）
-   * customScheme.graphqlをstack.ymlへ書き込み
+   * schema.graphqlは、customSchema.graphqlを指定すること（存在しない場合は新規作成）
+   * customSchema.graphqlをstack.ymlへ書き込み
    * レスポンスの型情報を選択 Example | 全Typeから選択（先にExampleにするか？を質問）
    */
 };

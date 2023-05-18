@@ -19,7 +19,7 @@ export default class extends FeatureHandlerAbstract {
     super(argv);
   }
 
-  private get defaultSchemeGrapqlFilePath(): string {
+  private get defaultSchemaGrapqlFilePath(): string {
     return `appsync/schema.graphql`;
   }
 
@@ -96,12 +96,12 @@ export default class extends FeatureHandlerAbstract {
     }
 
     if (info.apiType === 'Mutation') {
-      if (appSyncStack?.schema.isExistsMutationApi(info.apiName)) throw new Error('既にschemeにAPI定義が存在します');
+      if (appSyncStack?.schema.isExistsMutationApi(info.apiName)) throw new Error('既にschemaにAPI定義が存在します');
       return generateMutationService({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });
     }
 
     if (info.apiType === 'Query') {
-      if (appSyncStack?.schema.isExistsQueryApi(info.apiName)) throw new Error('既にschemeにAPI定義が存在します');
+      if (appSyncStack?.schema.isExistsQueryApi(info.apiName)) throw new Error('既にschemaにAPI定義が存在します');
       const { operation } = (await inquirer.prompt([
         {
           type: 'list',

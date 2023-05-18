@@ -159,53 +159,30 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
     return mappingTemplate;
   };
 
-  const scheneGraphqlProcess = async (): Promise<string> => {
+  const schemaGraphqlProcess = async (): Promise<string> => {
     const graphqlEditor = appSyncStackService.graphqlEditor;
-    // const typesMap = graphqlEditor.getTypeMap();
-    // const types: string[] = Object.keys(typesMap);
-    // const { type } = (await inquirer.prompt([
-    //   {
-    //     type: 'autocomplete',
-    //     name: 'type',
-    //     emptyText: '入力するとリソースが表示されます',
-    //     message: 'レスポンスタイプを選択して下さい',
-    //     source: (answersSoFar: string, input: string) => (_.isEmpty(input) ? types : types.filter((item) => item.includes(input))),
-    //   },
-    // ])) as { type: string };
-    // const selectedType = typesMap[type];
-    // if (info.apiType === 'Mutation') {
-    //   appSyncStackService.updateCustomSchemeGraphl({
-    //     mutation: {
-    //       apiName: info.apiName,
-    //       type: {
-    //         name: selectedType.name,
-    //       },
-    //       input: {},
-    //     },
-    //   });
-    // }
-    // if (info.apiType === 'Query') {
-    //   appSyncStackService.updateCustomSchemeGraphl({
-    //     query: {
-    //       apiName: info.apiName,
-    //       type: selectedType,
-    //       args: {},
-    //     },
-    //   });
-    // }
+    const type = appSyncStackService.graphqlEditor.addExampleType(info.apiName);
+    const input = appSyncStackService.graphqlEditor.addExampleInput(info.apiName);
+    appSyncStackService.updateCustomSchemaGraphl({
+      mutation: {
+        apiName: info.apiName,
+        type: type.getType(),
+        input: input.getType(),
+      },
+    });
     logger.debug('finished scheneGraphqlProcess');
-    return Promise.resolve(graphqlEditor.scheme as string);
+    return Promise.resolve(graphqlEditor.customSchema as string);
   };
 
   const resDataSource: AppSyncDataSource = await dataSourceProcess();
   const resFunctionConfigurations = await functionConfigurationsProcess({ dataSource: resDataSource });
   const resMappingTemplate: AppSyncMappingTemplate = await mappingTemplateProcess({ dataSource: resDataSource, functionConfigurations: resFunctionConfigurations });
-  const resSchemeGraphql: string = await scheneGraphqlProcess();
+  const resSchemaGraphql: string = await schemaGraphqlProcess();
 
   logger.debug({
     dataSource: resDataSource,
     functionConfigurations: resFunctionConfigurations,
     mappingTemplate: resMappingTemplate,
-    schemeGraphql: resSchemeGraphql,
+    schemaGraphql: resSchemaGraphql,
   });
 };

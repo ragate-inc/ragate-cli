@@ -1,15 +1,16 @@
 import { SchemaComposer } from 'graphql-compose';
 import { mergeSchemas } from '@graphql-tools/schema';
 import { GraphQLSchema } from 'graphql';
+import { addScalrs } from 'utils/graphql/appsyncScalars';
 import _ from 'lodash';
 
 /**
  * Parsing existing Graphql syntax
  */
 export default class GraphqlAnalyzer {
-  constructor(scheme: string[]) {
-    this._scheme = scheme;
-    this._schemaComposer = _.isEmpty(scheme) ? [new SchemaComposer()] : scheme.map((s) => new SchemaComposer(s));
+  constructor(schema: string[]) {
+    this._schema = schema;
+    this._schemaComposer = _.isEmpty(schema) ? [new SchemaComposer()] : schema.map((s) => new SchemaComposer(addScalrs(s)));
     this._mergedSchema = mergeSchemas({ schemas: this._schemaComposer.map((s) => s.buildSchema()) });
     this._mutations = this._schemaComposer.map((s) => {
       try {
@@ -51,9 +52,9 @@ export default class GraphqlAnalyzer {
     return this._subscriptions;
   }
 
-  private readonly _scheme: string[];
-  private get scheme(): string[] {
-    return this._scheme;
+  private readonly _schema: string[];
+  private get schema(): string[] {
+    return this._schema;
   }
 
   private readonly _schemaComposer: SchemaComposer[];

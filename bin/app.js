@@ -53,8 +53,8 @@
           u = r(a(8798)),
           c = r(a(8072)),
           d = a(6702),
-          f = r(a(6517)),
-          p = a(2762);
+          p = r(a(6517)),
+          f = a(2762);
         t.default = class {
           constructor() {
             try {
@@ -65,7 +65,7 @@
                   verbose: { type: this.verboseRef.type },
                   region: { default: this.regionRef.default, type: this.regionRef.type },
                 })
-                .check((e) => ((e.verbose = f.default.hasIn(e, 'verbose')), !0))
+                .check((e) => ((e.verbose = p.default.hasIn(e, 'verbose')), !0))
                 .help(!1)
                 .version(!1)
                 .parseSync();
@@ -76,7 +76,7 @@
                 (this.logger = s.default.getLogger(this.verbose ? 'debug' : 'info')),
                 (this.npmVersion = o.default.npmVersion);
             } finally {
-              (0, p.cleanUpTmpDirectory)();
+              (0, f.cleanUpTmpDirectory)();
             }
           }
           chalk;
@@ -221,7 +221,7 @@
           u = r(a(8806)),
           c = a(6870),
           d = a(7264);
-        class f extends s.FeatureBuilderAbstract {
+        class p extends s.FeatureBuilderAbstract {
           constructor(e) {
             super(e);
           }
@@ -266,7 +266,7 @@
               );
           }
         }
-        t.default = f;
+        t.default = p;
       },
       7352: (e, t, a) => {
         Object.defineProperty(t, '__esModule', { value: !0 });
@@ -296,8 +296,8 @@
           u = r(a(7973)),
           c = r(a(5837)),
           d = r(a(1092)),
-          f = r(a(3448)),
-          p = r(a(6849)),
+          p = r(a(3448)),
+          f = r(a(6849)),
           m = r(a(8391)),
           h = r(a(245)),
           g = r(a(7116));
@@ -305,7 +305,7 @@
           constructor(e) {
             super(e);
           }
-          get defaultSchemeGrapqlFilePath() {
+          get defaultSchemaGrapqlFilePath() {
             return 'appsync/schema.graphql';
           }
           get defaultServerlessConfigPath() {
@@ -345,7 +345,7 @@
             if (!a.isExistsServelessConfig) throw new Error('serverless.ymlが存在しません');
             const r = a.serverlessConfig;
             if (!(r.plugins ?? []).includes('serverless-appsync-plugin')) throw new Error('serverless-appsync-pluginがインストールされていません');
-            const n = f.default.parseSlsRecursivelyReference(r.custom?.appSync);
+            const n = p.default.parseSlsRecursivelyReference(r.custom?.appSync);
             if (i.default.isEmpty(n))
               throw new Error('serverless.ymlのcustom.appsyncが不正です、custom.appsyncには、以下のような文字列が設定されている必要があります。\n${file(./appsync/stack.yml)}');
             const y = new g.default({ stackFilePath: n, lang: this.lang, region: this.argv.region }),
@@ -353,11 +353,11 @@
             if (v?.mappingTemplates.some((e) => e.type === t.apiType && e.field === t.apiName)) throw new Error('既にマッピングテンプレートに定義が存在します');
             if ('PIPELINE' === t.resolverType && v?.functionConfigurations.some((e) => e.name === `Mutation${t.apiName}`)) throw new Error('既にリゾルバー関数がAPIが存在します');
             if ('Mutation' === t.apiType) {
-              if (v?.schema.isExistsMutationApi(t.apiName)) throw new Error('既にschemeにAPI定義が存在します');
-              return (0, p.default)({ appSyncStackService: y, lang: this.lang, slsConfig: a, info: t });
+              if (v?.schema.isExistsMutationApi(t.apiName)) throw new Error('既にschemaにAPI定義が存在します');
+              return (0, f.default)({ appSyncStackService: y, lang: this.lang, slsConfig: a, info: t });
             }
             if ('Query' === t.apiType) {
-              if (v?.schema.isExistsQueryApi(t.apiName)) throw new Error('既にschemeにAPI定義が存在します');
+              if (v?.schema.isExistsQueryApi(t.apiName)) throw new Error('既にschemaにAPI定義が存在します');
               const { operation: e } = await l.default.prompt([
                 { type: 'list', name: 'operation', choices: ['Query', 'GetItem'], message: 'Queryのタイプを選択', validate: (e) => new u.default(e, this.lang).required().value() },
               ]);
@@ -408,9 +408,9 @@
           c = a(6870);
         t.default = async (e) => {
           const { appSyncStackService: t, lang: a, slsConfig: r, info: d } = e,
-            f = s.default.getLogger();
-          f.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const p = async () => {
+            p = s.default.getLogger();
+          p.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
+          const f = async () => {
               const { createDataSource: e } = await n.default.prompt([
                 {
                   type: 'expand',
@@ -423,9 +423,9 @@
                   validate: (e) => new i.default(e, a).required().value(),
                 },
               ]);
-              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), p()));
+              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), f()));
             },
-            m = await p(),
+            m = await f(),
             h = await (async () => {
               if (m) {
                 const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
@@ -471,13 +471,13 @@
                   },
                 ]),
                 s = t.appSyncStack?.dataSources.find((t) => t.name === e);
-              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), f.debug('finished dataSourceProcess'), s;
+              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), p.debug('finished dataSourceProcess'), s;
             })(),
             g = await ((e) => {
               const { dataSource: a } = e;
               if ('UNIT' === d.resolverType) return Promise.resolve(void 0);
               const r = { dataSource: a.name, name: `${d.apiType}${d.apiName}`, request: !1, response: !1 };
-              return t.addFunctionConfiguration({ functionConfiguration: r }), f.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
+              return t.addFunctionConfiguration({ functionConfiguration: r }), p.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
             })({ dataSource: h }),
             y = await (async (e) => {
               const { dataSource: a, functionConfigurations: r } = e,
@@ -492,13 +492,19 @@
                         functions: [r?.name],
                       }
                     : { dataSource: a.name, type: d.apiType, field: d.apiName, kind: d.resolverType, request: !1, response: !1 };
-              return t.addMappingTemplate({ mappingTemplate: s }), f.debug('finished mappingTemplateProcess'), s;
+              return t.addMappingTemplate({ mappingTemplate: s }), p.debug('finished mappingTemplateProcess'), s;
             })({ dataSource: h, functionConfigurations: g }),
             v = await (async () => {
-              const e = t.graphqlEditor;
-              return f.debug('finished scheneGraphqlProcess'), Promise.resolve(e.scheme);
+              const e = t.graphqlEditor,
+                a = t.graphqlEditor.addExampleType(d.apiName),
+                r = t.graphqlEditor.addExampleInput(d.apiName);
+              return (
+                t.updateCustomSchemaGraphl({ mutation: { apiName: d.apiName, type: a.getType(), input: r.getType() } }),
+                p.debug('finished scheneGraphqlProcess'),
+                Promise.resolve(e.customSchema)
+              );
             })();
-          f.debug({ dataSource: h, functionConfigurations: g, mappingTemplate: y, schemeGraphql: v });
+          p.debug({ dataSource: h, functionConfigurations: g, mappingTemplate: y, schemaGraphql: v });
         };
       },
       8391: function (e, t, a) {
@@ -574,14 +580,14 @@
           u = i(a(3290)),
           c = i(a(7973)),
           d = i(a(1092)),
-          f = i(a(5837)),
-          p = n(a(7808)),
+          p = i(a(5837)),
+          f = n(a(7808)),
           m = n(a(2e3)),
           h = i(a(2056)),
           g = i(a(1325)),
           y = i(a(3624)),
           v = i(a(1325));
-        class _ extends l.FeatureHandlerAbstract {
+        class S extends l.FeatureHandlerAbstract {
           constructor(e) {
             super(e);
           }
@@ -594,18 +600,18 @@
           lambdaEdgeMemorySize = 128;
           generateLambdaIamRoleCf() {
             return y.default.generateCloudFormation(this.defaultLambdaRoleName, (e) => {
-              const t = new p.Role(e, this.defaultLambdaRoleName, { assumedBy: new p.ServicePrincipal('edgelambda.amazonaws.com') });
+              const t = new f.Role(e, this.defaultLambdaRoleName, { assumedBy: new f.ServicePrincipal('edgelambda.amazonaws.com') });
               return (
                 t.addToPolicy(
-                  new p.PolicyStatement({
-                    effect: p.Effect.ALLOW,
+                  new f.PolicyStatement({
+                    effect: f.Effect.ALLOW,
                     resources: [m.Fn.join(':', ['arn:aws:logs', m.Fn.ref('AWS::Region'), m.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],
                     actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
                   })
                 ),
                 t.addToPolicy(
-                  new p.PolicyStatement({
-                    effect: p.Effect.ALLOW,
+                  new f.PolicyStatement({
+                    effect: f.Effect.ALLOW,
                     resources: [m.Fn.join(':', ['arn:aws:logs', this.argv.region, m.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],
                     actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
                   })
@@ -633,7 +639,7 @@
                   default: 'BasicAuth',
                   validate: (e) => new c.default(e, this.lang).required().mustNoIncludeZenkaku().value(),
                   transformer: (e) => new d.default(e).removeAllSpace().value(),
-                  filter: (e) => new f.default(e).removeAllSpace().value(),
+                  filter: (e) => new p.default(e).removeAllSpace().value(),
                 },
                 {
                   type: 'input',
@@ -642,7 +648,7 @@
                   default: () => this.defaultIamRolePath,
                   validate: (e) => new c.default(e, this.lang).required().mustBeYamlFilePath().value(),
                   transformer: (e) => new d.default(e).removeAllSpace().value(),
-                  filter: (e) => new f.default(e).removeAllSpace().value(),
+                  filter: (e) => new p.default(e).removeAllSpace().value(),
                 },
                 {
                   type: 'input',
@@ -651,7 +657,7 @@
                   default: () => this.defaultBasicLambdaPath,
                   validate: (e) => new c.default(e, this.lang).required().mustBeExtension().value(),
                   transformer: (e) => new d.default(e).removeAllSpace().value(),
-                  filter: (e) => new f.default(e).removeAllSpace().value(),
+                  filter: (e) => new p.default(e).removeAllSpace().value(),
                 },
                 {
                   type: 'input',
@@ -660,7 +666,7 @@
                   default: () => this.defaultLambdaRoleName,
                   validate: (e) => new c.default(e, this.lang).required().value(),
                   transformer: (e) => new d.default(e).removeAllSpace().value(),
-                  filter: (e) => new f.default(e).removeAllSpace().value(),
+                  filter: (e) => new p.default(e).removeAllSpace().value(),
                 },
                 {
                   type: 'input',
@@ -669,7 +675,7 @@
                   default: () => this.defaultServerlessConfigPath,
                   validate: (e) => new c.default(e, this.lang).required().mustBeYamlFilePath().value(),
                   transformer: (e) => new d.default(e).removeAllSpace().value(),
-                  filter: (e) => new f.default(e).removeAllSpace().value(),
+                  filter: (e) => new p.default(e).removeAllSpace().value(),
                 },
               ])
               .then((e) => e);
@@ -691,7 +697,7 @@
               l.addResource({ filePath: s, resourceName: n, cf: this.generateLambdaIamRoleCf() });
           }
         }
-        t.default = _;
+        t.default = S;
       },
       8785: function (e, t, a) {
         var r =
@@ -764,16 +770,16 @@
           u = i(a(6517)),
           c = a(3362),
           d = i(a(3290)),
-          f = i(a(7973)),
-          p = i(a(5837)),
+          p = i(a(7973)),
+          f = i(a(5837)),
           m = i(a(1092)),
           h = i(a(3624)),
           g = n(a(8890)),
           y = n(a(9087)),
           v = n(a(6324)),
-          _ = n(a(5862)),
-          b = n(a(2e3)),
-          S = i(a(1325));
+          S = n(a(5862)),
+          _ = n(a(2e3)),
+          b = i(a(1325));
         class P extends l.FeatureHandlerAbstract {
           constructor(e) {
             super(e);
@@ -793,7 +799,7 @@
                     ? r.addSubscription(new v.EmailSubscription('****@****.com'))
                     : 'lambda' === t
                     ? r.addSubscription(
-                        new v.LambdaSubscription(_.Function.fromFunctionArn(a, `${e}Lambda`, `arn:aws:lambda:${this.argv.region}:${b.Fn.ref('AWS::AccountId')}:function:*****`))
+                        new v.LambdaSubscription(S.Function.fromFunctionArn(a, `${e}Lambda`, `arn:aws:lambda:${this.argv.region}:${_.Fn.ref('AWS::AccountId')}:function:*****`))
                       )
                     : 'sms' === t
                     ? r.addSubscription(new v.SmsSubscription('0000000000'))
@@ -816,7 +822,7 @@
                     message: 'input a sns resource name',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new f.default(e, this.lang).required().mustNoIncludeZenkaku().value(),
+                    validate: (e) => new p.default(e, this.lang).required().mustNoIncludeZenkaku().value(),
                   },
                 ])
                 .then(async (e) => ({
@@ -833,25 +839,25 @@
                       name: 'filePath',
                       message: 'input a cloudformation file path',
                       default: () => this.defaultResourcePath(e.resourceName),
-                      validate: (e) => new f.default(e, this.lang).required().mustBeYamlFilePath().value(),
+                      validate: (e) => new p.default(e, this.lang).required().mustBeYamlFilePath().value(),
                       transformer: (e) => new m.default(e).filePath().value(),
-                      filter: (e) => new p.default(e).filePath().value(),
+                      filter: (e) => new f.default(e).filePath().value(),
                     },
                     {
                       type: 'input',
                       name: 'serverlessConfigPath',
                       message: 'input a serverless config file path',
                       default: () => this.defaultServerlessConfigPath,
-                      validate: (e) => new f.default(e, this.lang).required().mustBeYamlFilePath().value(),
+                      validate: (e) => new p.default(e, this.lang).required().mustBeYamlFilePath().value(),
                       transformer: (e) => new m.default(e).removeAllSpace().value(),
-                      filter: (e) => new p.default(e).removeAllSpace().value(),
+                      filter: (e) => new f.default(e).removeAllSpace().value(),
                     },
                   ])),
                   ...e,
                 }));
             e.debug(`input values : ${JSON.stringify(a)}}`);
             const { resourceName: r, filePath: s, subscriptions: n, serverlessConfigPath: i } = a,
-              l = new S.default({ region: this.argv.region, serverlessConfigPath: i, lang: this.lang }),
+              l = new b.default({ region: this.argv.region, serverlessConfigPath: i, lang: this.lang }),
               h = this.generateSnsCf(r, n);
             l.addResource({ filePath: s, resourceName: r, cf: h });
           }
@@ -946,8 +952,8 @@
           u = i(a(6517)),
           c = i(a(3290)),
           d = i(a(7973)),
-          f = i(a(5837)),
-          p = i(a(1092)),
+          p = i(a(5837)),
+          f = i(a(1092)),
           m = n(a(9087)),
           h = i(a(3624)),
           g = i(a(1325));
@@ -1017,8 +1023,8 @@
                       message: 'input a cloudformation file path',
                       default: () => this.defaultResourcePath(e.resourceName),
                       validate: (e) => new d.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                      transformer: (e) => new p.default(e).filePath().value(),
-                      filter: (e) => new f.default(e).filePath().value(),
+                      transformer: (e) => new f.default(e).filePath().value(),
+                      filter: (e) => new p.default(e).filePath().value(),
                     },
                     {
                       type: 'input',
@@ -1026,8 +1032,8 @@
                       message: 'input a serverless config file path',
                       default: () => this.defaultServerlessConfigPath,
                       validate: (e) => new d.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                      transformer: (e) => new p.default(e).removeAllSpace().value(),
-                      filter: (e) => new f.default(e).removeAllSpace().value(),
+                      transformer: (e) => new f.default(e).removeAllSpace().value(),
+                      filter: (e) => new p.default(e).removeAllSpace().value(),
                     },
                   ])),
                   ...e,
@@ -1135,8 +1141,8 @@
           u = a(2762),
           c = r(a(6444)),
           d = a(6702),
-          f = r(a(1017));
-        class p extends d.FeatureHandlerAbstract {
+          p = r(a(1017));
+        class f extends d.FeatureHandlerAbstract {
           constructor(e) {
             super(e), s.default.registerPrompt('autocomplete', l.default);
           }
@@ -1168,14 +1174,14 @@
             if (
               (t.info(`template : ${l}`),
               t.info(`projectName : ${d}`),
-              t.debug(`check exists directory : ${f.default.join(n.default.currentPath, d)}`),
-              (0, u.isExistsDirectory)(f.default.join(n.default.currentPath, d)))
+              t.debug(`check exists directory : ${p.default.join(n.default.currentPath, d)}`),
+              (0, u.isExistsDirectory)(p.default.join(n.default.currentPath, d)))
             )
-              throw new Error(`${a.error.alreadyExistsDirectory} : ${f.default.join(n.default.currentPath, d)}`);
-            await (0, u.gitClone)(n.default.repositoyUrl, n.default.tmpPath), (0, u.moveDirectory)(f.default.join(n.default.tmpPath, l), f.default.join(n.default.currentPath, d));
+              throw new Error(`${a.error.alreadyExistsDirectory} : ${p.default.join(n.default.currentPath, d)}`);
+            await (0, u.gitClone)(n.default.repositoyUrl, n.default.tmpPath), (0, u.moveDirectory)(p.default.join(n.default.tmpPath, l), p.default.join(n.default.currentPath, d));
           }
         }
-        t.default = p;
+        t.default = f;
       },
       8798: function (e, t, a) {
         var r =
@@ -1266,14 +1272,14 @@
           u = a(3462),
           c = i(a(8705)),
           d = i(a(6517)),
-          f = i(a(7147)),
-          p = i(a(2322)),
+          p = i(a(7147)),
+          f = i(a(2322)),
           m = i(a(3448)),
           h = i(a(3624)),
           g = n(a(7808)),
           y = n(a(2e3)),
           v = a(7347),
-          _ = i(a(4259));
+          S = i(a(4259));
         t.default = class {
           constructor(e) {
             (this.logger = l.default.getLogger()),
@@ -1281,7 +1287,7 @@
               (this._lang = e.lang),
               (this._region = e.region),
               (this._defaultIamRolePath = `serverless/${e.region}/resources/iamrole/appsync.yml`),
-              (this._graphqlEditor = new _.default()),
+              (this._graphqlEditor = new S.default()),
               this.setAppSyncStackObject();
           }
           _graphqlEditor;
@@ -1365,13 +1371,13 @@
                 .chain(t)
                 .thru((e) => {
                   if (d.default.isString(e) && !d.default.isEmpty(e)) {
-                    const t = f.default.readFileSync(o.default.join(p.default.currentPath, e), 'utf8');
+                    const t = p.default.readFileSync(o.default.join(f.default.currentPath, e), 'utf8');
                     return d.default.isEmpty(t) ? [] : [t];
                   }
                   return d.default.isArray(e) && !d.default.isEmpty(e)
                     ? e
                         .map((e) => {
-                          const t = f.default.readFileSync(o.default.join(p.default.currentPath, e), 'utf8');
+                          const t = p.default.readFileSync(o.default.join(f.default.currentPath, e), 'utf8');
                           return d.default.isEmpty(t) ? '' : t;
                         })
                         .filter((e) => !d.default.isEmpty(e))
@@ -1447,18 +1453,18 @@
             }
             this.setAppSyncStackObject();
           }
-          updateCustomSchemeGraphl(e) {
-            this.graphqlEditor.updateCustomSchemeGraphl({
+          updateCustomSchemaGraphl(e) {
+            this.graphqlEditor.updateCustomSchemaGraphl({
               ...e,
               callback: (e, t) => {
                 if (e) {
-                  const { schemePath: e } = t,
+                  const { schemaPath: e } = t,
                     a = this.getAppSyncStackConfig();
                   d.default.isString(a.schema) && !a.schema.includes(e)
                     ? this.writeAppSyncStackConfig({ ...a, schema: [a.schema, e] })
                     : d.default.isArray(a.schema) && !a.schema.includes(e) && this.writeAppSyncStackConfig({ ...a, schema: [...a.schema, e] }),
                     this.setAppSyncStackObject();
-                } else this.logger.warn('skip update custom_scheme.graphql.');
+                } else this.logger.warn('skip update custom_schema.graphql.');
               },
             });
           }
@@ -1687,8 +1693,8 @@
           u = a(7347),
           c = i(a(6517)),
           d = a(3462),
-          f = i(a(3448)),
-          p = i(a(2056)),
+          p = i(a(3448)),
+          f = i(a(2056)),
           m = i(a(3624)),
           h = n(a(7808)),
           g = n(a(2e3));
@@ -1701,7 +1707,7 @@
             try {
               const t = (0, d.loadYaml)(this.serverlessConfigPath);
               if (((this._serverlessConfig = t), c.default.isString(t.functions))) {
-                const e = f.default.parseSlsRecursivelyReference(t.functions);
+                const e = p.default.parseSlsRecursivelyReference(t.functions);
                 this._functionsYamlPath = e;
               }
               this._region = t.provider.region ?? e.region;
@@ -1807,7 +1813,7 @@
                   i.info('write functions property'), i.info((0, u.chalk)().green(o));
                 }
               })(),
-              new p.default({ handlerPath: a, code: n }).write(),
+              new f.default({ handlerPath: a, code: n }).write(),
               (() => {
                 this.addResource({ filePath: `serverless/${this.region}/resources/iam-role.yml`, resourceName: 'DefaultLambdaRole', cf: this.generateDefaultLambdaRoleCf(t) });
               })();
@@ -2032,11 +2038,12 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = a(4361),
           n = a(4626),
-          i = r(a(6517));
+          i = a(1770),
+          o = r(a(6517));
         t.default = class {
           constructor(e) {
-            (this._scheme = e),
-              (this._schemaComposer = i.default.isEmpty(e) ? [new s.SchemaComposer()] : e.map((e) => new s.SchemaComposer(e))),
+            (this._schema = e),
+              (this._schemaComposer = o.default.isEmpty(e) ? [new s.SchemaComposer()] : e.map((e) => new s.SchemaComposer((0, i.addScalrs)(e)))),
               (this._mergedSchema = (0, n.mergeSchemas)({ schemas: this._schemaComposer.map((e) => e.buildSchema()) })),
               (this._mutations = this._schemaComposer.map((e) => {
                 try {
@@ -2072,9 +2079,9 @@
           get subscriptions() {
             return this._subscriptions;
           }
-          _scheme;
-          get scheme() {
-            return this._scheme;
+          _schema;
+          get schema() {
+            return this._schema;
           }
           _schemaComposer;
           get schemaComposer() {
@@ -2085,15 +2092,21 @@
             return this._mergedSchema;
           }
           isExistsMutationApi(e) {
-            return i.default.some(this.mutations, (t) => i.default.has(t, e));
+            return o.default.some(this.mutations, (t) => o.default.has(t, e));
           }
           isExistsQueryApi(e) {
-            return i.default.some(this.queries, (t) => i.default.has(t, e));
+            return o.default.some(this.queries, (t) => o.default.has(t, e));
           }
           isExistsSubscriptionApi(e) {
-            return i.default.some(this.subscriptions, (t) => i.default.has(t, e));
+            return o.default.some(this.subscriptions, (t) => o.default.has(t, e));
           }
         };
+      },
+      1770: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.removeScalars = t.addScalrs = void 0);
+        const a =
+          '\n  scalar ID\n  scalar String\n  scalar Int\n  scalar Float\n  scalar Boolean\n  scalar AWSDate\n  scalar AWSTime\n  scalar AWSDateTime\n  scalar AWSTimestamp\n  scalar AWSEmail\n  scalar AWSJSON\n  scalar AWSPhone\n  scalar AWSURL\n  scalar AWSIPAddress\n';
+        (t.addScalrs = (e) => `${a}\n  ${e}`), (t.removeScalars = (e) => e.replace(a, ''));
       },
       4259: function (e, t, a) {
         var r =
@@ -2108,56 +2121,88 @@
           o = r(a(6517)),
           l = a(2762),
           u = r(a(7147)),
-          c = a(7347);
+          c = a(7347),
+          d = a(1770);
         t.default = class {
           constructor(e) {
             (this.logger = i.default.getLogger()),
-              (this._schemePath = e ?? this.defaultCustomSchemePath),
-              this.setScheme(),
-              (this._schemaComposer = new s.SchemaComposer(this.scheme));
-          }
-          setScheme() {
-            try {
-              this._scheme = u.default.readFileSync((0, l.asFullPath)(this.schemePath), 'utf8');
-            } catch (e) {
-              this.logger.debug(e), this.logger.warn('custom_scheme.graphql is not found.');
-            }
-          }
-          _schemePath;
-          get schemePath() {
-            return this._schemePath;
+              (this._customSchemaPath = e?.customSchemaPath ?? this.defaultCustomSchemaPath),
+              (this._defaultSchemaPath = e?.defaultSchemaPath ?? this.defaultDefaultSchemaPath),
+              this.readOrSetCustomSchema(),
+              this.readOrSetDefaultSchema(),
+              (() => {
+                this.customSchema && this.allSchemaComposer.merge((0, n.buildSchema)(this.customSchema)),
+                  this.defaultSchema && this.allSchemaComposer.merge((0, n.buildSchema)(this.defaultSchema));
+              })(),
+              (() => {
+                this.customSchema && this.customSchemaComposer.merge((0, n.buildSchema)(this.customSchema));
+              })();
           }
           logger;
-          defaultCustomSchemePath = 'appsync/custom_scheme.graphql';
-          _scheme;
-          get scheme() {
-            return this._scheme;
+          defaultCustomSchemaPath = 'appsync/custom_schema.graphql';
+          defaultDefaultSchemaPath = 'appsync/schema.graphql';
+          _customSchemaPath;
+          _defaultSchemaPath;
+          _customSchemaComposer = new s.SchemaComposer();
+          _allSchemaComposer = new s.SchemaComposer();
+          _defaultSchema;
+          _customSchema;
+          get defaultSchemaPath() {
+            return this._defaultSchemaPath;
           }
-          _schemaComposer;
-          get schemaComposer() {
-            return this._schemaComposer;
+          get customSchemaPath() {
+            return this._customSchemaPath;
+          }
+          get defaultSchema() {
+            if (this._defaultSchema) return (0, d.addScalrs)(this._defaultSchema);
+          }
+          get customSchema() {
+            if (this._customSchema) return (0, d.addScalrs)(this._customSchema);
+          }
+          get customSchemaComposer() {
+            return this._customSchemaComposer;
+          }
+          get allSchemaComposer() {
+            return this._allSchemaComposer;
+          }
+          readOrSetCustomSchema() {
+            try {
+              this._customSchema = u.default.readFileSync((0, l.asFullPath)(this.customSchemaPath), 'utf8');
+            } catch (e) {
+              this.logger.debug(e), this.logger.warn('custom_schema.graphql is not found.');
+            }
+          }
+          readOrSetDefaultSchema() {
+            try {
+              this._defaultSchema = u.default.readFileSync((0, l.asFullPath)(this.defaultSchemaPath), 'utf8');
+            } catch (e) {
+              this.logger.debug(e), this.logger.warn('schema.graphql is not found.');
+            }
           }
           listQueies() {
-            return this.schemaComposer.getOTC('Query').getFields();
+            return this.allSchemaComposer.getOTC('Query').getFields();
           }
           listMutation() {
-            return this.schemaComposer.getOTC('Mutation').getFields();
+            return this.allSchemaComposer.getOTC('Mutation').getFields();
           }
           listSubscription() {
-            return this.schemaComposer.getOTC('Subscription').getFields();
+            return this.allSchemaComposer.getOTC('Subscription').getFields();
           }
-          getTypeMap() {
-            return this.schemaComposer.buildSchema().getTypeMap();
+          addExampleInput(e) {
+            return s.InputTypeComposer.create(`\n      input ${e}Input {\n        example: String!\n      },\n    `, this.customSchemaComposer);
+          }
+          addExampleType(e) {
+            return s.ObjectTypeComposer.create(`\n      type ${e}Response {\n        example: String!\n      }\n    `, this.customSchemaComposer);
           }
           addMutationField(e) {
             const { apiName: t, input: a, type: r } = e;
-            return this.schemaComposer.Mutation.addFields({ [t]: { type: r, args: { input: new n.GraphQLNonNull(a) } } }), this;
+            return this.customSchemaComposer.Mutation.addFields({ [t]: { type: r, args: { input: new n.GraphQLNonNull(a) } } }), this;
           }
           addQueryField(e) {
             const { apiName: t, args: a, type: r } = e;
-            return this.schemaComposer.Mutation.addFields({ [t]: { type: r, args: a } }), this;
+            return this.customSchemaComposer.Mutation.addFields({ [t]: { type: r, args: a } }), this;
           }
-          updateCustomSchemeGraphl(e) {
+          updateCustomSchemaGraphl(e) {
             const { query: t, mutation: a, callback: r } = e;
             let s = !1;
             if (
@@ -2171,12 +2216,20 @@
               s)
             ) {
               const e = this.printSchema();
-              u.default.writeFileSync((0, l.asFullPath)(this.schemePath), e, 'utf8'), this.logger.info((0, c.chalk)().green(e)), this.setScheme();
+              u.default.writeFileSync((0, l.asFullPath)(this.defaultCustomSchemaPath), e, 'utf8'), this.logger.info((0, c.chalk)().green(e)), this.readOrSetCustomSchema();
             }
-            r && r(s, { schemePath: this.schemePath });
+            r && r(s, { schemaPath: this.defaultCustomSchemaPath });
+          }
+          removeEmptyLines(e) {
+            return e
+              .split('\n')
+              .filter((e) => !e.includes('""""""'))
+              .join('\n');
           }
           printSchema() {
-            return (0, s.printSchema)(this.schemaComposer.buildSchema());
+            const e = (0, s.printSchema)(this.customSchemaComposer.buildSchema()),
+              t = this.removeEmptyLines(e);
+            return (0, d.removeScalars)(t);
           }
         };
       },
@@ -2508,28 +2561,28 @@
           i = a(454),
           o = a(7915),
           l = a(903),
-          { ERROR_LIKE_KEYS: u, MESSAGE_KEY: c, TIMESTAMP_KEY: d, LEVEL_KEY: f, LEVEL_NAMES: p } = a(7318),
+          { ERROR_LIKE_KEYS: u, MESSAGE_KEY: c, TIMESTAMP_KEY: d, LEVEL_KEY: p, LEVEL_NAMES: f } = a(7318),
           {
             isObject: m,
             prettifyErrorLog: h,
             prettifyLevel: g,
             prettifyMessage: y,
             prettifyMetadata: v,
-            prettifyObject: _,
-            prettifyTime: b,
-            buildSafeSonicBoom: S,
+            prettifyObject: S,
+            prettifyTime: _,
+            buildSafeSonicBoom: b,
             filterLog: P,
             handleCustomlevelsOpts: w,
-            handleCustomlevelNamesOpts: L,
+            handleCustomlevelNamesOpts: C,
           } = a(385),
-          C = (e) => {
+          L = (e) => {
             try {
               return { value: o.parse(e, { protoAction: 'remove' }) };
             } catch (e) {
               return { err: e };
             }
           },
-          k = {
+          E = {
             colorize: r,
             colorizeObjects: !0,
             crlf: !1,
@@ -2551,8 +2604,8 @@
             include: void 0,
             singleLine: !1,
           };
-        function E(e) {
-          const t = Object.assign({}, k, e),
+        function k(e) {
+          const t = Object.assign({}, E, e),
             a = t.crlf ? '\r\n' : '\n',
             r = '    ',
             s = t.messageKey,
@@ -2562,67 +2615,67 @@
             u = t.messageFormat,
             c = t.timestampKey,
             d = t.errorLikeObjectKeys,
-            S = t.errorProps.split(','),
-            E = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
+            b = t.errorProps.split(','),
+            k = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
             O = w(t.customLevels),
-            M = L(t.customLevels),
+            M = C(t.customLevels),
             A = t.customColors
               ? t.customColors.split(',').reduce((e, a) => {
                   const [r, s] = a.split(':'),
-                    n = (E ? t.customLevels : void 0 !== M[r]) ? M[r] : p[r],
+                    n = (k ? t.customLevels : void 0 !== M[r]) ? M[r] : f[r],
                     i = void 0 !== n ? n : r;
                   return e.push([i, s]), e;
                 }, [])
               : void 0,
-            R = { customLevels: O, customLevelNames: M };
-          E && !t.customLevels && ((R.customLevels = void 0), (R.customLevelNames = void 0));
-          const j = t.customPrettifiers,
+            j = { customLevels: O, customLevelNames: M };
+          k && !t.customLevels && ((j.customLevels = void 0), (j.customLevelNames = void 0));
+          const R = t.customPrettifiers,
             F = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
             x = !F && t.ignore ? new Set(t.ignore.split(',')) : void 0,
             q = t.hideObject,
             $ = t.singleLine,
-            N = l(t.colorize, A, E),
+            N = l(t.colorize, A, k),
             D = t.colorizeObjects ? N : l(!1, [], !1);
           return function (e) {
             let l;
             if (m(e)) l = e;
             else {
-              const t = C(e);
+              const t = L(e);
               if (t.err || !m(t.value)) return e + a;
               l = t.value;
             }
             if (o) {
-              const e = ((E ? t.customLevels : void 0 !== M[o]) ? M[o] : p[o]) || Number(o);
-              if (l[void 0 === n ? f : n] < e) return;
+              const e = ((k ? t.customLevels : void 0 !== M[o]) ? M[o] : f[o]) || Number(o);
+              if (l[void 0 === n ? p : n] < e) return;
             }
-            const w = y({ log: l, messageKey: s, colorizer: N, messageFormat: u, levelLabel: i, ...R, useOnlyCustomProps: E });
+            const w = y({ log: l, messageKey: s, colorizer: N, messageFormat: u, levelLabel: i, ...j, useOnlyCustomProps: k });
             (x || F) && (l = P({ log: l, ignoreKeys: x, includeKeys: F }));
-            const L = g({ log: l, colorizer: N, levelKey: n, prettifier: j.level, ...R }),
-              k = v({ log: l, prettifiers: j }),
-              O = b({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: j.time });
+            const C = g({ log: l, colorizer: N, levelKey: n, prettifier: R.level, ...j }),
+              E = v({ log: l, prettifiers: R }),
+              O = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: R.time });
             let A = '';
             if (
-              (t.levelFirst && L && (A = `${L}`),
+              (t.levelFirst && C && (A = `${C}`),
               O && '' === A ? (A = `${O}`) : O && (A = `${A} ${O}`),
-              !t.levelFirst && L && (A = A.length > 0 ? `${A} ${L}` : L),
-              k && (A = A.length > 0 ? `${A} ${k}:` : k),
+              !t.levelFirst && C && (A = A.length > 0 ? `${A} ${C}` : C),
+              E && (A = A.length > 0 ? `${A} ${E}:` : E),
               !1 === A.endsWith(':') && '' !== A && (A += ':'),
               w && (A = A.length > 0 ? `${A} ${w}` : w),
               A.length > 0 && !$ && (A += a),
               'Error' === l.type && l.stack)
             ) {
-              const e = h({ log: l, errorLikeKeys: d, errorProperties: S, ident: r, eol: a });
+              const e = h({ log: l, errorLikeKeys: d, errorProperties: b, ident: r, eol: a });
               $ && (A += a), (A += e);
             } else if (!q) {
               const e = [s, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = _({ input: l, skipKeys: e, customPrettifiers: j, errorLikeKeys: d, eol: a, ident: r, singleLine: $, colorizer: D });
+                t = S({ input: l, skipKeys: e, customPrettifiers: R, errorLikeKeys: d, eol: a, ident: r, singleLine: $, colorizer: D });
               $ && !/^\s$/.test(t) && (A += ' '), (A += t);
             }
             return A;
           };
         }
         function O(e = {}) {
-          const t = E(e);
+          const t = k(e);
           return i(
             function (a) {
               const r = new n({
@@ -2637,7 +2690,7 @@
                 (i =
                   'object' == typeof e.destination && 'function' == typeof e.destination.write
                     ? e.destination
-                    : S({ dest: e.destination || 1, append: e.append, mkdir: e.mkdir, sync: e.sync })),
+                    : b({ dest: e.destination || 1, append: e.append, mkdir: e.mkdir, sync: e.sync })),
                 a.on('unknown', function (e) {
                   i.write(e + '\n');
                 }),
@@ -2648,7 +2701,7 @@
             { parse: 'lines' }
           );
         }
-        (e.exports = O), (e.exports.prettyFactory = E), (e.exports.colorizerFactory = l), (e.exports.default = O);
+        (e.exports = O), (e.exports.prettyFactory = k), (e.exports.colorizerFactory = l), (e.exports.default = O);
       },
       903: (e, t, a) => {
         const { LEVELS: r, LEVEL_NAMES: s } = a(7318),
@@ -2656,8 +2709,8 @@
           i = { default: n, 60: n, 50: n, 40: n, 30: n, 20: n, 10: n, message: n, greyMessage: n },
           { createColors: o } = a(8387),
           l = o({ useColor: !0 }),
-          { white: u, bgRed: c, red: d, yellow: f, green: p, blue: m, gray: h, cyan: g } = l,
-          y = { default: u, 60: c, 50: d, 40: f, 30: p, 20: m, 10: h, message: g, greyMessage: h };
+          { white: u, bgRed: c, red: d, yellow: p, green: f, blue: m, gray: h, cyan: g } = l,
+          y = { default: u, 60: c, 50: d, 40: p, 30: f, 20: m, 10: h, message: g, greyMessage: h };
         function v(e) {
           return function (t, a, { customLevels: n, customLevelNames: i } = {}) {
             const o = e ? n || r : Object.assign({}, r, n),
@@ -2724,23 +2777,23 @@
           i = a(5376),
           { isMainThread: o } = a(1267),
           l = a(903)(),
-          { DATE_FORMAT: u, ERROR_LIKE_KEYS: c, MESSAGE_KEY: d, LEVEL_KEY: f, LEVEL_LABEL: p, TIMESTAMP_KEY: m, LOGGER_KEYS: h, LEVELS: g, DATE_FORMAT_SIMPLE: y } = a(7318),
+          { DATE_FORMAT: u, ERROR_LIKE_KEYS: c, MESSAGE_KEY: d, LEVEL_KEY: p, LEVEL_LABEL: f, TIMESTAMP_KEY: m, LOGGER_KEYS: h, LEVELS: g, DATE_FORMAT_SIMPLE: y } = a(7318),
           v = r({});
-        function _(e, t = !1) {
+        function S(e, t = !1) {
           if (!1 === t) return e;
-          const a = b(e);
-          if (!S(a)) return e;
+          const a = _(e);
+          if (!b(a)) return e;
           if (!0 === t) return s(a, y);
           const r = t.toUpperCase();
           if ('SYS:STANDARD' === r) return s(a, u);
           const n = r.substr(0, 4);
           return s(a, 'SYS:' === n || 'UTC:' === n ? ('UTC:' === n ? t : t.slice(4)) : `UTC:${t}`);
         }
-        function b(e) {
+        function _(e) {
           let t = new Date(e);
-          return S(t) || (t = new Date(+e)), t;
+          return b(t) || (t = new Date(+e)), t;
         }
-        function S(e) {
+        function b(e) {
           return e instanceof Date && !Number.isNaN(e.getTime());
         }
         function P(e) {
@@ -2751,7 +2804,7 @@
           for (let e = 1; e < r.length; e += 1) r[e] = t + r[e];
           return r.join(a);
         }
-        function L({
+        function C({
           input: e,
           ident: t = '    ',
           eol: a = '\n',
@@ -2762,12 +2815,12 @@
           singleLine: u = !1,
           colorizer: d = l,
         }) {
-          const f = [].concat(r);
-          !0 === o && Array.prototype.push.apply(f, h);
-          let p = '';
+          const p = [].concat(r);
+          !0 === o && Array.prototype.push.apply(p, h);
+          let f = '';
           const { plain: m, errors: g } = Object.entries(e).reduce(
             ({ plain: t, errors: a }, [r, i]) => {
-              if (!1 === f.includes(r)) {
+              if (!1 === p.includes(r)) {
                 const o = 'function' == typeof s[r] ? s[r](i, r, e) : i;
                 n.includes(r) ? (a[r] = o) : (t[r] = o);
               }
@@ -2777,22 +2830,22 @@
           );
           return (
             u
-              ? (Object.keys(m).length > 0 && (p += d.greyMessage(i(m))), (p += a), (p = p.replace(/\\\\/gi, '\\')))
+              ? (Object.keys(m).length > 0 && (f += d.greyMessage(i(m))), (f += a), (f = f.replace(/\\\\/gi, '\\')))
               : Object.entries(m).forEach(([e, r]) => {
                   let n = 'function' == typeof s[e] ? r : i(r, null, 2);
                   if (void 0 === n) return;
                   n = n.replace(/\\\\/gi, '\\');
                   const o = w({ input: n, ident: t, eol: a });
-                  p += `${t}${e}:${o.startsWith(a) ? '' : ' '}${o}${a}`;
+                  f += `${t}${e}:${o.startsWith(a) ? '' : ' '}${o}${a}`;
                 }),
             Object.entries(g).forEach(([e, r]) => {
               const n = 'function' == typeof s[e] ? r : i(r, null, 2);
-              void 0 !== n && (p += C({ keyName: e, lines: n, eol: a, ident: t }));
+              void 0 !== n && (f += L({ keyName: e, lines: n, eol: a, ident: t }));
             }),
-            p
+            f
           );
         }
-        function C({ keyName: e, lines: t, eol: a, ident: r }) {
+        function L({ keyName: e, lines: t, eol: a, ident: r }) {
           let s = '';
           const n = `${r}${e}: ${w({ input: t, ident: r, eol: a })}${a}`.split(a);
           for (let e = 0; e < n.length; e += 1) {
@@ -2810,7 +2863,7 @@
           }
           return s;
         }
-        function k(e) {
+        function E(e) {
           const t = [];
           let a = !1,
             r = '';
@@ -2820,8 +2873,8 @@
           }
           return r.length && t.push(r), t;
         }
-        function E(e, t) {
-          const a = Array.isArray(t) ? t : k(t);
+        function k(e, t) {
+          const a = Array.isArray(t) ? t : E(t);
           for (const t of a) {
             if (!Object.prototype.hasOwnProperty.call(e, t)) return;
             e = e[t];
@@ -2829,9 +2882,9 @@
           return e;
         }
         function O(e, t) {
-          const a = k(t),
+          const a = E(t),
             r = a.pop();
-          null !== (e = E(e, a)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, r) && delete e[r];
+          null !== (e = k(e, a)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, r) && delete e[r];
         }
         function M() {}
         function A(e, t) {
@@ -2854,13 +2907,13 @@
               for (let t = 0; t < l.length; t += 1) {
                 const n = l[t];
                 n in e != 0 &&
-                  (i = P(e[n]) ? `${i}${a}${n}: {${r}${L({ input: e[n], errorLikeKeys: s, excludeLoggerKeys: !1, eol: r, ident: a + a })}${a}}${r}` : `${i}${a}${n}: ${e[n]}${r}`);
+                  (i = P(e[n]) ? `${i}${a}${n}: {${r}${C({ input: e[n], errorLikeKeys: s, excludeLoggerKeys: !1, eol: r, ident: a + a })}${a}}${r}` : `${i}${a}${n}: ${e[n]}${r}`);
               }
             }
             return i;
           },
-          prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: a = f, prettifier: r, customLevels: s, customLevelNames: n }) {
-            const i = E(e, a);
+          prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: a = p, prettifier: r, customLevels: s, customLevelNames: n }) {
+            const i = k(e, a);
             return void 0 === i ? void 0 : r ? r(i) : t(i, { customLevels: s, customLevelNames: n });
           },
           prettifyMessage: function ({
@@ -2868,15 +2921,15 @@
             messageFormat: t,
             messageKey: a = d,
             colorizer: r = l,
-            levelLabel: s = p,
-            levelKey: n = f,
+            levelLabel: s = f,
+            levelKey: n = p,
             customLevels: i,
             useOnlyCustomProps: o,
           }) {
             if (t && 'string' == typeof t) {
               const a = String(t).replace(/{([^{}]+)}/g, function (t, a) {
                 let r;
-                return a === s && void 0 !== (r = E(e, n)) ? ((o ? void 0 === i : void 0 === i[r]) ? g[r] : i[r]) : E(e, a) || '';
+                return a === s && void 0 !== (r = k(e, n)) ? ((o ? void 0 === i : void 0 === i[r]) ? g[r] : i[r]) : k(e, a) || '';
               });
               return r.message(a);
             }
@@ -2897,11 +2950,11 @@
             }
             return e.caller && (a += `${'' === a ? '' : ' '}<${t.caller ? t.caller(e.caller) : e.caller}>`), '' === a ? void 0 : a;
           },
-          prettifyObject: L,
+          prettifyObject: C,
           prettifyTime: function ({ log: e, timestampKey: t = m, translateFormat: a, prettifier: r }) {
             let s = null;
             if ((t in e ? (s = e[t]) : 'timestamp' in e && (s = e.timestamp), null === s)) return;
-            const n = a ? _(s, a) : s;
+            const n = a ? S(s, a) : s;
             return r ? r(n) : `[${n}]`;
           },
           buildSafeSonicBoom: function (e) {
@@ -2972,14 +3025,14 @@
           },
         }),
           (e.exports.internals = {
-            formatTime: _,
+            formatTime: S,
             joinLinesWithIndentation: w,
-            prettifyError: C,
-            getPropertyValue: E,
+            prettifyError: L,
+            getPropertyValue: k,
             deleteLogProperty: O,
-            splitPropertyKey: k,
-            createDate: b,
-            isValidDate: S,
+            splitPropertyKey: E,
+            createDate: _,
+            isValidDate: b,
           });
       },
       4147: (e) => {

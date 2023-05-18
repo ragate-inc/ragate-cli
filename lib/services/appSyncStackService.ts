@@ -245,30 +245,30 @@ export default class {
     this.setAppSyncStackObject();
   }
 
-  public updateCustomSchemeGraphl(args: { query?: AddQueryFiledInput; mutation?: AddMutationFieldInput }) {
-    // update custom_scheme.graphql
-    const callback = (updated: boolean, opt: { schemePath: string }): void => {
+  public updateCustomSchemaGraphl(args: { query?: AddQueryFiledInput; mutation?: AddMutationFieldInput }) {
+    // update custom_schema.graphql
+    const callback = (updated: boolean, opt: { schemaPath: string }): void => {
       if (updated) {
         // update appsync stack yml
-        const { schemePath } = opt;
+        const { schemaPath } = opt;
         const stackDoc = this.getAppSyncStackConfig();
-        if (_.isString(stackDoc.schema) && !stackDoc.schema.includes(schemePath)) {
+        if (_.isString(stackDoc.schema) && !stackDoc.schema.includes(schemaPath)) {
           this.writeAppSyncStackConfig({
             ...stackDoc,
-            schema: [stackDoc.schema, schemePath],
+            schema: [stackDoc.schema, schemaPath],
           });
-        } else if (_.isArray(stackDoc.schema) && !stackDoc.schema.includes(schemePath)) {
+        } else if (_.isArray(stackDoc.schema) && !stackDoc.schema.includes(schemaPath)) {
           this.writeAppSyncStackConfig({
             ...stackDoc,
-            schema: [...stackDoc.schema, schemePath],
+            schema: [...stackDoc.schema, schemaPath],
           });
         }
         this.setAppSyncStackObject();
       } else {
-        this.logger.warn('skip update custom_scheme.graphql.');
+        this.logger.warn('skip update custom_schema.graphql.');
       }
     };
-    this.graphqlEditor.updateCustomSchemeGraphl({ ...args, callback });
+    this.graphqlEditor.updateCustomSchemaGraphl({ ...args, callback });
   }
 
   public addIamRoleByDataSource(args: { dataSource: Type.AppSyncDataSourceType; sls: ServerlessConfigService }): void {
