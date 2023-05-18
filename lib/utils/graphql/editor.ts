@@ -8,8 +8,6 @@ import fs from 'fs';
 import { chalk } from 'yargonaut';
 import { addScalrs, removeScalars } from 'utils/graphql/appsyncScalars';
 
-// Diffを出せるっぽいので検証したい : https://www.npmjs.com/package/graphql-schema-utils
-
 export type AddQueryFiledInput = {
   apiName: string;
   args: ObjectTypeComposerArgumentConfigMapDefinition;
