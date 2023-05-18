@@ -1,11 +1,16 @@
-export default (consistentRead: boolean) => `
+export default (args: { consistentRead: boolean; primaryKeyName: string; sortKeyName: string }) => `
+## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html
+
 ## [Start] 共通設定
-#set( $primaryKey = "your primary key attribute name" )
 #set( $primaryValue = "your primary key value" )
-#set( $sortKeyName = "your sory key attribute name" )
 #set( $sortKeyValue = "your sort key value" )
-#set( $consistentRead = ${consistentRead.toString()} )
 ## [End] 共通設定
+
+## [Start] 自動設定
+#set( $consistentRead = ${args.consistentRead.toString()} )
+#set( $primaryKey = "${args.primaryKeyName}" )
+#set( $sortKeyName = "${args.sortKeyName}" )
+## [End] 自動設定
 
 ## [Start] バリデーション
 #set( $modelExpression = {

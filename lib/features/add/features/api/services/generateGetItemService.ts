@@ -114,32 +114,78 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
     return selectedDataSource;
   };
 
-  const getTemplate = async (): Promise<{ before: string; after: string }> => {
-    const { template } = (await inquirer.prompt([
-      {
-        type: 'list',
-        name: 'template',
-        choices: ['getItem', 'getItemConsistentRead', 'localResolver'],
-        message: 'テンプレートを選択',
-        validate: (value: string) => new Validator(value, lang).required().value(),
-      },
-    ])) as { template: 'getItem' | 'getItemConsistentRead' | 'localResolver' };
-    if (template === 'getItem') {
+  const getTemplate = async (dataSource: AppSyncDataSource): Promise<{ before: string; after: string }> => {
+    if (dataSource.type === 'AMAZON_DYNAMODB') {
+      const { template, primaryKeyName, sortKeyName } = (await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'template',
+          choices: ['getItem', 'getItemConsistentRead', 'localResolver'],
+          message: 'テンプレートを選択',
+          validate: (value: string) => new Validator(value, lang).required().value(),
+        },
+        {
+          type: 'input',
+          name: 'primaryKeyName',
+          message: 'プライマリーキー名を入力',
+          default: () => 'Id',
+          filter: (input: string) => input.replace(/\s+/g, ''),
+          transformer: (input: string) => input.replace(/\s+/g, ''),
+          validate: (value: string) => new Validator(value, lang).required().mustNoIncludeZenkaku().value(),
+        },
+        {
+          type: 'input',
+          name: 'sortKeyName',
+          message: 'ソートキー名を入力',
+          default: () => 'Sk',
+          filter: (input: string) => input.replace(/\s+/g, ''),
+          transformer: (input: string) => input.replace(/\s+/g, ''),
+          validate: (value: string) => new Validator(value, lang).required().mustNoIncludeZenkaku().value(),
+        },
+      ])) as { template: 'getItem' | 'getItemConsistentRead' | 'localResolver'; primaryKeyName: string; sortKeyName: string };
+      if (template === 'getItem') {
+        return {
+          before: CodeService.templates.vtl.dynamoGetItemRequest({ consistentRead: false, primaryKeyName, sortKeyName }),
+          after: CodeService.templates.vtl.dynamoGetItemResponse,
+        };
+      }
+      if (template === 'getItemConsistentRead') {
+        return {
+          before: CodeService.templates.vtl.dynamoGetItemRequest({ consistentRead: true, primaryKeyName, sortKeyName }),
+          after: CodeService.templates.vtl.dynamoGetItemResponse,
+        };
+      }
+      if (template === 'localResolver') {
+        return {
+          before: CodeService.templates.vtl.localResolverRequest,
+          after: CodeService.templates.vtl.localResolverResponse,
+        };
+      }
+    } else if (dataSource.type === 'AMAZON_ELASTICSEARCH') {
+      const { indexName } = (await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'indexName',
+          message: 'インデックス名を入力',
+          default: () => info.apiName,
+          filter: (input: string) => input.replace(/\s+/g, ''),
+          transformer: (input: string) => input.replace(/\s+/g, ''),
+          validate: (value: string) => new Validator(value, lang).required().mustNoIncludeZenkaku().value(),
+        },
+      ])) as { indexName: string };
       return {
-        before: CodeService.templates.vtl.getItemRequest(false),
-        after: CodeService.templates.vtl.getItemResponse,
+        before: CodeService.templates.vtl.openSearchQueryRequest({ indexName }),
+        after: CodeService.templates.vtl.openSearchQueryResponse,
       };
-    }
-    if (template === 'getItemConsistentRead') {
+    } else if (dataSource.type === 'RELATIONAL_DATABASE') {
       return {
-        before: CodeService.templates.vtl.getItemRequest(true),
-        after: CodeService.templates.vtl.getItemResponse,
+        before: CodeService.templates.vtl.rdbQueryRequest,
+        after: CodeService.templates.vtl.rdbQueryResponse,
       };
-    }
-    if (template === 'localResolver') {
+    } else if (dataSource.type === 'HTTP') {
       return {
-        before: CodeService.templates.vtl.localResolverRequest,
-        after: CodeService.templates.vtl.localResolverResponse,
+        before: CodeService.templates.vtl.httpQueryRequest,
+        after: CodeService.templates.vtl.httpQueryResponse,
       };
     }
     return {
@@ -160,7 +206,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
       response: dataSource.type === 'AWS_LAMBDA' ? false : `functions/${info.apiType}.${info.apiName}.response.vtl`,
     };
     if (dataSource.type !== 'AWS_LAMBDA') {
-      const { before, after } = await getTemplate();
+      const { before, after } = await getTemplate(dataSource);
       if (_.isString(functionConfiguration.request)) {
         new CodeService({
           filePath: path.join(basePath, functionConfiguration.request),
@@ -211,7 +257,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
       };
       if (dataSource.type !== 'AWS_LAMBDA') {
         const basePath = appSyncStackService.appSyncStack?.mappingTemplatesLocation ?? './';
-        const { before, after } = await getTemplate();
+        const { before, after } = await getTemplate(dataSource);
         if (_.isString(mappingTemplate.request)) {
           new CodeService({
             filePath: path.join(basePath, mappingTemplate.request),
