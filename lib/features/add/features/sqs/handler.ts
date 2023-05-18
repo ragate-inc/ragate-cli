@@ -1,20 +1,16 @@
 import Logger from 'utils/logger';
-import { AWS_REGION, AwsResource, FeatureHandlerAbstract } from 'types/index';
+import { AWS_REGION, FeatureHandlerAbstract } from 'types/index';
 import yargs from 'yargs';
 import _ from 'lodash';
-import { loadYaml, writeServerlessConfig, writeYaml } from 'utils/yaml';
-import { getLocaleLang } from 'features/add/features/sqs/utils/getLocale';
-import { DuplicatedPropertyError } from 'exceptions/index';
 import inquirer from 'inquirer';
 import Validator from 'utils/validator';
 import Filter from 'utils/inquirer/filter';
 import Transformer from 'utils/inquirer/transformer';
-import { StandardQueueType, StandardDeadLetterQueueType, FifoDeadLetterQueueType, FifoQueueType } from 'features/add/features/sqs/types';
-import { chalk } from 'yargonaut';
-import { generateCloudFormation } from 'utils/yaml';
 import * as sqs from '@aws-cdk/aws-sqs';
+import CfService from 'services/cloudformationService';
+import ServerlessConfigService from 'services/serverlessConfigService';
 
-type generateSqsCfInput = {
+type GenerateSqsCfInput = {
   queueType: 'Standard' | 'Fifo';
   useDeadLetterQueue: boolean;
   contentBasedDeduplication: boolean;
@@ -45,8 +41,8 @@ export default class extends FeatureHandlerAbstract {
   private readonly defaultMaxMessageSizeBytes = 262144;
   private readonly defaultMaxReceiveCount = 3;
 
-  private generateSqsCf(queueName: string, input: generateSqsCfInput) {
-    return generateCloudFormation(queueName, (c) => {
+  private generateSqsCf(queueName: string, input: GenerateSqsCfInput) {
+    return CfService.generateCloudFormation(queueName, (c) => {
       const isFifo = input.queueType === 'Fifo';
       if (input.useDeadLetterQueue) {
         const dlqParams = {
@@ -95,8 +91,6 @@ export default class extends FeatureHandlerAbstract {
 
   public async run(): Promise<void> {
     const logger = Logger.getLogger();
-    const locale = getLocaleLang(this.lang);
-
     const res = await inquirer
       .prompt([
         {
@@ -180,46 +174,14 @@ export default class extends FeatureHandlerAbstract {
 
     const { resourceName, queueType, useDeadLetterQueue, contentBasedDeduplication, filePath, serverlessConfigPath } = res;
 
+    const sls = new ServerlessConfigService({ region: this.argv.region as AWS_REGION, serverlessConfigPath, lang: this.lang });
+
     const resources = this.generateSqsCf(resourceName, {
       queueType,
       useDeadLetterQueue,
       contentBasedDeduplication,
     });
 
-    try {
-      const doc = loadYaml<AwsResource<StandardQueueType | StandardDeadLetterQueueType | FifoDeadLetterQueueType | FifoQueueType>>(filePath) ?? {};
-      logger.debug('readed yaml file');
-      logger.debug(doc);
-
-      if (_.hasIn(doc, `Resources.${resourceName}`)) {
-        logger.error(`${locale.error.alreadyExistResource}`);
-        logger.error(`ResourceName : ${resourceName}`);
-        logger.error(doc);
-        throw new DuplicatedPropertyError(locale.error.alreadyExistResource);
-      }
-      const yamlText = writeYaml(filePath, {
-        ...doc,
-        Resources: {
-          ...doc.Resources,
-          ...resources,
-        },
-      });
-      logger.info(filePath);
-      logger.info(`${locale.overrightFile} : ${filePath}`);
-      logger.info(chalk().green(yamlText));
-    } catch (e) {
-      if ((e as Error).name === 'DuplicatedPropertyError') throw e;
-      logger.debug('create a new yaml file');
-      const yamlText = writeYaml(filePath, {
-        Resources: {
-          ...resources,
-        },
-      });
-      logger.info(filePath);
-      logger.info(`${locale.outputFile} : ${filePath}`);
-      logger.info(chalk().green(yamlText));
-    }
-
-    writeServerlessConfig({ serverlessConfigPath, resourceFilePath: filePath });
+    sls.addResource({ filePath, resourceName, cf: resources });
   }
 }

@@ -4,6 +4,7 @@ import Logger from 'utils/logger';
 import addSnsFeature from 'features/add/features/sns';
 import addSqsFeature from 'features/add/features/sqs';
 import addBasicauthlambdaFeature from 'features/add/features/basicauthlambda';
+import addApiFeature from 'features/add/features/api';
 import { chalk } from 'utils/yargonaut';
 import { getLocaleLang } from 'features/add/utils/getLocale';
 
@@ -36,6 +37,12 @@ export default class extends FeatureBuilderAbstract {
         chalk.grey(locale.command.description.basicAuthLambda),
         (_yargs) => new addBasicauthlambdaFeature.builder(this.args).build(_yargs),
         (argv) => new addBasicauthlambdaFeature.handler(argv as yargs.ArgumentsCamelCase<{ region: AWS_REGION }>).run()
+      )
+      .command(
+        'api',
+        chalk.grey(locale.command.description.api),
+        (_yargs) => new addApiFeature.builder(this.args).build(_yargs),
+        (argv) => new addApiFeature.handler(argv as yargs.ArgumentsCamelCase<{ region: AWS_REGION }>).run()
       )
       .command(
         '*',

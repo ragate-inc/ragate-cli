@@ -1,6 +1,7 @@
 import config from 'config';
 import yargs from 'yargs';
 import { chalk } from 'utils/yargonaut';
+import GraphqlAnalyzer from 'utils/graphql/analyzer';
 
 export type FeatureHandlerAbstractArgs = yargs.ArgumentsCamelCase<{ region: string }>;
 
@@ -134,6 +135,7 @@ export type ServerlessConfig = {
   };
   custom: {
     modules?: Record<string, unknown>;
+    appSync?: string;
   } & Record<string, unknown>;
 };
 
@@ -177,4 +179,50 @@ export type ServerlessFunctionsYamlInput = {
   name?: string;
   memorySize?: number;
   timeout?: number;
+};
+export type GraphqlApiType = 'Mutation' | 'Query' | 'Subscription';
+
+export type AppSyncResolverType = 'UNIT' | 'PIPELINE';
+
+export type AppSyncDataSourceType = 'AMAZON_DYNAMODB' | 'RELATIONAL_DATABASE' | 'AMAZON_ELASTICSEARCH' | 'AWS_LAMBDA' | 'HTTP';
+export type AppSyncDataSource = {
+  type: AppSyncDataSourceType;
+  name: string;
+  description: string;
+  config: Record<string, unknown>;
+};
+
+export type AppSyncMappingTemplate = {
+  type: GraphqlApiType;
+  field: string;
+  request: string | boolean;
+  response: string | boolean;
+  dataSource?: string;
+  kind?: AppSyncResolverType;
+  functions?: string[];
+};
+
+export type AppSyncFunctionConfiguration = {
+  dataSource: string;
+  name: string;
+  request: string | boolean;
+  response: string | boolean;
+};
+
+export type AppSyncStack = {
+  mappingTemplatesLocation: string;
+  functionConfigurationsLocation: string;
+  functionConfigurations: AppSyncFunctionConfiguration[];
+  dataSources: AppSyncDataSource[];
+  mappingTemplates: AppSyncMappingTemplate[];
+  schema: GraphqlAnalyzer;
+};
+
+export type AppSyncStackConfig = {
+  mappingTemplatesLocation: string;
+  functionConfigurationsLocation: string;
+  functionConfigurations: string[];
+  dataSources: string[];
+  mappingTemplates: string[];
+  schema: string | string[];
 };

@@ -1,5 +1,6 @@
+import _ from 'lodash';
 export default class {
-  public static parseLambdaHandlerPath(input: string): [string[], string] {
+  public static parseFilePath(input: string): [string[], string] {
     const parts = input.split('/');
     const path = parts.slice(0, -1);
     const filename = parts[parts.length - 1];
@@ -7,6 +8,7 @@ export default class {
   }
 
   public static parseSlsRecursivelyReference = (str: string): string | undefined => {
+    if (_.isEmpty(str)) return undefined;
     const regex = /\${file\((.*?)\)}/;
     const match = str.match(regex);
     if (match) {
@@ -16,7 +18,10 @@ export default class {
   };
 
   public static extractFilename(input: string): string {
-    const filename = input.split('.')[0];
-    return filename;
+    const array = input.split('.');
+    if (array.length === 1) return input;
+    else if (array.length === 2) return array[0];
+    array.pop();
+    return array.join('.');
   }
 }

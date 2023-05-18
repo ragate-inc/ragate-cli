@@ -4,6 +4,7 @@ export type Locale = {
       sqs: string;
       sns: string;
       basicAuthLambda: string;
+      api: string;
     };
   };
   unProcessed: string;

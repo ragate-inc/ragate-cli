@@ -20,10 +20,3 @@ export class CLIError extends BaseClass {
     this.name = 'CLIError';
   }
 }
-
-export class DuplicatedPropertyError extends BaseClass {
-  constructor(message?: string) {
-    super(message);
-    this.name = 'DuplicatedPropertyError';
-  }
-}

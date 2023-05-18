@@ -1,0 +1,7 @@
+export default `
+#if( $ctx.error )
+  $util.error($ctx.error.message, $ctx.error.type)
+#else
+  $util.toJson($ctx.result)
+#end
+`;
