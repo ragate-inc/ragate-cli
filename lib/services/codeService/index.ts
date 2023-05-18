@@ -1,5 +1,6 @@
 import parser from 'utils/parser';
-import templates from 'services/codeService/templates';
+import typescript from 'services/codeService/templates/typescript';
+import vtl from 'services/codeService/templates/vtl';
 import { asFullPath, createDirectories, isFileExists } from 'utils/cli';
 import fs from 'fs';
 import Logger from 'utils/logger';
@@ -7,17 +8,24 @@ import { chalk } from 'yargonaut';
 
 export default class CodeService {
   public static get templates() {
-    return templates;
+    return {
+      typescript,
+      vtl,
+    };
   }
 
   constructor(args: { filePath: string; code: string; type: 'typescript' | 'vtl' }) {
     const { filePath, code, type } = args;
-    const [directories, handlerName] = parser.parseFilePath(filePath);
+    const [directories, fileName] = parser.parseFilePath(filePath);
     this.type = type;
     this.filePath = filePath;
     this.code = code;
     this.destinationPath = directories.join('/') + '/';
-    this.fileName = parser.extractFilename(handlerName);
+    if (type === 'typescript') {
+      this.fileName = parser.extractFilename(fileName);
+    } else {
+      this.fileName = fileName;
+    }
     this.logger = Logger.getLogger();
   }
 
@@ -47,7 +55,7 @@ export default class CodeService {
       return;
     }
     createDirectories(this.destinationPath);
-    this.logger.info(`create directories : ${this.filePath}`);
+    this.logger.info(`create directories : ${this.destinationPath}`);
     fs.writeFileSync(destination, this.code, 'utf8');
     this.logger.info(`write : ${destination}`);
     this.logger.info(chalk().green(this.code));

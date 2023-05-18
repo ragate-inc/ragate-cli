@@ -139,7 +139,7 @@ export default class extends FeatureHandlerAbstract {
       lambdaHandler: lambdaHandler,
       memorySize: this.lambdaEdgeMemorySize,
       timeout: this.lambdaEdgeTimeout,
-      code: CodeService.templates.basicauthlambda,
+      code: CodeService.templates.typescript.basicauthlambda,
     });
 
     sls.addResource({

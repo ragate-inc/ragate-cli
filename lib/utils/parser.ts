@@ -18,7 +18,10 @@ export default class {
   };
 
   public static extractFilename(input: string): string {
-    const filename = input.split('.')[0];
-    return filename;
+    const array = input.split('.');
+    if (array.length === 1) return input;
+    else if (array.length === 2) return array[0];
+    array.pop();
+    return array.join('.');
   }
 }

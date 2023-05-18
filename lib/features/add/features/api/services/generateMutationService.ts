@@ -10,6 +10,7 @@ import * as Type from 'features/add/features/api/types/';
 import { chalk } from 'utils/yargonaut';
 import AppSyncStackService from 'services/appSyncStackService';
 import { AppSyncFunctionConfiguration } from 'types/index';
+import path from 'path';
 
 export default async (args: { appSyncStackService: AppSyncStackService; lang: string; slsConfig: ServerlessConfigService; info: Type.PromptApiInfo }): Promise<void> => {
   const { appSyncStackService, lang, slsConfig, info } = args;
@@ -74,7 +75,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
       slsConfig.addFunction({
         lambdaFunctionName,
         lambdaHandler,
-        code: CodeService.templates.skeleton,
+        code: CodeService.templates.typescript.skeleton,
       });
       const dataSource = {
         type: 'AWS_LAMBDA',
@@ -132,14 +133,18 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
     const { dataSource, functionConfigurations } = args;
     const generateDataSource = (): AppSyncMappingTemplate => {
       if (info.resolverType === 'PIPELINE') {
-        return {
+        const basePath = appSyncStackService.appSyncStack?.mappingTemplatesLocation ?? './';
+        const res = {
           type: info.apiType,
-          request: `functions/${info.apiType}.${info.apiName}.request.vtl`,
-          response: `functions/${info.apiType}.${info.apiName}.response.vtl`,
+          request: `mutations/${info.apiType}.${info.apiName}.request.vtl`,
+          response: `mutations/${info.apiType}.${info.apiName}.response.vtl`,
           field: info.apiName,
           kind: info.resolverType,
           functions: [functionConfigurations?.name as string],
         };
+        new CodeService({ filePath: path.join(basePath, res.request), code: CodeService.templates.vtl.pipelineBefore, type: 'vtl' }).write();
+        new CodeService({ filePath: path.join(basePath, res.response), code: CodeService.templates.vtl.pipelineAfter, type: 'vtl' }).write();
+        return res;
       }
       // unit resolver
       return {

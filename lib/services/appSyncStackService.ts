@@ -185,12 +185,6 @@ export default class {
       isWrite = true;
     }
 
-    // TODO: VTLを生成すること
-    console.log({
-      request: mappingTemplate.request,
-      response: mappingTemplate.response,
-    });
-
     // update appsync stack yml
     if (isWrite) {
       const stackDoc = this.getAppSyncStackConfig();
@@ -225,12 +219,6 @@ export default class {
       }
       isWrite = true;
     }
-
-    // TODO: VTLを生成すること
-    console.log({
-      request: functionConfiguration.request,
-      response: functionConfiguration.response,
-    });
 
     // update appsync stack yml
     if (isWrite) {

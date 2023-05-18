@@ -405,12 +405,13 @@
           o = r(a(1092)),
           l = r(a(5837)),
           u = r(a(2056)),
-          c = a(6870);
+          c = a(6870),
+          d = r(a(1017));
         t.default = async (e) => {
-          const { appSyncStackService: t, lang: a, slsConfig: r, info: d } = e,
-            p = s.default.getLogger();
-          p.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const f = async () => {
+          const { appSyncStackService: t, lang: a, slsConfig: r, info: p } = e,
+            f = s.default.getLogger();
+          f.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
+          const m = async () => {
               const { createDataSource: e } = await n.default.prompt([
                 {
                   type: 'expand',
@@ -423,17 +424,17 @@
                   validate: (e) => new i.default(e, a).required().value(),
                 },
               ]);
-              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), f()));
+              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), m()));
             },
-            m = await f(),
-            h = await (async () => {
-              if (m) {
+            h = await m(),
+            g = await (async () => {
+              if (h) {
                 const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
                   {
                     type: 'input',
                     name: 'lambdaFunctionName',
                     message: 'Lambda関数名を入力',
-                    default: () => d.apiName,
+                    default: () => p.apiName,
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
                     validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
@@ -442,17 +443,17 @@
                     type: 'input',
                     name: 'lambdaHandler',
                     message: 'input a lambda handler path',
-                    default: () => `src/functions/appsync/${d.apiName}.handler`,
+                    default: () => `src/functions/appsync/${p.apiName}.handler`,
                     validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
                     transformer: (e) => new o.default(e).removeAllSpace().value(),
                     filter: (e) => new l.default(e).removeAllSpace().value(),
                   },
                 ]);
-                r.addFunction({ lambdaFunctionName: e, lambdaHandler: s, code: u.default.templates.skeleton });
+                r.addFunction({ lambdaFunctionName: e, lambdaHandler: s, code: u.default.templates.typescript.skeleton });
                 const c = {
                   type: 'AWS_LAMBDA',
                   name: e,
-                  description: `It is for ${d.apiType}.${d.apiName}`,
+                  description: `It is for ${p.apiType}.${p.apiName}`,
                   config: {
                     functionName: { Ref: `${e}LambdaFunction` },
                     lambdaFunctionArn: { 'Fn::GetAtt': [`${e}LambdaFunction`, 'Arn'] },
@@ -471,40 +472,48 @@
                   },
                 ]),
                 s = t.appSyncStack?.dataSources.find((t) => t.name === e);
-              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), p.debug('finished dataSourceProcess'), s;
+              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), f.debug('finished dataSourceProcess'), s;
             })(),
-            g = await ((e) => {
+            y = await ((e) => {
               const { dataSource: a } = e;
-              if ('UNIT' === d.resolverType) return Promise.resolve(void 0);
-              const r = { dataSource: a.name, name: `${d.apiType}${d.apiName}`, request: !1, response: !1 };
-              return t.addFunctionConfiguration({ functionConfiguration: r }), p.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
-            })({ dataSource: h }),
-            y = await (async (e) => {
+              if ('UNIT' === p.resolverType) return Promise.resolve(void 0);
+              const r = { dataSource: a.name, name: `${p.apiType}${p.apiName}`, request: !1, response: !1 };
+              return t.addFunctionConfiguration({ functionConfiguration: r }), f.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
+            })({ dataSource: g }),
+            v = await (async (e) => {
               const { dataSource: a, functionConfigurations: r } = e,
-                s =
-                  'PIPELINE' === d.resolverType
-                    ? {
-                        type: d.apiType,
-                        request: `functions/${d.apiType}.${d.apiName}.request.vtl`,
-                        response: `functions/${d.apiType}.${d.apiName}.response.vtl`,
-                        field: d.apiName,
-                        kind: d.resolverType,
+                s = (() => {
+                  if ('PIPELINE' === p.resolverType) {
+                    const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
+                      a = {
+                        type: p.apiType,
+                        request: `mutations/${p.apiType}.${p.apiName}.request.vtl`,
+                        response: `mutations/${p.apiType}.${p.apiName}.response.vtl`,
+                        field: p.apiName,
+                        kind: p.resolverType,
                         functions: [r?.name],
-                      }
-                    : { dataSource: a.name, type: d.apiType, field: d.apiName, kind: d.resolverType, request: !1, response: !1 };
-              return t.addMappingTemplate({ mappingTemplate: s }), p.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: h, functionConfigurations: g }),
-            v = await (async () => {
+                      };
+                    return (
+                      new u.default({ filePath: d.default.join(e, a.request), code: u.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
+                      new u.default({ filePath: d.default.join(e, a.response), code: u.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
+                      a
+                    );
+                  }
+                  return { dataSource: a.name, type: p.apiType, field: p.apiName, kind: p.resolverType, request: !1, response: !1 };
+                })();
+              return t.addMappingTemplate({ mappingTemplate: s }), f.debug('finished mappingTemplateProcess'), s;
+            })({ dataSource: g, functionConfigurations: y }),
+            S = await (async () => {
               const e = t.graphqlEditor,
-                a = t.graphqlEditor.addExampleType(d.apiName),
-                r = t.graphqlEditor.addExampleInput(d.apiName);
+                a = t.graphqlEditor.addExampleType(p.apiName),
+                r = t.graphqlEditor.addExampleInput(p.apiName);
               return (
-                t.updateCustomSchemaGraphl({ mutation: { apiName: d.apiName, type: a.getType(), input: r.getType() } }),
-                p.debug('finished scheneGraphqlProcess'),
+                t.updateCustomSchemaGraphl({ mutation: { apiName: p.apiName, type: a.getType(), input: r.getType() } }),
+                f.debug('finished scheneGraphqlProcess'),
                 Promise.resolve(e.customSchema)
               );
             })();
-          p.debug({ dataSource: h, functionConfigurations: g, mappingTemplate: y, schemaGraphql: v });
+          f.debug({ dataSource: g, functionConfigurations: y, mappingTemplate: v, schemaGraphql: S });
         };
       },
       8391: function (e, t, a) {
@@ -692,7 +701,7 @@
               lambdaHandler: i,
               memorySize: this.lambdaEdgeMemorySize,
               timeout: this.lambdaEdgeTimeout,
-              code: h.default.templates.basicauthlambda,
+              code: h.default.templates.typescript.basicauthlambda,
             }),
               l.addResource({ filePath: s, resourceName: n, cf: this.generateLambdaIamRoleCf() });
           }
@@ -1424,7 +1433,7 @@
               }
               a = !0;
             }
-            if ((console.log({ request: t.request, response: t.response }), a)) {
+            if (a) {
               const e = this.getAppSyncStackConfig();
               e.mappingTemplates.every((e) => !e.includes(this.defaultCustomMappingtemplatePath)) &&
                 this.writeAppSyncStackConfig({ ...e, mappingTemplates: [...e.mappingTemplates, `\${file(./${this.defaultCustomMappingtemplatePath})}`] });
@@ -1446,7 +1455,7 @@
               }
               a = !0;
             }
-            if ((console.log({ request: t.request, response: t.response }), a)) {
+            if (a) {
               const e = this.getAppSyncStackConfig();
               e.functionConfigurations.every((e) => !e.includes(this.defaultCustomFunctionConfigurationsPath)) &&
                 this.writeAppSyncStackConfig({ ...e, functionConfigurations: [...e.functionConfigurations, `\${file(./${this.defaultCustomFunctionConfigurationsPath})}`] });
@@ -1594,14 +1603,15 @@
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(3448)),
-          n = r(a(6698)),
-          i = a(2762),
-          o = r(a(7147)),
-          l = r(a(6444)),
-          u = a(7347);
+          n = r(a(5053)),
+          i = r(a(7112)),
+          o = a(2762),
+          l = r(a(7147)),
+          u = r(a(6444)),
+          c = a(7347);
         t.default = class {
           static get templates() {
-            return n.default;
+            return { typescript: n.default, vtl: i.default };
           }
           constructor(e) {
             const { filePath: t, code: a, type: r } = e,
@@ -1610,8 +1620,8 @@
               (this.filePath = t),
               (this.code = a),
               (this.destinationPath = n.join('/') + '/'),
-              (this.fileName = s.default.extractFilename(i)),
-              (this.logger = l.default.getLogger());
+              (this.fileName = 'typescript' === r ? s.default.extractFilename(i) : i),
+              (this.logger = u.default.getLogger());
           }
           filePath;
           type;
@@ -1630,18 +1640,23 @@
             }
           }
           write() {
-            const e = `${(0, i.asFullPath)(this.destinationPath)}${this.fileName}.${this.extension}`;
-            (0, i.isFileExists)(e)
+            const e = `${(0, o.asFullPath)(this.destinationPath)}${this.fileName}.${this.extension}`;
+            (0, o.isFileExists)(e)
               ? this.logger.info(`already exists file, skip write : ${e}`)
-              : ((0, i.createDirectories)(this.destinationPath),
-                this.logger.info(`create directories : ${this.filePath}`),
-                o.default.writeFileSync(e, this.code, 'utf8'),
+              : ((0, o.createDirectories)(this.destinationPath),
+                this.logger.info(`create directories : ${this.destinationPath}`),
+                l.default.writeFileSync(e, this.code, 'utf8'),
                 this.logger.info(`write : ${e}`),
-                this.logger.info((0, u.chalk)().green(this.code)));
+                this.logger.info((0, c.chalk)().green(this.code)));
           }
         };
       },
-      6698: function (e, t, a) {
+      5955: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default =
+            "import { Context, CloudFrontRequest, Callback, CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda';\n\nexport const handler = (event: CloudFrontRequestEvent, _context: Context, callback: Callback): void => {\n  const request: CloudFrontRequest = event.Records[0].cf.request;\n  const headers = request.headers;\n\n  const authUser = 'ragate'; // Basic認証のユーザー名\n  const authPass = '20210525'; // Basic認証のパスワード\n\n  const authString = 'Basic ' + Buffer.from(authUser + ':' + authPass).toString('base64');\n  if (typeof headers.authorization === 'undefined' || headers.authorization[0].value !== authString) {\n    const body = 'Unauthorized';\n    const response: CloudFrontResultResponse = {\n      status: '401',\n      statusDescription: 'Unauthorized',\n      body: body,\n      headers: {\n        'www-authenticate': [{ key: 'WWW-Authenticate', value: 'Basic' }],\n      },\n    };\n    callback(null, response);\n  }\n  callback(null, request);\n};\n");
+      },
+      5053: function (e, t, a) {
         var r =
           (this && this.__importDefault) ||
           function (e) {
@@ -1652,15 +1667,27 @@
           n = r(a(146));
         t.default = { basicauthlambda: s.default, skeleton: n.default };
       },
-      5955: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            "import { Context, CloudFrontRequest, Callback, CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda';\n\nexport const handler = (event: CloudFrontRequestEvent, _context: Context, callback: Callback): void => {\n  const request: CloudFrontRequest = event.Records[0].cf.request;\n  const headers = request.headers;\n\n  const authUser = 'ragate'; // Basic認証のユーザー名\n  const authPass = '20210525'; // Basic認証のパスワード\n\n  const authString = 'Basic ' + Buffer.from(authUser + ':' + authPass).toString('base64');\n  if (typeof headers.authorization === 'undefined' || headers.authorization[0].value !== authString) {\n    const body = 'Unauthorized';\n    const response: CloudFrontResultResponse = {\n      status: '401',\n      statusDescription: 'Unauthorized',\n      body: body,\n      headers: {\n        'www-authenticate': [{ key: 'WWW-Authenticate', value: 'Basic' }],\n      },\n    };\n    callback(null, response);\n  }\n  callback(null, request);\n};\n");
-      },
       146: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default =
             "import { asyncHandlerWrapper } from 'functions/wrapper';\nimport { AppSyncResolverEvent, Context } from 'aws-lambda';\n\ntype Input = {\n  example: string;\n};\n\ntype Response = {\n  example: string;\n};\n\nexport const handler = asyncHandlerWrapper<AppSyncResolverEvent<Input>, Context, Response>(async (event) => {\n  console.log('It is skeleton 👻');\n});\n");
+      },
+      7112: function (e, t, a) {
+        var r =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const s = r(a(4709)),
+          n = r(a(5951));
+        t.default = { pipelineAfter: s.default, pipelineBefore: n.default };
+      },
+      4709: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.default = '$util.toJson($ctx.prev.result)');
+      },
+      5951: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.default = '{}');
       },
       1325: function (e, t, a) {
         var r =
@@ -2358,7 +2385,8 @@
             return t ? t[1] : void 0;
           };
           static extractFilename(e) {
-            return e.split('.')[0];
+            const t = e.split('.');
+            return 1 === t.length ? e : 2 === t.length ? t[0] : (t.pop(), t.join('.'));
           }
         };
       },
@@ -2646,12 +2674,12 @@
             j = { customLevels: O, customLevelNames: M };
           k && !t.customLevels && ((j.customLevels = void 0), (j.customLevelNames = void 0));
           const R = t.customPrettifiers,
-            F = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
-            x = !F && t.ignore ? new Set(t.ignore.split(',')) : void 0,
+            x = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
+            F = !x && t.ignore ? new Set(t.ignore.split(',')) : void 0,
             $ = t.hideObject,
             q = t.singleLine,
-            N = l(t.colorize, A, k),
-            D = t.colorizeObjects ? N : l(!1, [], !1);
+            D = l(t.colorize, A, k),
+            N = t.colorizeObjects ? D : l(!1, [], !1);
           return function (e) {
             let l;
             if (m(e)) l = e;
@@ -2664,9 +2692,9 @@
               const e = ((k ? t.customLevels : void 0 !== M[o]) ? M[o] : f[o]) || Number(o);
               if (l[void 0 === n ? p : n] < e) return;
             }
-            const w = y({ log: l, messageKey: s, colorizer: N, messageFormat: u, levelLabel: i, ...j, useOnlyCustomProps: k });
-            (x || F) && (l = P({ log: l, ignoreKeys: x, includeKeys: F }));
-            const C = g({ log: l, colorizer: N, levelKey: n, prettifier: R.level, ...j }),
+            const w = y({ log: l, messageKey: s, colorizer: D, messageFormat: u, levelLabel: i, ...j, useOnlyCustomProps: k });
+            (F || x) && (l = P({ log: l, ignoreKeys: F, includeKeys: x }));
+            const C = g({ log: l, colorizer: D, levelKey: n, prettifier: R.level, ...j }),
               E = v({ log: l, prettifiers: R }),
               O = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: R.time });
             let A = '';
@@ -2684,7 +2712,7 @@
               q && (A += a), (A += e);
             } else if (!$) {
               const e = [s, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = S({ input: l, skipKeys: e, customPrettifiers: R, errorLikeKeys: d, eol: a, ident: r, singleLine: q, colorizer: D });
+                t = S({ input: l, skipKeys: e, customPrettifiers: R, errorLikeKeys: d, eol: a, ident: r, singleLine: q, colorizer: N });
               q && !/^\s$/.test(t) && (A += ' '), (A += t);
             }
             return A;
