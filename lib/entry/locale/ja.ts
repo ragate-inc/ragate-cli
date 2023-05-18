@@ -8,6 +8,7 @@ const locale: Locale = {
     description: {
       create: 'プロジェクトを作成',
       add: 'AWSリソースの追加',
+      codegen: 'ソースコード自動生成',
     },
   },
   options: {

@@ -1,3615 +1,1434 @@
 #!/usr/bin/env node
-(() => {
-  'use strict';
-  var e = {
-      4712: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(9026));
-        (async () => {
-          const e = new s.default();
-          await e.run();
-        })();
-      },
-      2322: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(4147)),
-          n = r(a(6517)),
-          i = r(a(1017)),
-          o = {
-            npmVersion: s.default.version,
-            repositoyUrl: 'https://github.com/ragate-inc/serverless-starter',
-            tmpPath: `${i.default.dirname(process.argv[1])}/../tmp`,
-            currentPath: i.default.resolve(),
-            templates: n.default
-              .chain([{ category: 'Node.js', name: 'Node.js - aws-node-appsync', value: 'aws-node-appsync' }])
-              .sortBy('category')
-              .map((e) => ({ name: `${e.category} - ${e.name}`, value: e.value }))
-              .value(),
-          };
-        t.default = o;
-      },
-      9026: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6444)),
-          n = r(a(9267)),
-          i = a(6870),
-          o = r(a(2322)),
-          l = a(8014),
-          u = r(a(8798)),
-          c = r(a(8072)),
-          d = a(6702),
-          p = r(a(6517)),
-          m = a(2762);
-        t.default = class {
-          constructor() {
-            try {
-              (0, i.init)(), (this.chalk = i.chalk);
-              const e = (0, n.default)(process.argv.slice(2))
-                .options({
-                  lang: { default: this.langRef.default, type: this.langRef.type },
-                  verbose: { type: this.verboseRef.type },
-                  region: { default: this.regionRef.default, type: this.regionRef.type },
-                })
-                .check((e) => ((e.verbose = p.default.hasIn(e, 'verbose')), !0))
-                .help(!1)
-                .version(!1)
-                .parseSync();
-              (this.lang = e.lang),
-                (this.verbose = e.verbose),
-                (this.region = e.region),
-                (this.locale = (0, l.getLocaleLang)(e.lang)),
-                (this.logger = s.default.getLogger(this.verbose ? 'debug' : 'info')),
-                (this.npmVersion = o.default.npmVersion);
-            } finally {
-              (0, m.cleanUpTmpDirectory)();
-            }
-          }
-          chalk;
-          logger;
-          locale;
-          lang;
-          langRef = { default: process.env.LANG ?? 'en', type: 'string' };
-          verbose;
-          verboseRef = { type: 'flag' };
-          npmVersion;
-          get version() {
-            return `ragate-cli v${this.npmVersion}`;
-          }
-          region;
-          regionRef = { default: 'ap-northeast-1', type: 'string' };
-          handleError(e) {
-            const t = s.default.getLogger();
-            e.name && t.debug(e.name), e.stack && t.debug(e.stack), console.error('\n', i.chalk.red(e.message)), process.exit(1);
-          }
-          cli() {
-            const { version: e, chalk: t, locale: a, lang: r } = this;
-            return (0, n.default)(process.argv.slice(2))
-              .scriptName('')
-              .options({
-                verbose: { describe: t.grey(a.options.describe.verbose), type: this.verboseRef.type },
-                lang: { describe: t.grey(a.options.describe.lang), default: this.langRef.default, type: this.langRef.type },
-                region: { alias: 'r', describe: t.grey(a.options.describe.region), default: this.regionRef.default, type: this.regionRef.type, choices: d.awsRegions },
-              })
-              .usage(e)
-              .help('help', t.grey(a.help))
-              .alias('h', 'help')
-              .version('version', t.grey(a.version), e)
-              .alias('v', 'version')
-              .check((e) => {
-                if (0 === e._.length) throw new Error(this.locale.unProcessed.required);
-                return !0;
-              })
-              .command(
-                'create',
-                t.grey(a.command.description.create),
-                (e) => {
-                  const t = { lang: this.lang, region: this.region };
-                  return new u.default.builder(t).build(e);
-                },
-                (e) => new u.default.handler(e).run()
-              )
-              .command('add', t.grey(a.command.description.add), (e) => {
-                const t = { lang: this.lang, region: this.region };
-                return new c.default.builder(t).build(e);
-              })
-              .command(
-                '*',
-                '',
-                () => ({}),
-                () => {
-                  throw new Error(this.locale.unProcessed.notFound);
-                }
-              )
-              .wrap(Math.max((0, n.default)().terminalWidth() - 5, 60))
-              .locale(r)
-              .fail((e, t) => this.handleError(t));
-          }
-          async run() {
-            try {
-              await this.cli().parseAsync();
-            } catch (e) {
-              this.handleError(e);
-            }
-          }
-        };
-      },
-      1843: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = {
-            help: 'Show help',
-            version: 'Show version',
-            yourInput: 'your input',
-            command: { description: { create: 'Create a new project', add: 'Add aws resouces' } },
-            options: { describe: { verbose: 'Show verbose logs', region: 'Aws region', lang: 'Display language' } },
-            unProcessed: {
-              required: 'please input a command. Run "ragate help" for a list of all available commands.',
-              notFound: 'The command entered does not exist. Run "ragate help" for a list of all available commands.',
-            },
-          });
-      },
-      6471: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = {
-            help: 'ヘルプを表示',
-            version: 'バージョンを表示',
-            yourInput: '入力されたコマンド',
-            command: { description: { create: 'プロジェクトを作成', add: 'AWSリソースの追加' } },
-            options: { describe: { verbose: '詳細なログを出力', region: 'AWSリージョン', lang: '表示言語' } },
-            unProcessed: {
-              required: '指定のコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
-              notFound: '入力されたコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
-            },
-          });
-      },
-      8014: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
-        const s = r(a(6471)),
-          n = r(a(1843));
-        t.getLocaleLang = (e) => ('ja' === e ? s.default : n.default);
-      },
-      5033: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.CLIError = t.EnvironmentError = t.BaseClass = void 0);
-        class a extends Error {
-          constructor(e) {
-            super(e), (this.name = new.target.name), Error.captureStackTrace && Error.captureStackTrace(this, this.constructor), Object.setPrototypeOf(this, new.target.prototype);
-          }
-        }
-        (t.BaseClass = a),
-          (t.EnvironmentError = class extends a {
-            constructor(e) {
-              super(e), (this.name = 'EnvironmentError');
-            }
-          }),
-          (t.CLIError = class extends a {
-            constructor(e) {
-              super(e), (this.name = 'CLIError');
-            }
-          });
-      },
-      6040: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = a(6702),
-          n = r(a(6444)),
-          i = r(a(9211)),
-          o = r(a(592)),
-          l = r(a(8785)),
-          u = r(a(8806)),
-          c = a(6870),
-          d = a(7264);
-        class p extends s.FeatureBuilderAbstract {
-          constructor(e) {
-            super(e);
-          }
-          build(e) {
-            const t = this.args.lang,
-              a = (0, d.getLocaleLang)(t),
-              r = n.default.getLogger();
-            return e
-              .version(!1)
-              .usage('Usage: add <command> <options>')
-              .command(
-                'sns',
-                c.chalk.grey(a.command.description.sns),
-                (e) => new i.default.builder(this.args).build(e),
-                (e) => new i.default.handler(e).run()
-              )
-              .command(
-                'sqs',
-                c.chalk.grey(a.command.description.sns),
-                (e) => new o.default.builder(this.args).build(e),
-                (e) => new o.default.handler(e).run()
-              )
-              .command(
-                'basicauthlambda',
-                c.chalk.grey(a.command.description.basicAuthLambda),
-                (e) => new l.default.builder(this.args).build(e),
-                (e) => new l.default.handler(e).run()
-              )
-              .command(
-                'api',
-                c.chalk.grey(a.command.description.api),
-                (e) => new u.default.builder(this.args).build(e),
-                (e) => new u.default.handler(e).run()
-              )
-              .command(
-                '*',
-                c.chalk.grey('<command> <options>'),
-                () => ({}),
-                () => {
-                  r.error(c.chalk.red(a.unProcessed));
-                }
-              );
-          }
-        }
-        t.default = p;
-      },
-      7352: (e, t, a) => {
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const r = a(6702);
-        class s extends r.FeatureBuilderAbstract {
-          constructor(e) {
-            super(e);
-          }
-          build(e) {
-            return e.version(!1).usage('Usage: $0 api');
-          }
-        }
-        t.default = s;
-      },
-      1723: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6444)),
-          n = a(6702),
-          i = r(a(6517)),
-          o = r(a(1325)),
-          l = r(a(3290)),
-          u = r(a(7973)),
-          c = r(a(5837)),
-          d = r(a(1092)),
-          p = r(a(3448)),
-          m = r(a(6849)),
-          f = r(a(8391)),
-          g = r(a(245)),
-          h = r(a(7116));
-        class y extends n.FeatureHandlerAbstract {
-          constructor(e) {
-            super(e);
-          }
-          get defaultSchemaGrapqlFilePath() {
-            return 'appsync/schema.graphql';
-          }
-          get defaultServerlessConfigPath() {
-            return `serverless/${this.argv.region}/serverless.yml`;
-          }
-          async run() {
-            const e = s.default.getLogger(),
-              t = await l.default.prompt([
-                {
-                  type: 'input',
-                  name: 'apiName',
-                  message: 'API名を入力',
-                  filter: (e) => e.replace(/\s+/g, ''),
-                  transformer: (e) => e.replace(/\s+/g, ''),
-                  validate: (e) => new u.default(e, this.lang).required().mustNoIncludeZenkaku().value(),
-                },
-                { type: 'list', name: 'apiType', choices: ['Mutation', 'Query'], message: 'APIタイプを選択', validate: (e) => new u.default(e, this.lang).required().value() },
-                {
-                  type: 'list',
-                  name: 'resolverType',
-                  choices: ['UNIT', 'PIPELINE'],
-                  message: 'リゾルバータイプを選択',
-                  validate: (e) => new u.default(e, this.lang).required().value(),
-                },
-                {
-                  type: 'input',
-                  name: 'serverlessConfigPath',
-                  message: 'input a serverless config file path',
-                  default: () => this.defaultServerlessConfigPath,
-                  validate: (e) => new u.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                  transformer: (e) => new d.default(e).removeAllSpace().value(),
-                  filter: (e) => new c.default(e).removeAllSpace().value(),
-                },
-              ]);
-            e.debug(`input info values : ${JSON.stringify(t)}}`);
-            const a = new o.default({ region: this.argv.region, serverlessConfigPath: t.serverlessConfigPath, lang: this.lang });
-            if (!a.isExistsServelessConfig) throw new Error('serverless.ymlが存在しません');
-            const r = a.serverlessConfig;
-            if (!(r.plugins ?? []).includes('serverless-appsync-plugin')) throw new Error('serverless-appsync-pluginがインストールされていません');
-            const n = p.default.parseSlsRecursivelyReference(r.custom?.appSync);
-            if (i.default.isEmpty(n))
-              throw new Error('serverless.ymlのcustom.appsyncが不正です、custom.appsyncには、以下のような文字列が設定されている必要があります。\n${file(./appsync/stack.yml)}');
-            const y = new h.default({ stackFilePath: n, lang: this.lang, region: this.argv.region }),
-              v = y.appSyncStack;
-            if (v?.mappingTemplates.some((e) => e.type === t.apiType && e.field === t.apiName)) throw new Error('既にマッピングテンプレートに定義が存在します');
-            if ('PIPELINE' === t.resolverType && v?.functionConfigurations.some((e) => e.name === `Mutation${t.apiName}`)) throw new Error('既にリゾルバー関数がAPIが存在します');
-            if ('Mutation' === t.apiType) {
-              if (v?.schema.isExistsMutationApi(t.apiName)) throw new Error('既にschemaにAPI定義が存在します');
-              return (0, m.default)({ appSyncStackService: y, lang: this.lang, slsConfig: a, info: t });
-            }
-            if ('Query' === t.apiType) {
-              if (v?.schema.isExistsQueryApi(t.apiName)) throw new Error('既にschemaにAPI定義が存在します');
-              const { operation: e } = await l.default.prompt([
-                { type: 'list', name: 'operation', choices: ['Query', 'GetItem'], message: 'Queryのタイプを選択', validate: (e) => new u.default(e, this.lang).required().value() },
-              ]);
-              if ('Query' === e) return (0, f.default)({ appSyncStackService: y, lang: this.lang, slsConfig: a, info: t });
-              if ('GetItem' === e) return (0, g.default)({ appSyncStackService: y, lang: this.lang, slsConfig: a, info: t });
-            }
-          }
-        }
-        t.default = y;
-      },
-      8806: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(7352)),
-          n = r(a(1723));
-        t.default = { builder: s.default, handler: n.default };
-      },
-      245: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6444)),
-          n = r(a(3290)),
-          i = r(a(7973)),
-          o = r(a(1092)),
-          l = r(a(5837)),
-          u = r(a(2056)),
-          c = a(6870),
-          d = r(a(1017)),
-          p = r(a(6517)),
-          m = a(7343);
-        t.default = async (e) => {
-          const { appSyncStackService: t, lang: a, slsConfig: r, info: f } = e,
-            g = s.default.getLogger();
-          g.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const h = async () => {
-              const { createDataSource: e } = await n.default.prompt([
-                {
-                  type: 'expand',
-                  name: 'createDataSource',
-                  message: 'データソースを新しく作成しますか？',
-                  choices: [
-                    { key: 'y', name: 'yes', value: !0 },
-                    { key: 'n', name: 'no', value: !1 },
-                  ],
-                  validate: (e) => new i.default(e, a).required().value(),
-                },
-              ]);
-              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), h()));
-            },
-            y = await h(),
-            v = async (e) => {
-              if ('AMAZON_DYNAMODB' === e.type) {
-                const {
-                  template: e,
-                  primaryKeyName: t,
-                  sortKeyName: r,
-                } = await n.default.prompt([
-                  {
-                    type: 'list',
-                    name: 'template',
-                    choices: ['getItem', 'getItemConsistentRead', 'localResolver'],
-                    message: 'テンプレートを選択',
-                    validate: (e) => new i.default(e, a).required().value(),
-                  },
-                  {
-                    type: 'input',
-                    name: 'primaryKeyName',
-                    message: 'プライマリーキー名を入力',
-                    default: () => 'Id',
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                  },
-                  {
-                    type: 'input',
-                    name: 'sortKeyName',
-                    message: 'ソートキー名を入力',
-                    default: () => 'Sk',
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                  },
-                ]);
-                if ('getItem' === e)
-                  return {
-                    before: u.default.templates.vtl.dynamoGetItemRequest({ consistentRead: !1, primaryKeyName: t, sortKeyName: r }),
-                    after: u.default.templates.vtl.dynamoGetItemResponse,
-                  };
-                if ('getItemConsistentRead' === e)
-                  return {
-                    before: u.default.templates.vtl.dynamoGetItemRequest({ consistentRead: !0, primaryKeyName: t, sortKeyName: r }),
-                    after: u.default.templates.vtl.dynamoGetItemResponse,
-                  };
-                if ('localResolver' === e) return { before: u.default.templates.vtl.localResolverRequest, after: u.default.templates.vtl.localResolverResponse };
-              } else {
-                if ('AMAZON_ELASTICSEARCH' === e.type) {
-                  const { indexName: e } = await n.default.prompt([
-                    {
-                      type: 'input',
-                      name: 'indexName',
-                      message: 'インデックス名を入力',
-                      default: () => f.apiName,
-                      filter: (e) => e.replace(/\s+/g, ''),
-                      transformer: (e) => e.replace(/\s+/g, ''),
-                      validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                    },
-                  ]);
-                  return { before: u.default.templates.vtl.openSearchQueryRequest({ indexName: e }), after: u.default.templates.vtl.openSearchQueryResponse };
-                }
-                if ('RELATIONAL_DATABASE' === e.type) return { before: u.default.templates.vtl.rdbQueryRequest, after: u.default.templates.vtl.rdbQueryResponse };
-                if ('HTTP' === e.type) return { before: u.default.templates.vtl.httpQueryRequest, after: u.default.templates.vtl.httpQueryResponse };
-              }
-              return { before: '{}', after: '{}' };
-            },
-            S = await (async () => {
-              if (y) {
-                const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
-                  {
-                    type: 'input',
-                    name: 'lambdaFunctionName',
-                    message: 'Lambda関数名を入力',
-                    default: () => f.apiName,
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                  },
-                  {
-                    type: 'input',
-                    name: 'lambdaHandler',
-                    message: 'input a lambda handler path',
-                    default: () => `src/functions/appsync/${f.apiName}.handler`,
-                    validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
-                    transformer: (e) => new o.default(e).removeAllSpace().value(),
-                    filter: (e) => new l.default(e).removeAllSpace().value(),
-                  },
-                ]);
-                r.addFunction({ lambdaFunctionName: e, lambdaHandler: s, code: u.default.templates.typescript.skeleton });
-                const c = {
-                  type: 'AWS_LAMBDA',
-                  name: e,
-                  description: `It is for ${f.apiType}.${f.apiName}`,
-                  config: {
-                    functionName: { Ref: `${e}LambdaFunction` },
-                    lambdaFunctionArn: { 'Fn::GetAtt': [`${e}LambdaFunction`, 'Arn'] },
-                    serviceRoleArn: { 'Fn::GetAtt': [t.appSyncLambdaRoleName, 'Arn'] },
-                  },
-                };
-                return t.addIamRoleByDataSource({ dataSource: 'AWS_LAMBDA', sls: r }), t.addDataSource(c), c;
-              }
-              const { dataSource: e } = await n.default.prompt([
-                  {
-                    type: 'list',
-                    name: 'dataSource',
-                    choices: t.appSyncStack?.dataSources.map((e) => e.name),
-                    message: 'データソースを選択',
-                    validate: (e) => new i.default(e, a).required().value(),
-                  },
-                ]),
-                s = t.appSyncStack?.dataSources.find((t) => t.name === e);
-              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), g.debug('finished dataSourceProcess'), s;
-            })(),
-            $ = await (async (e) => {
-              const { dataSource: a } = e;
-              if ('UNIT' === f.resolverType) return Promise.resolve(void 0);
-              const r = t.appSyncStack?.functionConfigurationsLocation ?? './',
-                s = {
-                  dataSource: a.name,
-                  name: `${f.apiType}${p.default.upperFirst(f.apiName)}`,
-                  request: 'AWS_LAMBDA' !== a.type && `functions/${f.apiType}.${f.apiName}.request.vtl`,
-                  response: 'AWS_LAMBDA' !== a.type && `functions/${f.apiType}.${f.apiName}.response.vtl`,
-                };
-              if ('AWS_LAMBDA' !== a.type) {
-                const { before: e, after: t } = await v(a);
-                p.default.isString(s.request) && new u.default({ filePath: d.default.join(r, s.request), code: e, type: 'vtl' }).write(),
-                  p.default.isString(s.response) && new u.default({ filePath: d.default.join(r, s.response), code: t, type: 'vtl' }).write();
-              }
-              return t.addFunctionConfiguration({ functionConfiguration: s }), g.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
-            })({ dataSource: S }),
-            _ = await (async (e) => {
-              const { dataSource: a, functionConfigurations: r } = e,
-                s = await (async () => {
-                  if ('PIPELINE' === f.resolverType) {
-                    const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
-                      a = {
-                        type: f.apiType,
-                        request: `queries/${f.apiType}.${f.apiName}.request.vtl`,
-                        response: `queries/${f.apiType}.${f.apiName}.response.vtl`,
-                        field: f.apiName,
-                        kind: f.resolverType,
-                        functions: [r?.name],
-                      };
-                    return (
-                      new u.default({ filePath: d.default.join(e, a.request), code: u.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
-                      new u.default({ filePath: d.default.join(e, a.response), code: u.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
-                      a
-                    );
-                  }
-                  const e = {
-                    dataSource: a.name,
-                    type: f.apiType,
-                    field: f.apiName,
-                    kind: f.resolverType,
-                    request: 'AWS_LAMBDA' !== a.type && `queries/${f.apiType}.${f.apiName}.request.vtl`,
-                    response: 'AWS_LAMBDA' !== a.type && `queries/${f.apiType}.${f.apiName}.response.vtl`,
-                  };
-                  if ('AWS_LAMBDA' !== a.type) {
-                    const r = t.appSyncStack?.mappingTemplatesLocation ?? './',
-                      { before: s, after: n } = await v(a);
-                    p.default.isString(e.request) && new u.default({ filePath: d.default.join(r, e.request), code: s, type: 'vtl' }).write(),
-                      p.default.isString(e.response) && new u.default({ filePath: d.default.join(r, e.response), code: n, type: 'vtl' }).write();
-                  }
-                  return e;
-                })();
-              return t.addMappingTemplate({ mappingTemplate: s }), g.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: S, functionConfigurations: $ }),
-            b = await (async () => {
-              const e = t.graphqlEditor,
-                a = t.graphqlEditor.addExampleType(f.apiName);
-              return (
-                t.updateCustomSchemaGraphl({ query: { apiName: f.apiName, type: a.getType(), args: { example: { type: m.GraphQLString } } } }),
-                g.debug('finished scheneGraphqlProcess'),
-                Promise.resolve(e.customSchema)
-              );
-            })();
-          g.debug({ dataSource: S, functionConfigurations: $, mappingTemplate: _, schemaGraphql: b });
-        };
-      },
-      6849: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6444)),
-          n = r(a(3290)),
-          i = r(a(7973)),
-          o = r(a(1092)),
-          l = r(a(5837)),
-          u = r(a(2056)),
-          c = a(6870),
-          d = r(a(1017)),
-          p = r(a(6517));
-        t.default = async (e) => {
-          const { appSyncStackService: t, lang: a, slsConfig: r, info: m } = e,
-            f = s.default.getLogger();
-          f.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const g = async () => {
-              const { createDataSource: e } = await n.default.prompt([
-                {
-                  type: 'expand',
-                  name: 'createDataSource',
-                  message: 'データソースを新しく作成しますか？',
-                  choices: [
-                    { key: 'y', name: 'yes', value: !0 },
-                    { key: 'n', name: 'no', value: !1 },
-                  ],
-                  validate: (e) => new i.default(e, a).required().value(),
-                },
-              ]);
-              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), g()));
-            },
-            h = await g(),
-            y = await (async () => {
-              if (h) {
-                const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
-                  {
-                    type: 'input',
-                    name: 'lambdaFunctionName',
-                    message: 'Lambda関数名を入力',
-                    default: () => m.apiName,
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                  },
-                  {
-                    type: 'input',
-                    name: 'lambdaHandler',
-                    message: 'input a lambda handler path',
-                    default: () => `src/functions/appsync/${m.apiName}.handler`,
-                    validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
-                    transformer: (e) => new o.default(e).removeAllSpace().value(),
-                    filter: (e) => new l.default(e).removeAllSpace().value(),
-                  },
-                ]);
-                r.addFunction({ lambdaFunctionName: e, lambdaHandler: s, code: u.default.templates.typescript.skeleton });
-                const c = {
-                  type: 'AWS_LAMBDA',
-                  name: e,
-                  description: `It is for ${m.apiType}.${m.apiName}`,
-                  config: {
-                    functionName: { Ref: `${e}LambdaFunction` },
-                    lambdaFunctionArn: { 'Fn::GetAtt': [`${e}LambdaFunction`, 'Arn'] },
-                    serviceRoleArn: { 'Fn::GetAtt': [t.appSyncLambdaRoleName, 'Arn'] },
-                  },
-                };
-                return t.addIamRoleByDataSource({ dataSource: 'AWS_LAMBDA', sls: r }), t.addDataSource(c), c;
-              }
-              const { dataSource: e } = await n.default.prompt([
-                  {
-                    type: 'list',
-                    name: 'dataSource',
-                    choices: t.appSyncStack?.dataSources.map((e) => e.name),
-                    message: 'データソースを選択',
-                    validate: (e) => new i.default(e, a).required().value(),
-                  },
-                ]),
-                s = t.appSyncStack?.dataSources.find((t) => t.name === e);
-              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), f.debug('finished dataSourceProcess'), s;
-            })(),
-            v = await ((e) => {
-              const { dataSource: a } = e;
-              if ('UNIT' === m.resolverType) return Promise.resolve(void 0);
-              const r = { dataSource: a.name, name: `${m.apiType}${p.default.upperFirst(m.apiName)}`, request: !1, response: !1 };
-              return t.addFunctionConfiguration({ functionConfiguration: r }), f.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
-            })({ dataSource: y }),
-            S = await (async (e) => {
-              const { dataSource: a, functionConfigurations: r } = e,
-                s = (() => {
-                  if ('PIPELINE' === m.resolverType) {
-                    const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
-                      a = {
-                        type: m.apiType,
-                        request: `mutations/${m.apiType}.${m.apiName}.request.vtl`,
-                        response: `mutations/${m.apiType}.${m.apiName}.response.vtl`,
-                        field: m.apiName,
-                        kind: m.resolverType,
-                        functions: [r?.name],
-                      };
-                    return (
-                      new u.default({ filePath: d.default.join(e, a.request), code: u.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
-                      new u.default({ filePath: d.default.join(e, a.response), code: u.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
-                      a
-                    );
-                  }
-                  return { dataSource: a.name, type: m.apiType, field: m.apiName, kind: m.resolverType, request: !1, response: !1 };
-                })();
-              return t.addMappingTemplate({ mappingTemplate: s }), f.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: y, functionConfigurations: v }),
-            $ = await (async () => {
-              const e = t.graphqlEditor,
-                a = t.graphqlEditor.addExampleType(m.apiName),
-                r = t.graphqlEditor.addExampleInput(m.apiName);
-              return (
-                t.updateCustomSchemaGraphl({ mutation: { apiName: m.apiName, type: a.getType(), input: r.getType() } }),
-                f.debug('finished scheneGraphqlProcess'),
-                Promise.resolve(e.customSchema)
-              );
-            })();
-          f.debug({ dataSource: y, functionConfigurations: v, mappingTemplate: S, schemaGraphql: $ });
-        };
-      },
-      8391: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6444)),
-          n = r(a(3290)),
-          i = r(a(7973)),
-          o = r(a(1092)),
-          l = r(a(5837)),
-          u = r(a(2056)),
-          c = a(6870),
-          d = r(a(1017)),
-          p = r(a(6517)),
-          m = a(7343);
-        t.default = async (e) => {
-          const { appSyncStackService: t, lang: a, slsConfig: r, info: f } = e,
-            g = s.default.getLogger();
-          g.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const h = async () => {
-              const { createDataSource: e } = await n.default.prompt([
-                {
-                  type: 'expand',
-                  name: 'createDataSource',
-                  message: 'データソースを新しく作成しますか？',
-                  choices: [
-                    { key: 'y', name: 'yes', value: !0 },
-                    { key: 'n', name: 'no', value: !1 },
-                  ],
-                  validate: (e) => new i.default(e, a).required().value(),
-                },
-              ]);
-              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), h()));
-            },
-            y = await h(),
-            v = async (e) => {
-              if ('AMAZON_DYNAMODB' === e.type) {
-                const {
-                  template: e,
-                  primaryKeyName: t,
-                  sortKeyName: r,
-                } = await n.default.prompt([
-                  {
-                    type: 'list',
-                    name: 'template',
-                    choices: ['query', 'queryWithGsi', 'scan'],
-                    message: 'テンプレートを選択',
-                    validate: (e) => new i.default(e, a).required().value(),
-                  },
-                  {
-                    type: 'input',
-                    name: 'primaryKeyName',
-                    message: 'プライマリーキー名を入力',
-                    default: () => 'Id',
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                  },
-                  {
-                    type: 'input',
-                    name: 'sortKeyName',
-                    message: 'ソートキー名を入力',
-                    default: () => 'Sk',
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                  },
-                ]);
-                if ('query' === e)
-                  return { before: u.default.templates.vtl.dynamoQueryRequest({ primaryKeyName: t, sortKeyName: r }), after: u.default.templates.vtl.dynamoGetItemResponse };
-                if ('queryWithGsi' === e) {
-                  const { gsiName: e } = await n.default.prompt([
-                    {
-                      type: 'input',
-                      name: 'gsiName',
-                      message: 'GSI名を入力',
-                      default: () => 'ExampleIndex',
-                      filter: (e) => e.replace(/\s+/g, ''),
-                      transformer: (e) => e.replace(/\s+/g, ''),
-                      validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                    },
-                  ]);
-                  return {
-                    before: u.default.templates.vtl.dynamoQueryRequest({ gsiName: e, primaryKeyName: t, sortKeyName: r }),
-                    after: u.default.templates.vtl.dynamoGetItemResponse,
-                  };
-                }
-                if ('scan' === e) return { before: u.default.templates.vtl.dynamoScanRequest, after: u.default.templates.vtl.dynamoScanResponse };
-              } else {
-                if ('AMAZON_ELASTICSEARCH' === e.type) {
-                  const { indexName: e } = await n.default.prompt([
-                    {
-                      type: 'input',
-                      name: 'indexName',
-                      message: 'インデックス名を入力',
-                      default: () => f.apiName,
-                      filter: (e) => e.replace(/\s+/g, ''),
-                      transformer: (e) => e.replace(/\s+/g, ''),
-                      validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                    },
-                  ]);
-                  return { before: u.default.templates.vtl.openSearchQueryRequest({ indexName: e }), after: u.default.templates.vtl.openSearchQueryResponse };
-                }
-                if ('RELATIONAL_DATABASE' === e.type) return { before: u.default.templates.vtl.rdbQueryRequest, after: u.default.templates.vtl.rdbQueryResponse };
-                if ('HTTP' === e.type) return { before: u.default.templates.vtl.httpQueryRequest, after: u.default.templates.vtl.httpQueryResponse };
-              }
-              return { before: '{}', after: '{}' };
-            },
-            S = await (async () => {
-              if (y) {
-                const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
-                  {
-                    type: 'input',
-                    name: 'lambdaFunctionName',
-                    message: 'Lambda関数名を入力',
-                    default: () => f.apiName,
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                  },
-                  {
-                    type: 'input',
-                    name: 'lambdaHandler',
-                    message: 'input a lambda handler path',
-                    default: () => `src/functions/appsync/${f.apiName}.handler`,
-                    validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
-                    transformer: (e) => new o.default(e).removeAllSpace().value(),
-                    filter: (e) => new l.default(e).removeAllSpace().value(),
-                  },
-                ]);
-                r.addFunction({ lambdaFunctionName: e, lambdaHandler: s, code: u.default.templates.typescript.skeleton });
-                const c = {
-                  type: 'AWS_LAMBDA',
-                  name: e,
-                  description: `It is for ${f.apiType}.${f.apiName}`,
-                  config: {
-                    functionName: { Ref: `${e}LambdaFunction` },
-                    lambdaFunctionArn: { 'Fn::GetAtt': [`${e}LambdaFunction`, 'Arn'] },
-                    serviceRoleArn: { 'Fn::GetAtt': [t.appSyncLambdaRoleName, 'Arn'] },
-                  },
-                };
-                return t.addIamRoleByDataSource({ dataSource: 'AWS_LAMBDA', sls: r }), t.addDataSource(c), c;
-              }
-              const { dataSource: e } = await n.default.prompt([
-                  {
-                    type: 'list',
-                    name: 'dataSource',
-                    choices: t.appSyncStack?.dataSources.map((e) => e.name),
-                    message: 'データソースを選択',
-                    validate: (e) => new i.default(e, a).required().value(),
-                  },
-                ]),
-                s = t.appSyncStack?.dataSources.find((t) => t.name === e);
-              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), g.debug('finished dataSourceProcess'), s;
-            })(),
-            $ = await (async (e) => {
-              const { dataSource: a } = e;
-              if ('UNIT' === f.resolverType) return Promise.resolve(void 0);
-              const r = t.appSyncStack?.functionConfigurationsLocation ?? './',
-                s = {
-                  dataSource: a.name,
-                  name: `${f.apiType}${p.default.upperFirst(f.apiName)}`,
-                  request: 'AWS_LAMBDA' !== a.type && `functions/${f.apiType}.${f.apiName}.request.vtl`,
-                  response: 'AWS_LAMBDA' !== a.type && `functions/${f.apiType}.${f.apiName}.response.vtl`,
-                };
-              if ('AWS_LAMBDA' !== a.type) {
-                const { before: e, after: t } = await v(a);
-                p.default.isString(s.request) && new u.default({ filePath: d.default.join(r, s.request), code: e, type: 'vtl' }).write(),
-                  p.default.isString(s.response) && new u.default({ filePath: d.default.join(r, s.response), code: t, type: 'vtl' }).write();
-              }
-              return t.addFunctionConfiguration({ functionConfiguration: s }), g.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
-            })({ dataSource: S }),
-            _ = await (async (e) => {
-              const { dataSource: a, functionConfigurations: r } = e,
-                s = await (async () => {
-                  if ('PIPELINE' === f.resolverType) {
-                    const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
-                      a = {
-                        type: f.apiType,
-                        request: `queries/${f.apiType}.${f.apiName}.request.vtl`,
-                        response: `queries/${f.apiType}.${f.apiName}.response.vtl`,
-                        field: f.apiName,
-                        kind: f.resolverType,
-                        functions: [r?.name],
-                      };
-                    return (
-                      new u.default({ filePath: d.default.join(e, a.request), code: u.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
-                      new u.default({ filePath: d.default.join(e, a.response), code: u.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
-                      a
-                    );
-                  }
-                  const e = {
-                    dataSource: a.name,
-                    type: f.apiType,
-                    field: f.apiName,
-                    kind: f.resolverType,
-                    request: 'AWS_LAMBDA' !== a.type && `queries/${f.apiType}.${f.apiName}.request.vtl`,
-                    response: 'AWS_LAMBDA' !== a.type && `queries/${f.apiType}.${f.apiName}.response.vtl`,
-                  };
-                  if ('AWS_LAMBDA' !== a.type) {
-                    const r = t.appSyncStack?.mappingTemplatesLocation ?? './',
-                      { before: s, after: n } = await v(a);
-                    p.default.isString(e.request) && new u.default({ filePath: d.default.join(r, e.request), code: s, type: 'vtl' }).write(),
-                      p.default.isString(e.response) && new u.default({ filePath: d.default.join(r, e.response), code: n, type: 'vtl' }).write();
-                  }
-                  return e;
-                })();
-              return t.addMappingTemplate({ mappingTemplate: s }), g.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: S, functionConfigurations: $ }),
-            b = await (async () => {
-              const e = t.graphqlEditor,
-                a = t.graphqlEditor.addExampleType(f.apiName);
-              return (
-                t.updateCustomSchemaGraphl({ query: { apiName: f.apiName, type: a.getType(), args: { example: { type: m.GraphQLString } } } }),
-                g.debug('finished scheneGraphqlProcess'),
-                Promise.resolve(e.customSchema)
-              );
-            })();
-          g.debug({ dataSource: S, functionConfigurations: $, mappingTemplate: _, schemaGraphql: b });
-        };
-      },
-      3582: (e, t, a) => {
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const r = a(6702);
-        class s extends r.FeatureBuilderAbstract {
-          constructor(e) {
-            super(e);
-          }
-          build(e) {
-            return e.version(!1).usage('Usage: $0 basic-auth-lambda');
-          }
-        }
-        t.default = s;
-      },
-      306: function (e, t, a) {
-        var r =
-            (this && this.__createBinding) ||
-            (Object.create
-              ? function (e, t, a, r) {
-                  void 0 === r && (r = a);
-                  var s = Object.getOwnPropertyDescriptor(t, a);
-                  (s && !('get' in s ? !t.__esModule : s.writable || s.configurable)) ||
-                    (s = {
-                      enumerable: !0,
-                      get: function () {
-                        return t[a];
-                      },
-                    }),
-                    Object.defineProperty(e, r, s);
-                }
-              : function (e, t, a, r) {
-                  void 0 === r && (r = a), (e[r] = t[a]);
-                }),
-          s =
-            (this && this.__setModuleDefault) ||
-            (Object.create
-              ? function (e, t) {
-                  Object.defineProperty(e, 'default', { enumerable: !0, value: t });
-                }
-              : function (e, t) {
-                  e.default = t;
-                }),
-          n =
-            (this && this.__importStar) ||
-            function (e) {
-              if (e && e.__esModule) return e;
-              var t = {};
-              if (null != e) for (var a in e) 'default' !== a && Object.prototype.hasOwnProperty.call(e, a) && r(t, e, a);
-              return s(t, e), t;
-            },
-          i =
-            (this && this.__importDefault) ||
-            function (e) {
-              return e && e.__esModule ? e : { default: e };
-            };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = i(a(6444)),
-          l = a(6702),
-          u = i(a(3290)),
-          c = i(a(7973)),
-          d = i(a(1092)),
-          p = i(a(5837)),
-          m = n(a(7808)),
-          f = n(a(2e3)),
-          g = i(a(2056)),
-          h = i(a(1325)),
-          y = i(a(3624)),
-          v = i(a(1325));
-        class S extends l.FeatureHandlerAbstract {
-          constructor(e) {
-            super(e);
-          }
-          defaultServerlessConfigPath = 'serverless/us-east-1/serverless.yml';
-          defaultFunctionYamlPath = 'serverless/us-east-1/resources/functions.yml';
-          defaultIamRolePath = 'serverless/us-east-1/resources/iamrole/defaultLambdarole.yml';
-          defaultBasicLambdaPath = 'src/functions/lambdaedge/basicAuth.handler';
-          defaultLambdaRoleName = 'DefaultLambdaRole';
-          lambdaEdgeTimeout = 5;
-          lambdaEdgeMemorySize = 128;
-          generateLambdaIamRoleCf() {
-            return y.default.generateCloudFormation(this.defaultLambdaRoleName, (e) => {
-              const t = new m.Role(e, this.defaultLambdaRoleName, { assumedBy: new m.ServicePrincipal('edgelambda.amazonaws.com') });
-              return (
-                t.addToPolicy(
-                  new m.PolicyStatement({
-                    effect: m.Effect.ALLOW,
-                    resources: [f.Fn.join(':', ['arn:aws:logs', f.Fn.ref('AWS::Region'), f.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],
-                    actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
-                  })
-                ),
-                t.addToPolicy(
-                  new m.PolicyStatement({
-                    effect: m.Effect.ALLOW,
-                    resources: [f.Fn.join(':', ['arn:aws:logs', this.argv.region, f.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],
-                    actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
-                  })
-                ),
-                t
-              );
-            });
-          }
-          get defaultServerlessConfig() {
-            return h.default.generateServerlessConfig({
-              service: 'basic-lambda-auth',
-              provider: { region: 'us-east-1', environment: { LOG_LEVEL: 'WARN' }, iam: { role: this.defaultLambdaRoleName } },
-              custom: { awsResourcePrefix: '${self:service}-${self:provider.region}-${self:provider.stage}-' },
-              functions: `\${file(./${this.defaultFunctionYamlPath})}`,
-              resources: [`\${file(./${this.defaultIamRolePath})}`],
-            });
-          }
-          async prompt() {
-            return await u.default
-              .prompt([
-                {
-                  type: 'input',
-                  name: 'functionName',
-                  message: 'input a functions name',
-                  default: 'BasicAuth',
-                  validate: (e) => new c.default(e, this.lang).required().mustNoIncludeZenkaku().value(),
-                  transformer: (e) => new d.default(e).removeAllSpace().value(),
-                  filter: (e) => new p.default(e).removeAllSpace().value(),
-                },
-                {
-                  type: 'input',
-                  name: 'lamndaRoleCfPath',
-                  message: 'input a lambda iam role cloudformation path',
-                  default: () => this.defaultIamRolePath,
-                  validate: (e) => new c.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                  transformer: (e) => new d.default(e).removeAllSpace().value(),
-                  filter: (e) => new p.default(e).removeAllSpace().value(),
-                },
-                {
-                  type: 'input',
-                  name: 'lambdaHandler',
-                  message: 'input a lambda handler path',
-                  default: () => this.defaultBasicLambdaPath,
-                  validate: (e) => new c.default(e, this.lang).required().mustBeExtension().value(),
-                  transformer: (e) => new d.default(e).removeAllSpace().value(),
-                  filter: (e) => new p.default(e).removeAllSpace().value(),
-                },
-                {
-                  type: 'input',
-                  name: 'lamndaRoleName',
-                  message: 'input a lambda iam role name',
-                  default: () => this.defaultLambdaRoleName,
-                  validate: (e) => new c.default(e, this.lang).required().value(),
-                  transformer: (e) => new d.default(e).removeAllSpace().value(),
-                  filter: (e) => new p.default(e).removeAllSpace().value(),
-                },
-                {
-                  type: 'input',
-                  name: 'serverlessConfigPath',
-                  message: 'input a serverless config file path',
-                  default: () => this.defaultServerlessConfigPath,
-                  validate: (e) => new c.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                  transformer: (e) => new d.default(e).removeAllSpace().value(),
-                  filter: (e) => new p.default(e).removeAllSpace().value(),
-                },
-              ])
-              .then((e) => e);
-          }
-          async run() {
-            const e = o.default.getLogger(),
-              t = await this.prompt();
-            e.debug(`input values : ${JSON.stringify(t)}}`);
-            const { functionName: a, serverlessConfigPath: r, lamndaRoleCfPath: s, lamndaRoleName: n, lambdaHandler: i } = t,
-              l = new v.default({ region: this.argv.region, serverlessConfigPath: r, lang: this.lang });
-            if ('us-east-1' !== l.region) throw new Error('lambda edge must be in us-east-1');
-            l.addFunction({
-              lambdaFunctionName: a,
-              lambdaHandler: i,
-              memorySize: this.lambdaEdgeMemorySize,
-              timeout: this.lambdaEdgeTimeout,
-              code: g.default.templates.typescript.basicauthlambda,
-            }),
-              l.addResource({ filePath: s, resourceName: n, cf: this.generateLambdaIamRoleCf() });
-          }
-        }
-        t.default = S;
-      },
-      8785: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(3582)),
-          n = r(a(306));
-        t.default = { builder: s.default, handler: n.default };
-      },
-      6433: (e, t, a) => {
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const r = a(6702);
-        class s extends r.FeatureBuilderAbstract {
-          constructor(e) {
-            super(e);
-          }
-          build(e) {
-            return e.version(!1).usage('Usage: $0 sns');
-          }
-        }
-        t.default = s;
-      },
-      2917: function (e, t, a) {
-        var r =
-            (this && this.__createBinding) ||
-            (Object.create
-              ? function (e, t, a, r) {
-                  void 0 === r && (r = a);
-                  var s = Object.getOwnPropertyDescriptor(t, a);
-                  (s && !('get' in s ? !t.__esModule : s.writable || s.configurable)) ||
-                    (s = {
-                      enumerable: !0,
-                      get: function () {
-                        return t[a];
-                      },
-                    }),
-                    Object.defineProperty(e, r, s);
-                }
-              : function (e, t, a, r) {
-                  void 0 === r && (r = a), (e[r] = t[a]);
-                }),
-          s =
-            (this && this.__setModuleDefault) ||
-            (Object.create
-              ? function (e, t) {
-                  Object.defineProperty(e, 'default', { enumerable: !0, value: t });
-                }
-              : function (e, t) {
-                  e.default = t;
-                }),
-          n =
-            (this && this.__importStar) ||
-            function (e) {
-              if (e && e.__esModule) return e;
-              var t = {};
-              if (null != e) for (var a in e) 'default' !== a && Object.prototype.hasOwnProperty.call(e, a) && r(t, e, a);
-              return s(t, e), t;
-            },
-          i =
-            (this && this.__importDefault) ||
-            function (e) {
-              return e && e.__esModule ? e : { default: e };
-            };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = i(a(6444)),
-          l = a(6702),
-          u = i(a(6517)),
-          c = a(3362),
-          d = i(a(3290)),
-          p = i(a(7973)),
-          m = i(a(5837)),
-          f = i(a(1092)),
-          g = i(a(3624)),
-          h = n(a(8890)),
-          y = n(a(9087)),
-          v = n(a(6324)),
-          S = n(a(5862)),
-          $ = n(a(2e3)),
-          _ = i(a(1325));
-        class b extends l.FeatureHandlerAbstract {
-          constructor(e) {
-            super(e);
-          }
-          defaultResourcePath(e) {
-            return `serverless/${this.argv.region}/resources/sns/${e}.yml`;
-          }
-          get defaultServerlessConfigPath() {
-            return `serverless/${this.argv.region}/serverless.yml`;
-          }
-          generateSnsCf(e, t) {
-            return g.default.generateCloudFormation(e, (a) => {
-              const r = new h.Topic(a, e, { topicName: e });
-              return (
-                t.forEach((t) => {
-                  'email' === t
-                    ? r.addSubscription(new v.EmailSubscription('****@****.com'))
-                    : 'lambda' === t
-                    ? r.addSubscription(
-                        new v.LambdaSubscription(S.Function.fromFunctionArn(a, `${e}Lambda`, `arn:aws:lambda:${this.argv.region}:${$.Fn.ref('AWS::AccountId')}:function:*****`))
-                      )
-                    : 'sms' === t
-                    ? r.addSubscription(new v.SmsSubscription('0000000000'))
-                    : 'url' === t
-                    ? r.addSubscription(new v.UrlSubscription('https://*****.com'))
-                    : 'sqs' === t && r.addSubscription(new v.SqsSubscription(new y.Queue(a, `${e}SubscribeQueue`)));
-                }),
-                r
-              );
-            });
-          }
-          async run() {
-            const e = o.default.getLogger(),
-              t = (0, c.getLocaleLang)(this.lang),
-              a = await d.default
-                .prompt([
-                  {
-                    type: 'input',
-                    name: 'resourceName',
-                    message: 'input a sns resource name',
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new p.default(e, this.lang).required().mustNoIncludeZenkaku().value(),
-                  },
-                ])
-                .then(async (e) => ({
-                  ...(await d.default.prompt([
-                    {
-                      type: 'checkbox',
-                      name: 'subscriptions',
-                      message: 'select a sns subscriptions',
-                      choices: ['email', 'lambda', 'sms', 'url', 'sqs'],
-                      validate: (e) => !u.default.isEmpty(e) || t.error.reqiredSubscriptions,
-                    },
-                    {
-                      type: 'input',
-                      name: 'filePath',
-                      message: 'input a cloudformation file path',
-                      default: () => this.defaultResourcePath(e.resourceName),
-                      validate: (e) => new p.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                      transformer: (e) => new f.default(e).filePath().value(),
-                      filter: (e) => new m.default(e).filePath().value(),
-                    },
-                    {
-                      type: 'input',
-                      name: 'serverlessConfigPath',
-                      message: 'input a serverless config file path',
-                      default: () => this.defaultServerlessConfigPath,
-                      validate: (e) => new p.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                      transformer: (e) => new f.default(e).removeAllSpace().value(),
-                      filter: (e) => new m.default(e).removeAllSpace().value(),
-                    },
-                  ])),
-                  ...e,
-                }));
-            e.debug(`input values : ${JSON.stringify(a)}}`);
-            const { resourceName: r, filePath: s, subscriptions: n, serverlessConfigPath: i } = a,
-              l = new _.default({ region: this.argv.region, serverlessConfigPath: i, lang: this.lang }),
-              g = this.generateSnsCf(r, n);
-            l.addResource({ filePath: s, resourceName: r, cf: g });
-          }
-        }
-        t.default = b;
-      },
-      9211: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6433)),
-          n = r(a(2917));
-        t.default = { builder: s.default, handler: n.default };
-      },
-      6353: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.default = { error: { reqiredSubscriptions: 'required select a subscriptions' } });
-      },
-      5423: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.default = { error: { reqiredSubscriptions: 'サブスクリプションを選択して下さい' } });
-      },
-      3362: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
-        const s = r(a(5423)),
-          n = r(a(6353));
-        t.getLocaleLang = (e) => ('ja' === e ? s.default : n.default);
-      },
-      6621: (e, t, a) => {
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const r = a(6702);
-        class s extends r.FeatureBuilderAbstract {
-          constructor(e) {
-            super(e);
-          }
-          build(e) {
-            return e.version(!1).usage('Usage: $0 sqs');
-          }
-        }
-        t.default = s;
-      },
-      4267: function (e, t, a) {
-        var r =
-            (this && this.__createBinding) ||
-            (Object.create
-              ? function (e, t, a, r) {
-                  void 0 === r && (r = a);
-                  var s = Object.getOwnPropertyDescriptor(t, a);
-                  (s && !('get' in s ? !t.__esModule : s.writable || s.configurable)) ||
-                    (s = {
-                      enumerable: !0,
-                      get: function () {
-                        return t[a];
-                      },
-                    }),
-                    Object.defineProperty(e, r, s);
-                }
-              : function (e, t, a, r) {
-                  void 0 === r && (r = a), (e[r] = t[a]);
-                }),
-          s =
-            (this && this.__setModuleDefault) ||
-            (Object.create
-              ? function (e, t) {
-                  Object.defineProperty(e, 'default', { enumerable: !0, value: t });
-                }
-              : function (e, t) {
-                  e.default = t;
-                }),
-          n =
-            (this && this.__importStar) ||
-            function (e) {
-              if (e && e.__esModule) return e;
-              var t = {};
-              if (null != e) for (var a in e) 'default' !== a && Object.prototype.hasOwnProperty.call(e, a) && r(t, e, a);
-              return s(t, e), t;
-            },
-          i =
-            (this && this.__importDefault) ||
-            function (e) {
-              return e && e.__esModule ? e : { default: e };
-            };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = i(a(6444)),
-          l = a(6702),
-          u = i(a(6517)),
-          c = i(a(3290)),
-          d = i(a(7973)),
-          p = i(a(5837)),
-          m = i(a(1092)),
-          f = n(a(9087)),
-          g = i(a(3624)),
-          h = i(a(1325));
-        class y extends l.FeatureHandlerAbstract {
-          constructor(e) {
-            super(e);
-          }
-          defaultResourcePath(e) {
-            return `serverless/${this.argv.region}/resources/sqs/${e}.yml`;
-          }
-          get defaultServerlessConfigPath() {
-            return `serverless/${this.argv.region}/serverless.yml`;
-          }
-          defaultMaxMessageSizeBytes = 262144;
-          defaultMaxReceiveCount = 3;
-          generateSqsCf(e, t) {
-            return g.default.generateCloudFormation(e, (a) => {
-              const r = 'Fifo' === t.queueType;
-              if (t.useDeadLetterQueue) {
-                const s = { queueName: `${e}DeadLetter` };
-                r && u.default.assign(s, { queueName: `${e}DeadLetter.fifo`, fifo: !0 });
-                const n = new f.Queue(a, `${e}DeadLetter`, s),
-                  i = { queueName: e, fifo: r, maxMessageSizeBytes: this.defaultMaxMessageSizeBytes, deadLetterQueue: { maxReceiveCount: this.defaultMaxReceiveCount, queue: n } };
-                return r && u.default.assign(i, { queueName: `${e}.fifo`, contentBasedDeduplication: t.contentBasedDeduplication }), new f.Queue(a, e, i);
-              }
-              const s = { queueName: e, fifo: r, maxMessageSizeBytes: this.defaultMaxMessageSizeBytes };
-              return r && u.default.assign(s, { queueName: `${e}.fifo`, contentBasedDeduplication: t.contentBasedDeduplication }), new f.Queue(a, e, s);
-            });
-          }
-          async run() {
-            const e = o.default.getLogger(),
-              t = await c.default
-                .prompt([
-                  {
-                    type: 'input',
-                    name: 'resourceName',
-                    message: 'input a sqs resource name',
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new d.default(e, this.lang).required().mustNoIncludeZenkaku().value(),
-                  },
-                ])
-                .then(async (e) => ({
-                  ...(await c.default.prompt([
-                    { type: 'list', name: 'queueType', default: 'Standard', choices: ['Standard', 'Fifo'], message: 'Is it a FIFO queue?' },
-                    {
-                      type: 'expand',
-                      name: 'useDeadLetterQueue',
-                      message: 'Do you use dead letter queue?',
-                      choices: [
-                        { key: 'y', name: 'yes', value: !0 },
-                        { key: 'n', name: 'no', value: !1 },
-                      ],
-                    },
-                    {
-                      type: 'expand',
-                      name: 'contentBasedDeduplication',
-                      message: 'Do you use content-based deduplication?',
-                      choices: [
-                        { key: 'y', name: 'yes', value: !0 },
-                        { key: 'n', name: 'no', value: !1 },
-                      ],
-                    },
-                    {
-                      type: 'input',
-                      name: 'filePath',
-                      message: 'input a cloudformation file path',
-                      default: () => this.defaultResourcePath(e.resourceName),
-                      validate: (e) => new d.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                      transformer: (e) => new m.default(e).filePath().value(),
-                      filter: (e) => new p.default(e).filePath().value(),
-                    },
-                    {
-                      type: 'input',
-                      name: 'serverlessConfigPath',
-                      message: 'input a serverless config file path',
-                      default: () => this.defaultServerlessConfigPath,
-                      validate: (e) => new d.default(e, this.lang).required().mustBeYamlFilePath().value(),
-                      transformer: (e) => new m.default(e).removeAllSpace().value(),
-                      filter: (e) => new p.default(e).removeAllSpace().value(),
-                    },
-                  ])),
-                  ...e,
-                }));
-            e.debug(`input values : ${JSON.stringify(t)}}`);
-            const { resourceName: a, queueType: r, useDeadLetterQueue: s, contentBasedDeduplication: n, filePath: i, serverlessConfigPath: l } = t,
-              u = new h.default({ region: this.argv.region, serverlessConfigPath: l, lang: this.lang }),
-              f = this.generateSqsCf(a, { queueType: r, useDeadLetterQueue: s, contentBasedDeduplication: n });
-            u.addResource({ filePath: i, resourceName: a, cf: f });
-          }
-        }
-        t.default = y;
-      },
-      592: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6621)),
-          n = r(a(4267));
-        t.default = { builder: s.default, handler: n.default };
-      },
-      8072: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6040));
-        t.default = { builder: s.default };
-      },
-      4005: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = {
-            command: { description: { sns: 'add AWS SQS', sqs: 'add AWS SQS', basicAuthLambda: 'add AWS Basic lambda auth in us-east-1', api: 'add graphql api' } },
-            unProcessed: 'The command entered does not exist. Run "ragate add help" for a list of all available commands.',
-          });
-      },
-      5699: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = {
-            command: {
-              description: { sns: 'AWS SQS を追加', sqs: 'AWS SQS を追加', basicAuthLambda: 'us-east-1 リージョンに Basic 認証用の Lambda を追加', api: 'Graphql API を追加' },
-            },
-            unProcessed: '入力されたコマンドは存在しません。「ragate add help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
-          });
-      },
-      7264: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
-        const s = r(a(5699)),
-          n = r(a(4005));
-        t.getLocaleLang = (e) => ('ja' === e ? s.default : n.default);
-      },
-      3818: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = a(6702),
-          n = a(6870),
-          i = r(a(8798));
-        class o extends s.FeatureBuilderAbstract {
-          constructor(e) {
-            super(e);
-          }
-          build(e) {
-            return e
-              .version(!1)
-              .usage('Usage: create <options>')
-              .command(
-                '*',
-                n.chalk.grey('<command> <options>'),
-                () => ({}),
-                (e) => {
-                  if (1 === e._.length) return new i.default.handler(e).run();
-                  throw new Error('locale.error.unProcessed');
-                }
-              );
-          }
-        }
-        t.default = o;
-      },
-      975: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(3290)),
-          n = r(a(2322)),
-          i = a(2868),
-          o = r(a(6517)),
-          l = r(a(169)),
-          u = a(2762),
-          c = r(a(6444)),
-          d = a(6702),
-          p = r(a(1017));
-        class m extends d.FeatureHandlerAbstract {
-          constructor(e) {
-            super(e), s.default.registerPrompt('autocomplete', l.default);
-          }
-          async run() {
-            const { argv: e } = this,
-              t = c.default.getLogger();
-            t.debug('create hander : ', e);
-            const a = (0, i.getLocaleLang)(this.lang),
-              r = await s.default
-                .prompt([
-                  {
-                    type: 'autocomplete',
-                    name: 'template',
-                    emptyText: a.inquirer.template.autocomplete.emptyText,
-                    message: a.inquirer.template.choiceTemplate,
-                    source: (e, t) => (o.default.isEmpty(t) ? n.default.templates : n.default.templates.filter((e) => e.name.includes(t))),
-                  },
-                  {
-                    type: 'input',
-                    name: 'projectName',
-                    message: 'input a project name',
-                    default: (e) => e.template,
-                    validate: (e) => !o.default.isEmpty(e) || 'required input a project name',
-                  },
-                ])
-                .then((e) => e);
-            t.debug(`input values : ${JSON.stringify(r)}}`);
-            const { template: l, projectName: d } = r;
-            if (
-              (t.info(`template : ${l}`),
-              t.info(`projectName : ${d}`),
-              t.debug(`check exists directory : ${p.default.join(n.default.currentPath, d)}`),
-              (0, u.isExistsDirectory)(p.default.join(n.default.currentPath, d)))
-            )
-              throw new Error(`${a.error.alreadyExistsDirectory} : ${p.default.join(n.default.currentPath, d)}`);
-            await (0, u.gitClone)(n.default.repositoyUrl, n.default.tmpPath), (0, u.moveDirectory)(p.default.join(n.default.tmpPath, l), p.default.join(n.default.currentPath, d));
-          }
-        }
-        t.default = m;
-      },
-      8798: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(3818)),
-          n = r(a(975));
-        t.default = { builder: s.default, handler: n.default };
-      },
-      7544: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = {
-            error: {
-              alreadyExistsDirectory: 'already exists directory',
-              unProcessed: 'The command entered does not exist. Run "ragate create help" for a list of all available commands.',
-            },
-            inquirer: { template: { choiceTemplate: 'Choose a project template', autocomplete: { emptyText: 'No result' } } },
-          });
-      },
-      7016: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = {
-            error: {
-              alreadyExistsDirectory: '既にディレクトリが存在します',
-              unProcessed: '入力されたコマンドは存在しません。「ragate create help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
-            },
-            inquirer: { template: { choiceTemplate: 'プロジェクトの雛形を選択してください。', autocomplete: { emptyText: '該当するテンプレートが見つかりません' } } },
-          });
-      },
-      2868: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
-        const s = r(a(7016)),
-          n = r(a(7544));
-        t.getLocaleLang = (e) => ('ja' === e ? s.default : n.default);
-      },
-      7116: function (e, t, a) {
-        var r =
-            (this && this.__createBinding) ||
-            (Object.create
-              ? function (e, t, a, r) {
-                  void 0 === r && (r = a);
-                  var s = Object.getOwnPropertyDescriptor(t, a);
-                  (s && !('get' in s ? !t.__esModule : s.writable || s.configurable)) ||
-                    (s = {
-                      enumerable: !0,
-                      get: function () {
-                        return t[a];
-                      },
-                    }),
-                    Object.defineProperty(e, r, s);
-                }
-              : function (e, t, a, r) {
-                  void 0 === r && (r = a), (e[r] = t[a]);
-                }),
-          s =
-            (this && this.__setModuleDefault) ||
-            (Object.create
-              ? function (e, t) {
-                  Object.defineProperty(e, 'default', { enumerable: !0, value: t });
-                }
-              : function (e, t) {
-                  e.default = t;
-                }),
-          n =
-            (this && this.__importStar) ||
-            function (e) {
-              if (e && e.__esModule) return e;
-              var t = {};
-              if (null != e) for (var a in e) 'default' !== a && Object.prototype.hasOwnProperty.call(e, a) && r(t, e, a);
-              return s(t, e), t;
-            },
-          i =
-            (this && this.__importDefault) ||
-            function (e) {
-              return e && e.__esModule ? e : { default: e };
-            };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = i(a(1017)),
-          l = i(a(6444)),
-          u = a(3462),
-          c = i(a(8705)),
-          d = i(a(6517)),
-          p = i(a(7147)),
-          m = i(a(2322)),
-          f = i(a(3448)),
-          g = i(a(3624)),
-          h = n(a(7808)),
-          y = n(a(2e3)),
-          v = a(7347),
-          S = i(a(4259));
-        t.default = class {
-          constructor(e) {
-            (this.logger = l.default.getLogger()),
-              (this._stackFilePath = e.stackFilePath),
-              (this._lang = e.lang),
-              (this._region = e.region),
-              (this._defaultIamRolePath = `serverless/${e.region}/resources/iamrole/appsync.yml`),
-              (this._graphqlEditor = new S.default()),
-              this.setAppSyncStackObject();
-          }
-          _graphqlEditor;
-          get graphqlEditor() {
-            return this._graphqlEditor;
-          }
-          appSyncDynamoDBRoleName = 'AppSyncDynamoDBRole';
-          appSyncRDSRoleName = 'AppSyncRDSRole';
-          appSyncOpenSearchRoleName = 'AppSyncOpenSearchRole';
-          appSyncLambdaRoleName = 'AppSyncLambdaRole';
-          defaultCustomDataSourcePath = 'appsync/custom_datasources.yml';
-          defaultCustomMappingtemplatePath = 'appsync/custom_mappingtemplate.yml';
-          defaultCustomFunctionConfigurationsPath = 'appsync/custom_functionConfigurations.yml';
-          defaultAppSyncStackIndex = 0;
-          logger;
-          _defaultIamRolePath;
-          get defaultIamRolePath() {
-            return this._defaultIamRolePath;
-          }
-          _appSyncStack;
-          get appSyncStack() {
-            return this._appSyncStack;
-          }
-          _stackFilePath;
-          get stackFilePath() {
-            return this._stackFilePath;
-          }
-          _lang;
-          get lang() {
-            return this._lang;
-          }
-          _region;
-          get region() {
-            return this._region;
-          }
-          getAppSyncStackConfig() {
-            const e = (0, u.loadYaml)(this.stackFilePath),
-              t = this.defaultAppSyncStackIndex;
-            return {
-              ...e[t],
-              functionConfigurations: e[t].functionConfigurations ?? [],
-              dataSources: e[t].dataSources ?? [],
-              mappingTemplates: e[t].mappingTemplates ?? [],
-              schema: e[t].schema ?? [],
-            };
-          }
-          writeAppSyncStackConfig(e) {
-            const t = (0, u.loadYaml)(this.stackFilePath);
-            t[this.defaultAppSyncStackIndex] = e;
-            const a = (0, u.writeYaml)(this.stackFilePath, t);
-            this.logger.info((0, v.chalk)().green(a));
-          }
-          setAppSyncStackObject() {
-            const e = this.getAppSyncStackConfig(),
-              { schema: t, dataSources: a, mappingTemplates: r, mappingTemplatesLocation: s, functionConfigurationsLocation: n, functionConfigurations: i } = e;
-            this._appSyncStack = {
-              mappingTemplatesLocation: s,
-              functionConfigurationsLocation: n,
-              functionConfigurations:
-                d.default
-                  .chain(i)
-                  .map((e) => (0, u.loadYaml)(f.default.parseSlsRecursivelyReference(e)))
-                  .flatten()
-                  .filter((e) => e && !d.default.isEmpty(e))
-                  .value() ?? [],
-              dataSources:
-                d.default
-                  .chain(a)
-                  .map((e) => (0, u.loadYaml)(f.default.parseSlsRecursivelyReference(e)))
-                  .flatten()
-                  .filter((e) => e && !d.default.isEmpty(e))
-                  .value() ?? [],
-              mappingTemplates:
-                d.default
-                  .chain(r)
-                  .map((e) => (0, u.loadYaml)(f.default.parseSlsRecursivelyReference(e)))
-                  .flatten()
-                  .filter((e) => e && !d.default.isEmpty(e))
-                  .value() ?? [],
-              schema: d.default
-                .chain(t)
-                .thru((e) => {
-                  if (d.default.isString(e) && !d.default.isEmpty(e)) {
-                    const t = p.default.readFileSync(o.default.join(m.default.currentPath, e), 'utf8');
-                    return d.default.isEmpty(t) ? [] : [t];
-                  }
-                  return d.default.isArray(e) && !d.default.isEmpty(e)
-                    ? e
-                        .map((e) => {
-                          const t = p.default.readFileSync(o.default.join(m.default.currentPath, e), 'utf8');
-                          return d.default.isEmpty(t) ? '' : t;
-                        })
-                        .filter((e) => !d.default.isEmpty(e))
-                    : [];
-                })
-                .thru((e) => new c.default(e))
-                .value(),
-            };
-          }
-          addDataSource(e) {
-            let t = !1;
-            if (this.appSyncStack?.dataSources.some((t) => t.name === e.name)) this.logger.warn(`DataSource ${e.name} is already exists.`), (t = !1);
-            else {
-              try {
-                const t = [...(0, u.loadYaml)(this.defaultCustomDataSourcePath), e],
-                  a = (0, u.writeYaml)(this.defaultCustomDataSourcePath, t);
-                this.logger.info((0, v.chalk)().green(a));
-              } catch (t) {
-                const a = (0, u.writeYaml)(this.defaultCustomDataSourcePath, [e]);
-                this.logger.info((0, v.chalk)().green(a));
-              }
-              t = !0;
-            }
-            if (t) {
-              const e = this.getAppSyncStackConfig();
-              e.dataSources.every((e) => !e.includes(this.defaultCustomDataSourcePath)) &&
-                this.writeAppSyncStackConfig({ ...e, dataSources: [...e.dataSources, `\${file(./${this.defaultCustomDataSourcePath})}`] });
-            }
-            this.setAppSyncStackObject();
-          }
-          addMappingTemplate(e) {
-            const { mappingTemplate: t } = e;
-            let a = !1;
-            if (this.appSyncStack?.mappingTemplates.some((e) => e.type === t.type && e.field === t.field))
-              this.logger.warn(`MappingTemplate ${t.type}.${t.field} is already exists.`), (a = !1);
-            else {
-              try {
-                const e = [...(0, u.loadYaml)(this.defaultCustomMappingtemplatePath), t],
-                  a = (0, u.writeYaml)(this.defaultCustomMappingtemplatePath, e);
-                this.logger.info((0, v.chalk)().green(a));
-              } catch (e) {
-                const a = (0, u.writeYaml)(this.defaultCustomMappingtemplatePath, [t]);
-                this.logger.info((0, v.chalk)().green(a));
-              }
-              a = !0;
-            }
-            if (a) {
-              const e = this.getAppSyncStackConfig();
-              e.mappingTemplates.every((e) => !e.includes(this.defaultCustomMappingtemplatePath)) &&
-                this.writeAppSyncStackConfig({ ...e, mappingTemplates: [...e.mappingTemplates, `\${file(./${this.defaultCustomMappingtemplatePath})}`] });
-            }
-            this.setAppSyncStackObject();
-          }
-          addFunctionConfiguration(e) {
-            const { functionConfiguration: t } = e;
-            let a = !1;
-            if (this.appSyncStack?.functionConfigurations.some((e) => e.name === t.name)) this.logger.warn(`FunctionConfiguration ${t.name} is already exists.`), (a = !1);
-            else {
-              try {
-                const e = [...(0, u.loadYaml)(this.defaultCustomFunctionConfigurationsPath), t],
-                  a = (0, u.writeYaml)(this.defaultCustomFunctionConfigurationsPath, e);
-                this.logger.info((0, v.chalk)().green(a));
-              } catch (e) {
-                const a = (0, u.writeYaml)(this.defaultCustomFunctionConfigurationsPath, [t]);
-                this.logger.info((0, v.chalk)().green(a));
-              }
-              a = !0;
-            }
-            if (a) {
-              const e = this.getAppSyncStackConfig();
-              e.functionConfigurations.every((e) => !e.includes(this.defaultCustomFunctionConfigurationsPath)) &&
-                this.writeAppSyncStackConfig({ ...e, functionConfigurations: [...e.functionConfigurations, `\${file(./${this.defaultCustomFunctionConfigurationsPath})}`] });
-            }
-            this.setAppSyncStackObject();
-          }
-          updateCustomSchemaGraphl(e) {
-            this.graphqlEditor.updateCustomSchemaGraphl({
-              ...e,
-              callback: (e, t) => {
-                if (e) {
-                  const { schemaPath: e } = t,
-                    a = this.getAppSyncStackConfig();
-                  d.default.isString(a.schema) && !a.schema.includes(e)
-                    ? this.writeAppSyncStackConfig({ ...a, schema: [a.schema, e] })
-                    : d.default.isArray(a.schema) && !a.schema.includes(e) && this.writeAppSyncStackConfig({ ...a, schema: [...a.schema, e] }),
-                    this.setAppSyncStackObject();
-                } else this.logger.warn('skip update custom_schema.graphql.');
-              },
-            });
-          }
-          addIamRoleByDataSource(e) {
-            const { dataSource: t, sls: a } = e;
-            switch (t) {
-              case 'AMAZON_DYNAMODB':
-                a.addResource({
-                  resourceName: this.appSyncDynamoDBRoleName,
-                  filePath: this.defaultIamRolePath,
-                  cf: g.default.generateCloudFormation(this.appSyncDynamoDBRoleName, (e) => {
-                    const t = new h.Role(e, this.appSyncDynamoDBRoleName, { assumedBy: new h.ServicePrincipal('appsync.amazonaws.com') });
-                    return (
-                      t.addToPolicy(
-                        new h.PolicyStatement({
-                          effect: h.Effect.ALLOW,
-                          resources: [y.Fn.join(':', ['arn:aws:dynamodb', this.region, y.Fn.ref('AWS::AccountId'), 'table/*'])],
-                          actions: ['dynamodb:*'],
-                        })
-                      ),
-                      t
-                    );
-                  }),
-                });
-                break;
-              case 'RELATIONAL_DATABASE':
-                a.addResource({
-                  resourceName: this.appSyncRDSRoleName,
-                  filePath: this.defaultIamRolePath,
-                  cf: g.default.generateCloudFormation(this.appSyncRDSRoleName, (e) => {
-                    const t = new h.Role(e, this.appSyncRDSRoleName, { assumedBy: new h.ServicePrincipal('appsync.amazonaws.com') });
-                    return (
-                      t.addToPolicy(
-                        new h.PolicyStatement({
-                          effect: h.Effect.ALLOW,
-                          resources: [y.Fn.join(':', ['arn:aws:rds', this.region, y.Fn.ref('AWS::AccountId'), 'secret:*'])],
-                          actions: [
-                            'rds-data:DeleteItems',
-                            'rds-data:ExecuteSql',
-                            'rds-data:ExecuteStatement',
-                            'rds-data:GetItems',
-                            'rds-data:InsertItems',
-                            'rds-data:UpdateItems',
-                          ],
-                        })
-                      ),
-                      t.addToPolicy(
-                        new h.PolicyStatement({
-                          effect: h.Effect.ALLOW,
-                          resources: [y.Fn.join(':', ['arn:aws:secretsmanager', this.region, y.Fn.ref('AWS::AccountId'), 'table/*'])],
-                          actions: ['secretsmanager:GetSecretValue'],
-                        })
-                      ),
-                      t
-                    );
-                  }),
-                });
-                break;
-              case 'AMAZON_ELASTICSEARCH':
-                a.addResource({
-                  resourceName: this.appSyncOpenSearchRoleName,
-                  filePath: this.defaultIamRolePath,
-                  cf: g.default.generateCloudFormation(
-                    this.appSyncOpenSearchRoleName,
-                    (e) => new h.Role(e, this.appSyncOpenSearchRoleName, { assumedBy: new h.ServicePrincipal('appsync.amazonaws.com') })
-                  ),
-                });
-                break;
-              case 'AWS_LAMBDA':
-                a.addResource({
-                  resourceName: this.appSyncLambdaRoleName,
-                  filePath: this.defaultIamRolePath,
-                  cf: g.default.generateCloudFormation(this.appSyncLambdaRoleName, (e) => {
-                    const t = new h.Role(e, this.appSyncLambdaRoleName, { assumedBy: new h.ServicePrincipal('appsync.amazonaws.com') });
-                    return (
-                      t.addToPolicy(
-                        new h.PolicyStatement({
-                          effect: h.Effect.ALLOW,
-                          resources: [y.Fn.join(':', ['arn:aws:lambda', this.region, y.Fn.ref('AWS::AccountId'), 'function:*'])],
-                          actions: ['lambda:invokeFunction'],
-                        })
-                      ),
-                      t
-                    );
-                  }),
-                });
-                break;
-              case 'HTTP':
-                a.addResource({
-                  resourceName: 'AppSyncHttpRole',
-                  filePath: this.defaultIamRolePath,
-                  cf: g.default.generateCloudFormation('AppSyncHttpRole', (e) => new h.Role(e, 'AppSyncHttpRole', { assumedBy: new h.ServicePrincipal('appsync.amazonaws.com') })),
-                });
-            }
-          }
-        };
-      },
-      3624: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6444)),
-          n = a(6817),
-          i = a(2726);
-        t.default = class {
-          static generateCloudFormation = (e, t) => {
-            class a extends n.Stack {
-              constructor(a, r, s) {
-                super(a, r, s), t(this).node.defaultChild.overrideLogicalId(e);
-              }
-            }
-            const r = s.default.getLogger(),
-              o = new a(new n.App(), 'ragate'),
-              l = i.SynthUtils.toCloudFormation(o);
-            return r.debug('generated cloudFormation template:'), r.debug(l), l.Resources;
-          };
-        };
-      },
-      2056: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(3448)),
-          n = r(a(5053)),
-          i = r(a(7112)),
-          o = a(2762),
-          l = r(a(7147)),
-          u = r(a(6444)),
-          c = a(7347);
-        t.default = class {
-          static get templates() {
-            return { typescript: n.default, vtl: i.default };
-          }
-          constructor(e) {
-            const { filePath: t, code: a, type: r } = e,
-              [n, i] = s.default.parseFilePath(t);
-            (this.type = r),
-              (this.filePath = t),
-              (this.code = a),
-              (this.destinationPath = n.join('/') + '/'),
-              (this.fileName = 'typescript' === r ? s.default.extractFilename(i) : i),
-              (this.logger = u.default.getLogger());
-          }
-          filePath;
-          type;
-          destinationPath;
-          fileName;
-          code;
-          logger;
-          get extension() {
-            switch (this.type) {
-              case 'typescript':
-                return 'ts';
-              case 'vtl':
-                return 'vtl';
-              default:
-                throw (this.logger.error(`An unsupported file type was specified. : ${this.filePath}`), Error('An unsupported file type was specified.'));
-            }
-          }
-          write() {
-            const e = `${(0, o.asFullPath)(this.destinationPath)}${this.fileName}.${this.extension}`;
-            (0, o.isFileExists)(e)
-              ? this.logger.info(`already exists file, skip write : ${e}`)
-              : ((0, o.createDirectories)(this.destinationPath),
-                this.logger.info(`create directories : ${this.destinationPath}`),
-                l.default.writeFileSync(e, this.code, 'utf8'),
-                this.logger.info(`write : ${e}`),
-                this.logger.info((0, c.chalk)().green(this.code)));
-          }
-        };
-      },
-      5955: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            "import { Context, CloudFrontRequest, Callback, CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda';\n\nexport const handler = (event: CloudFrontRequestEvent, _context: Context, callback: Callback): void => {\n  const request: CloudFrontRequest = event.Records[0].cf.request;\n  const headers = request.headers;\n\n  const authUser = 'ragate'; // Basic認証のユーザー名\n  const authPass = '20210525'; // Basic認証のパスワード\n\n  const authString = 'Basic ' + Buffer.from(authUser + ':' + authPass).toString('base64');\n  if (typeof headers.authorization === 'undefined' || headers.authorization[0].value !== authString) {\n    const body = 'Unauthorized';\n    const response: CloudFrontResultResponse = {\n      status: '401',\n      statusDescription: 'Unauthorized',\n      body: body,\n      headers: {\n        'www-authenticate': [{ key: 'WWW-Authenticate', value: 'Basic' }],\n      },\n    };\n    callback(null, response);\n  }\n  callback(null, request);\n};\n");
-      },
-      5053: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(5955)),
-          n = r(a(146));
-        t.default = { basicauthlambda: s.default, skeleton: n.default };
-      },
-      146: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            "import { asyncHandlerWrapper } from 'functions/wrapper';\nimport { AppSyncResolverEvent, Context } from 'aws-lambda';\n\ntype Input = {\n  example: string;\n};\n\ntype Response = {\n  example: string;\n};\n\nexport const handler = asyncHandlerWrapper<AppSyncResolverEvent<Input>, Context, Response>(async (event) => {\n  console.log('It is skeleton 👻');\n});\n");
-      },
-      790: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = (e) =>
-            `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n## [Start] 共通設定\n#set( $primaryValue = "your primary key value" )\n#set( $sortKeyValue = "your sort key value" )\n## [End] 共通設定\n\n## [Start] 自動設定\n#set( $consistentRead = ${e.consistentRead.toString()} )\n#set( $primaryKey = "${
-              e.primaryKeyName
-            }" )\n#set( $sortKeyName = "${
-              e.sortKeyName
-            }" )\n## [End] 自動設定\n\n## [Start] バリデーション\n#set( $modelExpression = {\n    "version" : "2017-02-28",\n    "operation" : "GetItem",\n    "key" : {},\n    "consistentRead" : $consistentRead\n} )\n#if( $util.isNullOrEmpty($primaryValue) )\n  $util.error("PrimaryValue is null.", "InvalidIndexValueError")\n#else\n  $util.qr($modelExpression.key.put($primaryKey, $util.dynamodb.toDynamoDB($primaryValue)))\n#end\n#if( !$util.isNullOrEmpty($sortKeyName) && $util.isNullOrEmpty($sortKeyValue) )\n  $util.error("sortKeyValue is null.", "InvalidIndexValueError")\n#elseif( !$util.isNullOrEmpty($sortKeyName) && !$util.isNullOrEmpty($sortKeyValue) )\n  $util.qr($modelExpression.key.put($sortKeyName, $util.dynamodb.toDynamoDB($sortKeyValue)))\n#end\n## [End] バリデーション\n\n$util.toJson($modelExpression)\n`);
-      },
-      6178: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            '\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n');
-      },
-      4771: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = (e) =>
-            `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n## [Start] 手動設定\n#set( $primaryValue = "your primary key value" )\n#set( $sortKeyValue = "your sort key value" )\n## [End] 手動設定\n\n## [Start] 自動設定\n${
-              e?.gsiName ? `#set( $indexName = "${e?.gsiName}" )` : ''
-            }\n#set( $args = $ctx.args )\n#set( $primaryKey = "${e.primaryKeyName}" )\n#set( $sortKeyName = "${
-              e.sortKeyName
-            }" )\n## [End] 自動設定\n\n## [Start] バリデーション\n#set( $modelQueryExpression = {} )\n#if( $util.isNullOrEmpty($primaryValue) )\n  $util.error("PrimaryValue is null.", "InvalidIndexValueError")\n#else\n  #set( $modelQueryExpression.expression = "#$primaryKey = :$primaryKey" )\n  #set( $modelQueryExpression.expressionNames = {\n    "#$primaryKey": $primaryKey\n  })\n  #set( $modelQueryExpression.expressionValues = {\n    ":$primaryKey": $util.dynamodb.toDynamoDB($primaryValue)\n  })\n#end\n## [End] バリデーション\n\n## [Start] ソートキー用クエリー生成\n#if( !$util.isNullOrEmpty($sortKeyName) && !$util.isNullOrEmpty($sortKeyValue) )\n  #if( !$util.isNull($sortKeyValue.beginsWith) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND begins_with(#sortKey, :sortKey)" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey",  $util.dynamodb.toDynamoDB("$sortKeyValue.beginsWith") ))\n  #elseif( !$util.isNull($sortKeyValue.between) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey BETWEEN :sortKey0 AND :sortKey1" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey0", $util.dynamodb.toDynamoDB("$sortKeyValue.between[0]") ))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey1", $util.dynamodb.toDynamoDB("$sortKeyValue.between[1]") ))\n  #elseif( !$util.isNull($sortKeyValue.eq) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey = :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.eq") ))\n  #elseif( !$util.isNull($sortKeyValue.lt) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey < :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.lt") ))\n  #elseif( !$util.isNull($sortKeyValue.le) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey <= :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.le") ))\n  #elseif( !$util.isNull($sortKeyValue.gt) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey > :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.gt") ))\n  #elseif( !$util.isNull($sortKeyValue.ge) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey >= :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.ge") ))\n  #elseif( !$util.isNull($sortKeyValue.contains) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND contains(#sortKey, :sortKey)" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.contains") ))\n  #elseif( !$util.isNull($sortKeyValue.notContains) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND notContains(#sortKey, :sortKey)" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.notContains") ))\n  #else\n  #end\n#end\n## [End] ソートキー用クエリー生成\n\n## [Start] VTL文字列出力\n#set( $limit = $util.defaultIfNull($args.limit, 100) )\n#set( $request = {\n  "version": "2018-05-29",\n  "limit": $limit\n} )\n#if( $args.nextToken && !$util.isNullOrEmpty($args.nextToken) )\n  #set( $request.nextToken = $args.nextToken )\n#end\n#if( $args.filter )\n  #set( $request.filter = $util.parseJson("$util.transform.toDynamoDBFilterExpression($args.filter)") )\n#end\n#if( !$util.isNull($modelQueryExpression) && !$util.isNullOrEmpty($modelQueryExpression.expression) )\n  $util.qr($request.put("operation", "Query"))\n  $util.qr($request.put("query", $modelQueryExpression))\n  #if( $util.isNullOrEmpty($args.sortDirection) )\n    #set( $request.scanIndexForward = false )\n  #elseif( $args.sortDirection == "ASC" )\n    #set( $request.scanIndexForward = true )\n  #elseif( $args.sortDirection == "DESC" )\n    #set( $request.scanIndexForward = false )\n  #end\n#else\n  $util.qr($request.put("operation", "Scan"))\n#end\n#if(!$util.isNull($indexName))\n    $util.qr($request.put("index", $indexName))\n#end\n$util.toJson($request)\n## [End] VTL文字列出力`);
-      },
-      7230: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            '\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n');
-      },
-      2525: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            '\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n#set( $args = $ctx.args )\n\n## [Start] VTL文字列出力\n#set( $limit = $util.defaultIfNull($args.limit, 100) )\n#set( $request = {\n  "version": "2018-05-29",\n  "limit": $limit\n} )\n#if( $args.nextToken && !$util.isNullOrEmpty($args.nextToken) )\n  #set( $request.nextToken = $args.nextToken )\n#end\n#if( $args.filter )\n  #set( $request.filter = $util.parseJson("$util.transform.toDynamoDBFilterExpression($args.filter)") )\n#end\n$util.qr($request.put("operation", "Scan"))\n$util.toJson($request)\n## [End] VTL文字列出力\n');
-      },
-      9064: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            '\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n');
-      },
-      2292: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            '\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-http.html\n\n{\n    "version": "2018-05-29",\n    "method": "PUT|POST|GET|DELETE|PATCH",\n    "params": {\n        "query": Map,\n        "headers": Map,\n        "body": string\n    },\n    "resourcePath": string\n}\n');
-      },
-      9768: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            '\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-http.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n');
-      },
-      7112: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(4709)),
-          n = r(a(5951)),
-          i = r(a(8520)),
-          o = r(a(8382)),
-          l = r(a(4771)),
-          u = r(a(7230)),
-          c = r(a(2525)),
-          d = r(a(9064)),
-          p = r(a(790)),
-          m = r(a(6178)),
-          f = r(a(2592)),
-          g = r(a(2922)),
-          h = r(a(2292)),
-          y = r(a(9768)),
-          v = r(a(1954)),
-          S = r(a(8002));
-        t.default = {
-          pipelineAfter: s.default,
-          pipelineBefore: n.default,
-          dynamoGetItemRequest: p.default,
-          dynamoGetItemResponse: m.default,
-          dynamoQueryRequest: l.default,
-          dynamoQueryResponse: u.default,
-          localResolverRequest: i.default,
-          localResolverResponse: o.default,
-          dynamoScanRequest: c.default,
-          dynamoScanResponse: d.default,
-          openSearchQueryRequest: f.default,
-          openSearchQueryResponse: g.default,
-          httpQueryRequest: h.default,
-          httpQueryResponse: y.default,
-          rdbQueryRequest: v.default,
-          rdbQueryResponse: S.default,
-        };
-      },
-      8520: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            '\n## [Start] 共通設定\n#set($payload = $ctx.args )\n#set($primaryValue = "your primary key value" )\n## [End] 共通設定\n\n#if( $util.isNullOrEmpty($primaryValue) )\n  #return\n#end\n\n{\n  "version": "2017-02-28",\n  "payload": $util.toJson($payload)\n}\n');
-      },
-      8382: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = '\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n');
-      },
-      2592: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = (e) =>
-            `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-elasticsearch.html\n\n## [START] 共通設定\n#set( $args = $ctx.args )\n#set( $indexName = "${e.indexName}" )\n#set( $allowedAggFields = ["ALLOWED_ALL_FIELDS"] ) ## アグリゲーション指定許可するフィールド名(ALLOWED_ALL_FIELDSを指定時は全フィールド許可)\n## [END] 共通設定\n\n## [START] ソート条件生成\n#set( $sortValues = [] )\n#set( $sortFields = [] )\n#if( !$util.isNullOrEmpty($args.sort) )\n  #foreach( $sortItem in $args.sort )\n    #set( $temp = {\n      $sortItem.field : $sortItem.direction\n    } )\n    $util.qr($sortValues.add($temp))\n  #end\n#end\n## [END] ソート条件生成\n\n## [START] Aggregates適用(分析対象フィールド)\n#set( $aggregateValues = {} )\n#foreach( $aggItem in $args.aggregates )\n  #if( $allowedAggFields[0] == "ALLOWED_ALL_FIELDS" )\n    #set( $aggFilter = { "match_all": {} } )\n  #elseif( $allowedAggFields.contains($aggItem.field) )\n    #set( $aggFilter = { "match_all": {} } )\n  #else\n    $util.error("Unauthorized to run aggregation on field: \${aggItem.field}", "Unauthorized")\n  #end\n  $util.qr($aggregateValues.put("$aggItem.name", { "filter": $aggFilter, "aggs": { "$aggItem.name": { "$aggItem.type": { "field": "$aggItem.field" }}} }))\n#end\n## [END] Aggregates適用(分析対象フィールド)\n\n## [START] フィルター適用\n#if( $util.isNullOrEmpty($args.filter) )\n  #set( $filter = {\n    "match_all": {}\n  } )\n#else\n  #set( $filter = $util.parseJson($util.transform.toElasticsearchQueryDSL($args.filter)) )\n#end\n## [END] フィルター適用\n\n{\n  "version": "2018-05-29",\n  "operation": "GET",\n  "path": "/$indexName/_doc/_search",\n  "params": {\n      "body": {\n                #if( !$util.isNullOrEmpty($args.nextToken) )"search_after": $util.base64Decode($args.nextToken), #end\n                #if( $args.from )"from": $args.from, #end\n                "size": #if( $args.limit ) $args.limit #else 100 #end,\n                "sort": $util.toJson($sortValues),\n                "version": false,\n                "query": $util.toJson($filter),\n                "aggs": $util.toJson($aggregateValues)\n              }\n  }\n}\n`);
-      },
-      2922: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            '\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-elasticsearch.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#end\n\n#set( $es_items = [] )\n#set( $aggregateValues = [] )\n#foreach( $entry in $context.result.hits.hits )\n  #if( !$foreach.hasNext )\n    #set( $nextToken = $util.base64Encode($util.toJson($entry.sort)) )\n  #end\n  $util.qr($es_items.add($entry.get("_source")))\n#end\n#foreach( $aggItem in $context.result.aggregations.keySet() )\n  #set( $aggResult = {} )\n  #set( $aggResultValue = {} )\n  #set( $currentAggItem = $ctx.result.aggregations.get($aggItem) )\n  $util.qr($aggResult.put("name", $aggItem))\n  #if( !$util.isNullOrEmpty($currentAggItem) )\n    #if( !$util.isNullOrEmpty($currentAggItem.get($aggItem).buckets) )\n      ## $util.qr($aggResultValue.put("__typename", "SearchableAggregateBucketResult"))\n      $util.qr($aggResultValue.put("buckets", $currentAggItem.get($aggItem).buckets))\n    #end\n    #if( !$util.isNullOrEmpty($currentAggItem.get($aggItem).value) )\n      ## $util.qr($aggResultValue.put("__typename", "SearchableAggregateScalarResult"))\n      $util.qr($aggResultValue.put("value", $currentAggItem.get($aggItem).value))\n    #end\n  #end\n  $util.qr($aggResult.put("result", $aggResultValue))\n  $util.qr($aggregateValues.add($aggResult))\n#end\n$util.toJson({\n  "items": $es_items,\n  "total": $ctx.result.hits.total.value,\n  "nextToken": $nextToken,\n  "aggregateItems": $aggregateValues\n})\n');
-      },
-      4709: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.default = '$util.toJson($ctx.prev.result)');
-      },
-      5951: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.default = '{}');
-      },
-      1954: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            '\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-rds.html\n\n{\n    "version": "2018-05-29",\n    "statements": [],\n    "variableMap": {}\n}\n');
-      },
-      8002: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default =
-            '\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-rds.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n');
-      },
-      1325: function (e, t, a) {
-        var r =
-            (this && this.__createBinding) ||
-            (Object.create
-              ? function (e, t, a, r) {
-                  void 0 === r && (r = a);
-                  var s = Object.getOwnPropertyDescriptor(t, a);
-                  (s && !('get' in s ? !t.__esModule : s.writable || s.configurable)) ||
-                    (s = {
-                      enumerable: !0,
-                      get: function () {
-                        return t[a];
-                      },
-                    }),
-                    Object.defineProperty(e, r, s);
-                }
-              : function (e, t, a, r) {
-                  void 0 === r && (r = a), (e[r] = t[a]);
-                }),
-          s =
-            (this && this.__setModuleDefault) ||
-            (Object.create
-              ? function (e, t) {
-                  Object.defineProperty(e, 'default', { enumerable: !0, value: t });
-                }
-              : function (e, t) {
-                  e.default = t;
-                }),
-          n =
-            (this && this.__importStar) ||
-            function (e) {
-              if (e && e.__esModule) return e;
-              var t = {};
-              if (null != e) for (var a in e) 'default' !== a && Object.prototype.hasOwnProperty.call(e, a) && r(t, e, a);
-              return s(t, e), t;
-            },
-          i =
-            (this && this.__importDefault) ||
-            function (e) {
-              return e && e.__esModule ? e : { default: e };
-            };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = i(a(1017)),
-          l = i(a(6444)),
-          u = a(7347),
-          c = i(a(6517)),
-          d = a(3462),
-          p = i(a(3448)),
-          m = i(a(2056)),
-          f = i(a(3624)),
-          g = n(a(7808)),
-          h = n(a(2e3));
-        t.default = class {
-          constructor(e) {
-            (this.logger = l.default.getLogger()),
-              (this._serverlessConfigPath = e.serverlessConfigPath),
-              (this._lang = e.lang),
-              (this._defaultFunctionYamlPath = `serverless/${e.region}/resources/functions.yml`);
-            try {
-              const t = (0, d.loadYaml)(this.serverlessConfigPath);
-              if (((this._serverlessConfig = t), c.default.isString(t.functions))) {
-                const e = p.default.parseSlsRecursivelyReference(t.functions);
-                this._functionsYamlPath = e;
-              }
-              this._region = t.provider.region ?? e.region;
-            } catch (t) {
-              this._region = e.region;
-            }
-            this._isExistsServelessConfig = this.getIsExistsServelessConfig(this.serverlessConfigPath);
-          }
-          defaultLambdaTimeOut = 30;
-          defaultMemorySize = 1024;
-          logger;
-          _isExistsServelessConfig;
-          get isExistsServelessConfig() {
-            return this._isExistsServelessConfig;
-          }
-          _lang;
-          get lang() {
-            return this._lang;
-          }
-          _defaultFunctionYamlPath;
-          get defaultFunctionYamlPath() {
-            return this._defaultFunctionYamlPath;
-          }
-          _region;
-          get region() {
-            return this._region;
-          }
-          _serverlessConfigPath;
-          get serverlessConfigPath() {
-            return this._serverlessConfigPath;
-          }
-          _functionsYamlPath;
-          get functionsYamlPath() {
-            return this._functionsYamlPath;
-          }
-          _serverlessConfig;
-          get serverlessConfig() {
-            return this._serverlessConfig;
-          }
-          cannotProces() {
-            const e = this.logger;
-            return this.isExistsServelessConfig
-              ? !!c.default.isEmpty(this.region) && (e.warn('not found region property, skip update'), e.warn(`please check a input path : ${this.serverlessConfigPath}`), !0)
-              : (e.warn('not found serverless config file, skip update'), e.warn(`please check a input path : ${this.serverlessConfigPath}`), !0);
-          }
-          addResource = (e) => {
-            if (this.cannotProces()) return;
-            const t = this.logger,
-              { filePath: a, resourceName: r, cf: s } = e;
-            (() => {
-              const e = this.serverlessConfig,
-                r = o.default.join('./', a),
-                s = e.resources ?? [];
-              if (s.some((e) => e.includes(r))) t.warn(`already exists resource file path : ${r}`);
-              else {
-                s.push(`\${file(./${r})}`);
-                const a = (0, d.writeYaml)(this.serverlessConfigPath, { ...e, resources: s });
-                t.info(r), t.info((0, u.chalk)().green(a));
-              }
-            })(),
-              (() => {
-                try {
-                  const e = (0, d.loadYaml)(a) ?? {};
-                  if (c.default.has(e, `Resources.${r}`)) t.warn(`resource name : ${r}`), t.warn(`already exists resource file path : ${a}`);
-                  else {
-                    const r = (0, d.writeYaml)(a, { ...e, Resources: { ...e.Resources, ...s } });
-                    t.info(a), t.info(`over right : ${a}`), t.info((0, u.chalk)().green(r));
-                  }
-                } catch (e) {
-                  const r = (0, d.writeYaml)(a, { Resources: { ...s } });
-                  t.info(`created yaml file : ${a}`), t.info((0, u.chalk)().green(r));
-                }
-              })();
-          };
-          addFunction = (e) => {
-            if (this.cannotProces()) return;
-            const { lambdaFunctionName: t, lambdaHandler: a, memorySize: r, timeout: s, code: n } = e,
-              i = this.logger;
-            i.debug("functionsYamlPath', functionsYamlPath"),
-              (() => {
-                const e = this.serverlessConfig;
-                if (c.default.isEmpty(e.functions)) {
-                  const t = (0, d.writeYaml)(this.serverlessConfigPath, { ...e, functions: `\${file(./${this.defaultFunctionYamlPath})}` });
-                  i.info('write functions property'), i.info((0, u.chalk)().green(t));
-                }
-              })(),
-              (() => {
-                const e = this.functionsYamlPath ?? this.defaultFunctionYamlPath;
-                try {
-                  const n = (0, d.loadYaml)(e) ?? {};
-                  if (c.default.has(n, t)) i.warn(`already exists lambda function at, skip update : ${t}`);
-                  else {
-                    const o = (0, d.writeYaml)(e, {
-                      ...n,
-                      ...this.generateFunctionYamlProperty(t, { handler: a, memorySize: r ?? this.defaultMemorySize, timeout: s ?? this.defaultLambdaTimeOut }),
-                    });
-                    i.info('write functions property'), i.info((0, u.chalk)().green(o));
-                  }
-                } catch (n) {
-                  const o = (0, d.writeYaml)(e, {
-                    ...this.generateFunctionYamlProperty(t, { handler: a, memorySize: r ?? this.defaultMemorySize, timeout: s ?? this.defaultLambdaTimeOut }),
-                  });
-                  i.info('write functions property'), i.info((0, u.chalk)().green(o));
-                }
-              })(),
-              new m.default({ filePath: a, code: n, type: 'typescript' }).write(),
-              (() => {
-                this.addResource({ filePath: `serverless/${this.region}/resources/iam-role.yml`, resourceName: 'DefaultLambdaRole', cf: this.generateDefaultLambdaRoleCf(t) });
-              })();
-          };
-          generateFunctionYamlProperty = (e, t) => ({
-            [e]: {
-              handler: t?.handler ?? 'index.handler',
-              name: t?.name ?? e,
-              memorySize: t?.memorySize ?? this.defaultMemorySize,
-              timeout: t?.timeout ?? this.defaultLambdaTimeOut,
-            },
-          });
-          getIsExistsServelessConfig(e) {
-            if (c.default.isEmpty(e)) return this.logger.warn('not found serverless config file, skip update'), this.logger.warn(`please check a input path : ${e}`), !1;
-            try {
-              return (0, d.loadYaml)(e), !0;
-            } catch (t) {
-              return this.logger.warn('not found serverless config file, skip update'), this.logger.warn(`please check a input path : ${e}`), !1;
-            }
-          }
-          generateDefaultLambdaRoleCf(e) {
-            return f.default.generateCloudFormation(e, (t) => {
-              const a = new g.Role(t, e, { assumedBy: new g.ServicePrincipal('lambda.amazonaws.com') });
-              return (
-                a.addToPolicy(
-                  new g.PolicyStatement({
-                    effect: g.Effect.ALLOW,
-                    resources: [h.Fn.join(':', ['arn:aws:logs', h.Fn.ref('AWS::Region'), h.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],
-                    actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
-                  })
-                ),
-                a.addToPolicy(
-                  new g.PolicyStatement({
-                    effect: g.Effect.ALLOW,
-                    resources: [h.Fn.join(':', ['arn:aws:logs', this.region, h.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],
-                    actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
-                  })
-                ),
-                a
-              );
-            });
-          }
-          static generateServerlessConfig = (e) => ({
-            service: e?.service ?? 'starter',
-            useDotenv: e?.useDotenv ?? !0,
-            provider: {
-              name: e?.provider?.name ?? 'aws',
-              runtime: e?.provider?.runtime ?? 'nodejs18.x',
-              stage: e?.provider?.stage ?? '${opt:stage}',
-              region: e?.provider?.region ?? 'ap-northeast-1',
-              iam: { role: e?.provider?.iam?.role ?? 'DefaultLambdaRole' },
-              environment: {
-                STAGE: e?.provider?.environment?.STAGE ?? '${self:provider.stage}',
-                REGION: e?.provider?.environment?.REGION ?? '${self:provider.region}',
-                AWS_RESOURCE_PRIFIX: e?.provider?.environment?.AWS_RESOURCE_PRIFIX ?? '${self:custom.awsResourcePrefix}',
-                LOG_LEVEL: e?.provider?.environment?.LOG_LEVEL ?? 'INFO',
-              },
-            },
-            plugins: e?.plugins ?? ['serverless-webpack', 'serverless-prune-plugin'],
-            functions: e?.functions ?? '${file(./serverless/ap-northeast-1/resources/functions.yml)}',
-            resources: e?.resources ?? [],
-            package: {
-              individually: e?.package?.individually ?? !0,
-              includeModules: e?.package?.includeModules ?? !0,
-              patterns: e?.package?.patterns ?? ['!appsync/*,*', '!node_modules/**', '!resources/**', '!__tests__/**', '!.git/**', '!tmp/**'],
-            },
-            custom: {
-              awsResourcePrefix: e?.custom?.awsResourcePrefix ?? '${self:service}-${self:provider.stage}-',
-              webpack: e?.custom?.webpack ?? { includeModules: !0, packager: 'npm' },
-              prune: e?.custom?.prune ?? { automatic: !0, number: 3 },
-            },
-          });
-        };
-      },
-      6702: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.awsRegions = t.FeatureBuilderAbstract = t.FeatureHandlerAbstract = void 0);
-        const s = r(a(2322)),
-          n = a(6870);
-        (t.FeatureHandlerAbstract = class {
-          _argv;
-          _lang;
-          constructor(e) {
-            (this._argv = e), (this._lang = e.lang);
-          }
-          get argv() {
-            return this._argv;
-          }
-          get lang() {
-            return this._lang;
-          }
-        }),
-          (t.FeatureBuilderAbstract = class {
-            _args;
-            _npmVersion;
-            _chalk;
-            constructor(e) {
-              (this._chalk = n.chalk), (this._args = e), (this._npmVersion = s.default.npmVersion);
-            }
-            get args() {
-              return this._args;
-            }
-            get npmVersion() {
-              return this._npmVersion;
-            }
-            get chalk() {
-              return this._chalk;
-            }
-          }),
-          (t.awsRegions = [
-            'us-east-2',
-            'us-east-1',
-            'us-west-1',
-            'us-west-2',
-            'af-south-1',
-            'ap-east-1',
-            'ap-south-2',
-            'ap-southeast-3',
-            'ap-southeast-4',
-            'ap-south-1',
-            'ap-northeast-3',
-            'ap-northeast-2',
-            'ap-southeast-1',
-            'ap-southeast-2',
-            'ap-northeast-1',
-            'ca-central-1',
-            'eu-central-1',
-            'eu-west-1',
-            'eu-west-2',
-            'eu-south-1',
-            'eu-west-3',
-            'eu-south-2',
-            'eu-north-1',
-            'eu-central-2',
-            'me-south-1',
-            'me-central-1',
-            'sa-east-1',
-            'us-gov-east-1',
-            'us-gov-west-1',
-          ]);
-      },
-      2762: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.asFullPath = t.createDirectories = t.isFileExists = t.isExistsDirectory = t.cleanUpTmpDirectory = t.moveDirectory = t.gitClone = void 0);
-        const s = a(5033),
-          n = r(a(6444)),
-          i = r(a(4470)),
-          o = r(a(2322)),
-          l = r(a(6237)),
-          u = r(a(1155)),
-          c = r(a(1017));
-        (t.gitClone = async function (e, t) {
-          const a = n.default.getLogger();
-          try {
-            a.debug(`git clone : ${e} -> ${t}`),
-              await i.default.promises.mkdir(t, { recursive: !0 }),
-              await l.default.clone({ fs: i.default, http: u.default, dir: t, url: e, singleBranch: !0, depth: 1 });
-          } catch (e) {
-            const t = e;
-            throw new s.CLIError(t.message);
-          }
-        }),
-          (t.moveDirectory = function (e, t) {
-            const a = n.default.getLogger();
-            try {
-              a.debug(`move : ${e} -> ${t}`), i.default.renameSync(e, t);
-            } catch (e) {
-              const t = e;
-              throw new s.CLIError(t.message);
-            }
-          }),
-          (t.cleanUpTmpDirectory = function () {
-            const e = n.default.getLogger();
-            try {
-              e.debug(`clean up tmp directory : ${o.default.tmpPath}`),
-                i.default.removeSync(o.default.tmpPath),
-                e.debug(`create tmp directory : ${o.default.tmpPath}`),
-                i.default.mkdirSync(o.default.tmpPath, { recursive: !0 });
-            } catch (e) {
-              const t = e;
-              throw new s.CLIError(t.message);
-            }
-          }),
-          (t.isExistsDirectory = function (e) {
-            const t = n.default.getLogger();
-            try {
-              return t.debug(`check exists directory : ${e}`), i.default.statSync(e).isDirectory();
-            } catch (e) {
-              if ('ENOENT' === e.code) return !1;
-              throw e;
-            }
-          }),
-          (t.isFileExists = function (e) {
-            try {
-              return i.default.accessSync(e), !0;
-            } catch (e) {
-              return !1;
-            }
-          }),
-          (t.createDirectories = (e) => {
-            e.split(c.default.sep)
-              .slice(0, -1)
-              .reduce((e, t) => ((e = c.default.join(e, t)), i.default.existsSync(e) || i.default.mkdirSync(e), e), '');
-          }),
-          (t.asFullPath = (e) => c.default.join(o.default.currentPath, e));
-      },
-      8705: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = a(4361),
-          n = a(4626),
-          i = a(1770),
-          o = r(a(6517));
-        t.default = class {
-          constructor(e) {
-            (this._schema = e),
-              (this._schemaComposer = o.default.isEmpty(e) ? [new s.SchemaComposer()] : e.map((e) => new s.SchemaComposer((0, i.addScalrs)(e)))),
-              (this._mergedSchema = (0, n.mergeSchemas)({ schemas: this._schemaComposer.map((e) => e.buildSchema()) })),
-              (this._mutations = this._schemaComposer.map((e) => {
-                try {
-                  return e.getOTC('Mutation').getFields();
-                } catch (e) {
-                  return {};
-                }
-              })),
-              (this._queries = this._schemaComposer.map((e) => {
-                try {
-                  return e.getOTC('Query').getFields();
-                } catch (e) {
-                  return {};
-                }
-              })),
-              (this._subscriptions = this._schemaComposer.map((e) => {
-                try {
-                  return e.getOTC('Subscription').getFields();
-                } catch (e) {
-                  return {};
-                }
-              }));
-          }
-          _mutations;
-          get mutations() {
-            return this._mutations;
-          }
-          _queries;
-          get queries() {
-            return this._queries;
-          }
-          _subscriptions;
-          get subscriptions() {
-            return this._subscriptions;
-          }
-          _schema;
-          get schema() {
-            return this._schema;
-          }
-          _schemaComposer;
-          get schemaComposer() {
-            return this._schemaComposer;
-          }
-          _mergedSchema;
-          get mergedSchema() {
-            return this._mergedSchema;
-          }
-          isExistsMutationApi(e) {
-            return o.default.some(this.mutations, (t) => o.default.has(t, e));
-          }
-          isExistsQueryApi(e) {
-            return o.default.some(this.queries, (t) => o.default.has(t, e));
-          }
-          isExistsSubscriptionApi(e) {
-            return o.default.some(this.subscriptions, (t) => o.default.has(t, e));
-          }
-        };
-      },
-      1770: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.removeScalars = t.addScalrs = void 0);
-        const a =
-          '\n  scalar ID\n  scalar String\n  scalar Int\n  scalar Float\n  scalar Boolean\n  scalar AWSDate\n  scalar AWSTime\n  scalar AWSDateTime\n  scalar AWSTimestamp\n  scalar AWSEmail\n  scalar AWSJSON\n  scalar AWSPhone\n  scalar AWSURL\n  scalar AWSIPAddress\n';
-        (t.addScalrs = (e) => `${a}\n  ${e}`), (t.removeScalars = (e) => e.replace(a, ''));
-      },
-      4259: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = a(4361),
-          n = a(7343),
-          i = r(a(6444)),
-          o = r(a(6517)),
-          l = a(2762),
-          u = r(a(7147)),
-          c = a(7347),
-          d = a(1770);
-        t.default = class {
-          constructor(e) {
-            (this.logger = i.default.getLogger()),
-              (this._customSchemaPath = e?.customSchemaPath ?? this.defaultCustomSchemaPath),
-              (this._defaultSchemaPath = e?.defaultSchemaPath ?? this.defaultDefaultSchemaPath),
-              this.readOrSetCustomSchema(),
-              this.readOrSetDefaultSchema(),
-              (() => {
-                this.customSchema && this.allSchemaComposer.merge((0, n.buildSchema)(this.customSchema)),
-                  this.defaultSchema && this.allSchemaComposer.merge((0, n.buildSchema)(this.defaultSchema));
-              })(),
-              (() => {
-                this.customSchema && this.customSchemaComposer.merge((0, n.buildSchema)(this.customSchema));
-              })();
-          }
-          logger;
-          defaultCustomSchemaPath = 'appsync/custom_schema.graphql';
-          defaultDefaultSchemaPath = 'appsync/schema.graphql';
-          _customSchemaPath;
-          _defaultSchemaPath;
-          _customSchemaComposer = new s.SchemaComposer();
-          _allSchemaComposer = new s.SchemaComposer();
-          _defaultSchema;
-          _customSchema;
-          get defaultSchemaPath() {
-            return this._defaultSchemaPath;
-          }
-          get customSchemaPath() {
-            return this._customSchemaPath;
-          }
-          get defaultSchema() {
-            if (this._defaultSchema) return (0, d.addScalrs)(this._defaultSchema);
-          }
-          get customSchema() {
-            if (this._customSchema) return (0, d.addScalrs)(this._customSchema);
-          }
-          get customSchemaComposer() {
-            return this._customSchemaComposer;
-          }
-          get allSchemaComposer() {
-            return this._allSchemaComposer;
-          }
-          readOrSetCustomSchema() {
-            try {
-              this._customSchema = u.default.readFileSync((0, l.asFullPath)(this.customSchemaPath), 'utf8');
-            } catch (e) {
-              this.logger.debug(e), this.logger.warn('custom_schema.graphql is not found.');
-            }
-          }
-          readOrSetDefaultSchema() {
-            try {
-              this._defaultSchema = u.default.readFileSync((0, l.asFullPath)(this.defaultSchemaPath), 'utf8');
-            } catch (e) {
-              this.logger.debug(e), this.logger.warn('schema.graphql is not found.');
-            }
-          }
-          listQueies() {
-            return this.allSchemaComposer.getOTC('Query').getFields();
-          }
-          listMutation() {
-            return this.allSchemaComposer.getOTC('Mutation').getFields();
-          }
-          listSubscription() {
-            return this.allSchemaComposer.getOTC('Subscription').getFields();
-          }
-          addExampleInput(e) {
-            return s.InputTypeComposer.create(`\n      input ${e}Input {\n        example: String!\n      },\n    `, this.customSchemaComposer);
-          }
-          addExampleType(e) {
-            return s.ObjectTypeComposer.create(`\n      type ${e}Response {\n        example: String!\n      }\n    `, this.customSchemaComposer);
-          }
-          addMutationField(e) {
-            const { apiName: t, input: a, type: r } = e;
-            return this.customSchemaComposer.Mutation.addFields({ [t]: { type: r, args: { input: new n.GraphQLNonNull(a) } } }), this;
-          }
-          addQueryField(e) {
-            const { apiName: t, args: a, type: r } = e;
-            return this.customSchemaComposer.Query.addFields({ [t]: { type: r, args: a } }), this;
-          }
-          updateCustomSchemaGraphl(e) {
-            const { query: t, mutation: a, callback: r } = e;
-            let s = !1;
-            if (
-              (t || a
-                ? (t && (o.default.has(this.listQueies(), t.apiName) ? (this.logger.warn(`Query ${t.apiName} is already exists.`), (s = !1)) : (this.addQueryField(t), (s = !0))),
-                  a &&
-                    (o.default.has(this.listMutation(), a.apiName)
-                      ? (this.logger.warn(`Mutation ${a.apiName} is already exists.`), (s = !1))
-                      : (this.addMutationField(a), (s = !0))))
-                : this.logger.warn('query or mutation is empty.'),
-              s)
-            ) {
-              const e = this.printSchema();
-              u.default.writeFileSync((0, l.asFullPath)(this.defaultCustomSchemaPath), e, 'utf8'), this.logger.info((0, c.chalk)().green(e)), this.readOrSetCustomSchema();
-            }
-            r && r(s, { schemaPath: this.defaultCustomSchemaPath });
-          }
-          removeEmptyLines(e) {
-            return e
-              .split('\n')
-              .filter((e) => !e.includes('""""""'))
-              .join('\n');
-          }
-          printSchema() {
-            const e = (0, s.printSchema)(this.customSchemaComposer.buildSchema()),
-              t = this.removeEmptyLines(e);
-            return (0, d.removeScalars)(t);
-          }
-        };
-      },
-      5837: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6517));
-        t.default = class {
-          constructor(e) {
-            this.input = e;
-          }
-          input;
-          filters = [];
-          filePath = () => (s.default.isString(this.input) && this.filters.push((e) => e.replace(/\s+/g, '')), this);
-          removeAllSpace = () => (s.default.isString(this.input) && this.filters.push((e) => e.replace(/\s+/g, '')), this);
-          value() {
-            return s.default.isEmpty(this.filters) ? this.input : s.default.reduce(this.filters, (e, t) => t(e), this.input);
-          }
-        };
-      },
-      1092: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6517));
-        t.default = class {
-          constructor(e) {
-            this.input = e;
-          }
-          input;
-          transforms = [];
-          filePath = () => (s.default.isString(this.input) && this.transforms.push((e) => e.replace(/\s+/g, '')), this);
-          removeAllSpace = () => (s.default.isString(this.input) && this.transforms.push((e) => e.replace(/\s+/g, '')), this);
-          value() {
-            return s.default.isEmpty(this.transforms) ? this.input : s.default.reduce(this.transforms, (e, t) => t(e), this.input);
-          }
-        };
-      },
-      6444: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(8545)),
-          n = r(a(4233)),
-          i = a(6870),
-          o = r(a(6517)),
-          l = (0, n.default)({
-            colorize: !0,
-            messageFormat: (e, t) => {
-              const a = (t) => (30 === e.level ? i.chalk.white(t) : e.level < 30 ? i.chalk.grey(t) : 40 === e.level ? i.chalk.yellow(t) : e.level >= 50 ? i.chalk.red(t) : t),
-                r = e[t];
-              return o.default.isEmpty(r)
-                ? o.default
-                    .chain(e)
-                    .omit(['level', 'time', 'pid', 'hostname'])
-                    .thru((e) => JSON.stringify(e, null, 2))
-                    .thru((e) => a(e))
-                    .value()
-                : e.requestId
-                ? `[${e.requestId}] ${a(r)}`
-                : a(r);
-            },
-            timestampKey: 'time',
-            ignore: 'pid,hostname',
-            include: 'level,time',
-            singleLine: !1,
-            translateTime: 'yyyy-mm-dd HH:MM:ss',
-            sync: !0,
-          });
-        t.default = class {
-          constructor() {
-            throw new Error('singleton cannot be instantiated');
-          }
-          static logger;
-          static getLogger(e) {
-            return e
-              ? ((this.logger = (0, s.default)({ level: e ?? 'info' }, l)), this.logger)
-              : (this.logger || (this.logger = (0, s.default)({ level: e ?? 'info' }, l)), this.logger);
-          }
-        };
-      },
-      3448: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6517));
-        t.default = class {
-          static parseFilePath(e) {
-            const t = e.split('/'),
-              a = t.slice(0, -1),
-              r = t[t.length - 1];
-            return [a.length > 0 ? a : [], r];
-          }
-          static parseSlsRecursivelyReference = (e) => {
-            if (s.default.isEmpty(e)) return;
-            const t = e.match(/\${file\((.*?)\)}/);
-            return t ? t[1] : void 0;
-          };
-          static extractFilename(e) {
-            const t = e.split('.');
-            return 1 === t.length ? e : 2 === t.length ? t[0] : (t.pop(), t.join('.'));
-          }
-        };
-      },
-      7973: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6517)),
-          n = a(2414);
-        t.default = class {
-          constructor(e, t) {
-            (this._input = e), (this._lang = t), (this._locale = (0, n.getLocaleLang)(this._lang));
-          }
-          _input;
-          _lang;
-          _locale;
-          validations = [];
-          get locale() {
-            return this._locale;
-          }
-          get input() {
-            return this._input;
-          }
-          required = () => (
-            this.validations.push(() =>
-              s.default.isUndefined(this.input) || s.default.isNull(this.input)
-                ? this.locale.required
-                : !s.default.isString(this.input) || !s.default.isEmpty(this.input) || this.locale.required
-            ),
-            this
-          );
-          mustNoIncludeZenkaku = () => (
-            this.validations.push(() => !s.default.isString(this.input) || !/[^\x01-\x7E]/.test(this.input.toString()) || this.locale.mustNoIncludeZenkaku), this
-          );
-          mustBeYamlFilePath = () => (
-            this.validations.push(() => !s.default.isString(this.input) || !(!this.input.endsWith('.yml') && !this.input.endsWith('.yaml')) || this.locale.mustBeYamlFilePath), this
-          );
-          mustBeExtension = () => (this.validations.push(() => !s.default.isString(this.input) || !!/\.[^.]*$/.test(this.input) || this.locale.mustBeExtension), this);
-          value() {
-            for (let e = 0; e < this.validations.length; e++) {
-              const t = this.validations[e]();
-              if (s.default.isString(t)) return t;
-            }
-            return !0;
-          }
-        };
-      },
-      4179: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = {
-            mustBeYamlFilePath: 'input a yaml file path',
-            mustNoIncludeZenkaku: 'must no include zenkaku',
-            mustBeExtension: 'must be extension',
-            required: 'required input',
-          });
-      },
-      6028: (e, t) => {
-        Object.defineProperty(t, '__esModule', { value: !0 }),
-          (t.default = {
-            mustBeYamlFilePath: 'Yamlファイルを指定して下さい',
-            mustNoIncludeZenkaku: '全角を含めないでください',
-            mustBeExtension: '文字列の最後は「.＋文字列」を入力して下さい',
-            required: '入力必須',
-          });
-      },
-      2414: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
-        const s = r(a(6028)),
-          n = r(a(4179));
-        t.getLocaleLang = (e) => ('ja' === e ? s.default : n.default);
-      },
-      3462: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.loadYaml = t.writeYaml = void 0);
-        const s = r(a(7147)),
-          n = r(a(9793)),
-          i = a(4355),
-          o = a(2762);
-        (t.writeYaml = (e, t) => {
-          const a = n.default.dump(t, { schema: i.schema, indent: 2, lineWidth: -1 });
-          return (0, o.createDirectories)(e), s.default.writeFileSync((0, o.asFullPath)(e), a, 'utf8'), a;
-        }),
-          (t.loadYaml = (e) => n.default.load(s.default.readFileSync((0, o.asFullPath)(e), 'utf8'), { schema: i.schema }));
-      },
-      6870: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 }), (t.chalk = t.init = void 0);
-        const s = r(a(7347));
-        (t.init = () => s.default.font('SansSerif').helpStyle('grey').errorsStyle('red')), (t.chalk = s.default.chalk());
-      },
-      2726: (e) => {
-        e.exports = require('@aws-cdk/assert');
-      },
-      7808: (e) => {
-        e.exports = require('@aws-cdk/aws-iam');
-      },
-      5862: (e) => {
-        e.exports = require('@aws-cdk/aws-lambda');
-      },
-      8890: (e) => {
-        e.exports = require('@aws-cdk/aws-sns');
-      },
-      6324: (e) => {
-        e.exports = require('@aws-cdk/aws-sns-subscriptions');
-      },
-      9087: (e) => {
-        e.exports = require('@aws-cdk/aws-sqs');
-      },
-      6817: (e) => {
-        e.exports = require('@aws-cdk/core');
-      },
-      4626: (e) => {
-        e.exports = require('@graphql-tools/schema');
-      },
-      2e3: (e) => {
-        e.exports = require('aws-cdk-lib');
-      },
-      8387: (e) => {
-        e.exports = require('colorette');
-      },
-      4612: (e) => {
-        e.exports = require('dateformat');
-      },
-      4563: (e) => {
-        e.exports = require('fast-copy');
-      },
-      5376: (e) => {
-        e.exports = require('fast-safe-stringify');
-      },
-      4470: (e) => {
-        e.exports = require('fs-extra');
-      },
-      7343: (e) => {
-        e.exports = require('graphql');
-      },
-      4361: (e) => {
-        e.exports = require('graphql-compose');
-      },
-      3290: (e) => {
-        e.exports = require('inquirer');
-      },
-      169: (e) => {
-        e.exports = require('inquirer-autocomplete-prompt');
-      },
-      6237: (e) => {
-        e.exports = require('isomorphic-git');
-      },
-      1155: (e) => {
-        e.exports = require('isomorphic-git/http/node');
-      },
-      9793: (e) => {
-        e.exports = require('js-yaml');
-      },
-      6517: (e) => {
-        e.exports = require('lodash');
-      },
-      2067: (e) => {
-        e.exports = require('on-exit-leak-free');
-      },
-      8545: (e) => {
-        e.exports = require('pino');
-      },
-      454: (e) => {
-        e.exports = require('pino-abstract-transport');
-      },
-      7304: (e) => {
-        e.exports = require('pump');
-      },
-      3248: (e) => {
-        e.exports = require('readable-stream');
-      },
-      7915: (e) => {
-        e.exports = require('secure-json-parse');
-      },
-      5246: (e) => {
-        e.exports = require('sonic-boom');
-      },
-      4355: (e) => {
-        e.exports = require('yaml-cfn');
-      },
-      7347: (e) => {
-        e.exports = require('yargonaut');
-      },
-      9267: (e) => {
-        e.exports = require('yargs/yargs');
-      },
-      7147: (e) => {
-        e.exports = require('fs');
-      },
-      1017: (e) => {
-        e.exports = require('path');
-      },
-      1267: (e) => {
-        e.exports = require('worker_threads');
-      },
-      4233: (e, t, a) => {
-        const { isColorSupported: r } = a(8387),
-          s = a(7304),
-          { Transform: n } = a(3248),
-          i = a(454),
-          o = a(7915),
-          l = a(903),
-          { ERROR_LIKE_KEYS: u, MESSAGE_KEY: c, TIMESTAMP_KEY: d, LEVEL_KEY: p, LEVEL_NAMES: m } = a(7318),
-          {
-            isObject: f,
-            prettifyErrorLog: g,
-            prettifyLevel: h,
-            prettifyMessage: y,
-            prettifyMetadata: v,
-            prettifyObject: S,
-            prettifyTime: $,
-            buildSafeSonicBoom: _,
-            filterLog: b,
-            handleCustomlevelsOpts: w,
-            handleCustomlevelNamesOpts: P,
-          } = a(385),
-          E = (e) => {
-            try {
-              return { value: o.parse(e, { protoAction: 'remove' }) };
-            } catch (e) {
-              return { err: e };
-            }
-          },
-          x = {
-            colorize: r,
-            colorizeObjects: !0,
-            crlf: !1,
-            errorLikeObjectKeys: u,
-            errorProps: '',
-            customLevels: null,
-            customColors: null,
-            useOnlyCustomProps: !0,
-            levelFirst: !1,
-            messageKey: c,
-            messageFormat: !1,
-            timestampKey: d,
-            translateTime: !0,
-            useMetadata: !1,
-            outputStream: process.stdout,
-            customPrettifiers: {},
-            hideObject: !1,
-            ignore: 'hostname',
-            include: void 0,
-            singleLine: !1,
-          };
-        function A(e) {
-          const t = Object.assign({}, x, e),
-            a = t.crlf ? '\r\n' : '\n',
-            r = '    ',
-            s = t.messageKey,
-            n = t.levelKey,
-            i = t.levelLabel,
-            o = t.minimumLevel,
-            u = t.messageFormat,
-            c = t.timestampKey,
-            d = t.errorLikeObjectKeys,
-            _ = t.errorProps.split(','),
-            A = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
-            N = w(t.customLevels),
-            L = P(t.customLevels),
-            k = t.customColors
-              ? t.customColors.split(',').reduce((e, a) => {
-                  const [r, s] = a.split(':'),
-                    n = (A ? t.customLevels : void 0 !== L[r]) ? L[r] : m[r],
-                    i = void 0 !== n ? n : r;
-                  return e.push([i, s]), e;
-                }, [])
-              : void 0,
-            q = { customLevels: N, customLevelNames: L };
-          A && !t.customLevels && ((q.customLevels = void 0), (q.customLevelNames = void 0));
-          const C = t.customPrettifiers,
-            R = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
-            O = !R && t.ignore ? new Set(t.ignore.split(',')) : void 0,
-            M = t.hideObject,
-            j = t.singleLine,
-            D = l(t.colorize, k, A),
-            F = t.colorizeObjects ? D : l(!1, [], !1);
-          return function (e) {
-            let l;
-            if (f(e)) l = e;
-            else {
-              const t = E(e);
-              if (t.err || !f(t.value)) return e + a;
-              l = t.value;
-            }
-            if (o) {
-              const e = ((A ? t.customLevels : void 0 !== L[o]) ? L[o] : m[o]) || Number(o);
-              if (l[void 0 === n ? p : n] < e) return;
-            }
-            const w = y({ log: l, messageKey: s, colorizer: D, messageFormat: u, levelLabel: i, ...q, useOnlyCustomProps: A });
-            (O || R) && (l = b({ log: l, ignoreKeys: O, includeKeys: R }));
-            const P = h({ log: l, colorizer: D, levelKey: n, prettifier: C.level, ...q }),
-              x = v({ log: l, prettifiers: C }),
-              N = $({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: C.time });
-            let k = '';
-            if (
-              (t.levelFirst && P && (k = `${P}`),
-              N && '' === k ? (k = `${N}`) : N && (k = `${k} ${N}`),
-              !t.levelFirst && P && (k = k.length > 0 ? `${k} ${P}` : P),
-              x && (k = k.length > 0 ? `${k} ${x}:` : x),
-              !1 === k.endsWith(':') && '' !== k && (k += ':'),
-              w && (k = k.length > 0 ? `${k} ${w}` : w),
-              k.length > 0 && !j && (k += a),
-              'Error' === l.type && l.stack)
-            ) {
-              const e = g({ log: l, errorLikeKeys: d, errorProperties: _, ident: r, eol: a });
-              j && (k += a), (k += e);
-            } else if (!M) {
-              const e = [s, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = S({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: d, eol: a, ident: r, singleLine: j, colorizer: F });
-              j && !/^\s$/.test(t) && (k += ' '), (k += t);
-            }
-            return k;
-          };
-        }
-        function N(e = {}) {
-          const t = A(e);
-          return i(
-            function (a) {
-              const r = new n({
-                objectMode: !0,
-                autoDestroy: !0,
-                transform(e, a, r) {
-                  r(null, t(e));
-                },
-              });
-              let i;
-              return (
-                (i =
-                  'object' == typeof e.destination && 'function' == typeof e.destination.write
-                    ? e.destination
-                    : _({ dest: e.destination || 1, append: e.append, mkdir: e.mkdir, sync: e.sync })),
-                a.on('unknown', function (e) {
-                  i.write(e + '\n');
-                }),
-                s(a, r, i),
-                r
-              );
-            },
-            { parse: 'lines' }
-          );
-        }
-        (e.exports = N), (e.exports.prettyFactory = A), (e.exports.colorizerFactory = l), (e.exports.default = N);
-      },
-      903: (e, t, a) => {
-        const { LEVELS: r, LEVEL_NAMES: s } = a(7318),
-          n = (e) => e,
-          i = { default: n, 60: n, 50: n, 40: n, 30: n, 20: n, 10: n, message: n, greyMessage: n },
-          { createColors: o } = a(8387),
-          l = o({ useColor: !0 }),
-          { white: u, bgRed: c, red: d, yellow: p, green: m, blue: f, gray: g, cyan: h } = l,
-          y = { default: u, 60: c, 50: d, 40: p, 30: m, 20: f, 10: g, message: h, greyMessage: g };
-        function v(e) {
-          return function (t, a, { customLevels: n, customLevelNames: i } = {}) {
-            const o = e ? n || r : Object.assign({}, r, n),
-              l = e ? i || s : Object.assign({}, s, i);
-            let u = 'default';
-            u = Number.isInteger(+t) ? (Object.prototype.hasOwnProperty.call(o, t) ? t : u) : Object.prototype.hasOwnProperty.call(l, t.toLowerCase()) ? l[t.toLowerCase()] : u;
-            const c = o[u];
-            return Object.prototype.hasOwnProperty.call(a, u) ? a[u](c) : a.default(c);
-          };
-        }
-        e.exports = function (e = !1, t, a) {
-          return e && void 0 !== t
-            ? (function (e, t) {
-                const a = (function (e) {
-                    return e.reduce(
-                      function (e, [t, a]) {
-                        return (e[t] = 'function' == typeof l[a] ? l[a] : u), e;
-                      },
-                      { default: u, message: h, greyMessage: g }
-                    );
-                  })(e),
-                  r = t ? a : Object.assign({}, y, a),
-                  s = v(t),
-                  n = function (e, t) {
-                    return s(e, r, t);
-                  };
-                return (n.message = n.message || r.message), (n.greyMessage = n.greyMessage || r.greyMessage), n;
-              })(t, a)
-            : e
-            ? (function (e) {
-                const t = v(e),
-                  a = function (e, a) {
-                    return t(e, y, a);
-                  };
-                return (a.message = y.message), (a.greyMessage = y.greyMessage), a;
-              })(a)
-            : (function (e) {
-                const t = v(e),
-                  a = function (e, a) {
-                    return t(e, i, a);
-                  };
-                return (a.message = i.message), (a.greyMessage = i.greyMessage), a;
-              })(a);
-        };
-      },
-      7318: (e) => {
-        e.exports = {
-          DATE_FORMAT: 'yyyy-mm-dd HH:MM:ss.l o',
-          DATE_FORMAT_SIMPLE: 'HH:MM:ss.l',
-          ERROR_LIKE_KEYS: ['err', 'error'],
-          MESSAGE_KEY: 'msg',
-          LEVEL_KEY: 'level',
-          LEVEL_LABEL: 'levelLabel',
-          TIMESTAMP_KEY: 'time',
-          LEVELS: { default: 'USERLVL', 60: 'FATAL', 50: 'ERROR', 40: 'WARN', 30: 'INFO', 20: 'DEBUG', 10: 'TRACE' },
-          LEVEL_NAMES: { fatal: 60, error: 50, warn: 40, info: 30, debug: 20, trace: 10 },
-          LOGGER_KEYS: ['pid', 'hostname', 'name', 'level', 'time', 'timestamp', 'caller'],
-        };
-      },
-      385: (e, t, a) => {
-        const { createCopier: r } = a(4563),
-          s = a(4612),
-          n = a(5246),
-          i = a(5376),
-          { isMainThread: o } = a(1267),
-          l = a(903)(),
-          { DATE_FORMAT: u, ERROR_LIKE_KEYS: c, MESSAGE_KEY: d, LEVEL_KEY: p, LEVEL_LABEL: m, TIMESTAMP_KEY: f, LOGGER_KEYS: g, LEVELS: h, DATE_FORMAT_SIMPLE: y } = a(7318),
-          v = r({});
-        function S(e, t = !1) {
-          if (!1 === t) return e;
-          const a = $(e);
-          if (!_(a)) return e;
-          if (!0 === t) return s(a, y);
-          const r = t.toUpperCase();
-          if ('SYS:STANDARD' === r) return s(a, u);
-          const n = r.substr(0, 4);
-          return s(a, 'SYS:' === n || 'UTC:' === n ? ('UTC:' === n ? t : t.slice(4)) : `UTC:${t}`);
-        }
-        function $(e) {
-          let t = new Date(e);
-          return _(t) || (t = new Date(+e)), t;
-        }
-        function _(e) {
-          return e instanceof Date && !Number.isNaN(e.getTime());
-        }
-        function b(e) {
-          return '[object Object]' === Object.prototype.toString.apply(e);
-        }
-        function w({ input: e, ident: t = '    ', eol: a = '\n' }) {
-          const r = e.split(/\r?\n/);
-          for (let e = 1; e < r.length; e += 1) r[e] = t + r[e];
-          return r.join(a);
-        }
-        function P({
-          input: e,
-          ident: t = '    ',
-          eol: a = '\n',
-          skipKeys: r = [],
-          customPrettifiers: s = {},
-          errorLikeKeys: n = c,
-          excludeLoggerKeys: o = !0,
-          singleLine: u = !1,
-          colorizer: d = l,
-        }) {
-          const p = [].concat(r);
-          !0 === o && Array.prototype.push.apply(p, g);
-          let m = '';
-          const { plain: f, errors: h } = Object.entries(e).reduce(
-            ({ plain: t, errors: a }, [r, i]) => {
-              if (!1 === p.includes(r)) {
-                const o = 'function' == typeof s[r] ? s[r](i, r, e) : i;
-                n.includes(r) ? (a[r] = o) : (t[r] = o);
-              }
-              return { plain: t, errors: a };
-            },
-            { plain: {}, errors: {} }
-          );
-          return (
-            u
-              ? (Object.keys(f).length > 0 && (m += d.greyMessage(i(f))), (m += a), (m = m.replace(/\\\\/gi, '\\')))
-              : Object.entries(f).forEach(([e, r]) => {
-                  let n = 'function' == typeof s[e] ? r : i(r, null, 2);
-                  if (void 0 === n) return;
-                  n = n.replace(/\\\\/gi, '\\');
-                  const o = w({ input: n, ident: t, eol: a });
-                  m += `${t}${e}:${o.startsWith(a) ? '' : ' '}${o}${a}`;
-                }),
-            Object.entries(h).forEach(([e, r]) => {
-              const n = 'function' == typeof s[e] ? r : i(r, null, 2);
-              void 0 !== n && (m += E({ keyName: e, lines: n, eol: a, ident: t }));
-            }),
-            m
-          );
-        }
-        function E({ keyName: e, lines: t, eol: a, ident: r }) {
-          let s = '';
-          const n = `${r}${e}: ${w({ input: t, ident: r, eol: a })}${a}`.split(a);
-          for (let e = 0; e < n.length; e += 1) {
-            0 !== e && (s += a);
-            const t = n[e];
-            if (/^\s*"stack"/.test(t)) {
-              const e = /^(\s*"stack":)\s*(".*"),?$/.exec(t);
-              if (e && 3 === e.length) {
-                const r = /^\s*/.exec(t)[0].length + 4,
-                  n = ' '.repeat(r),
-                  i = e[2];
-                s += e[1] + a + n + JSON.parse(i).replace(/\n/g, a + n);
-              } else s += t;
-            } else s += t;
-          }
-          return s;
-        }
-        function x(e) {
-          const t = [];
-          let a = !1,
-            r = '';
-          for (let s = 0; s < e.length; s++) {
-            const n = e.charAt(s);
-            '\\' !== n ? (a ? ((a = !1), (r += n)) : '.' !== n ? (r += n) : (t.push(r), (r = ''))) : (a = !0);
-          }
-          return r.length && t.push(r), t;
-        }
-        function A(e, t) {
-          const a = Array.isArray(t) ? t : x(t);
-          for (const t of a) {
-            if (!Object.prototype.hasOwnProperty.call(e, t)) return;
-            e = e[t];
-          }
-          return e;
-        }
-        function N(e, t) {
-          const a = x(t),
-            r = a.pop();
-          null !== (e = A(e, a)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, r) && delete e[r];
-        }
-        function L() {}
-        function k(e, t) {
-          e.destroyed ||
-            ('beforeExit' === t
-              ? (e.flush(),
-                e.on('drain', function () {
-                  e.end();
-                }))
-              : e.flushSync());
-        }
-        (e.exports = {
-          isObject: b,
-          prettifyErrorLog: function ({ log: e, messageKey: t = d, ident: a = '    ', eol: r = '\n', errorLikeKeys: s = c, errorProperties: n = [] }) {
-            let i = `${a}${w({ input: e.stack, ident: a, eol: r })}${r}`;
-            if (n.length > 0) {
-              const o = g.concat(t, 'type', 'stack');
-              let l;
-              l = '*' === n[0] ? Object.keys(e).filter((e) => !1 === o.includes(e)) : n.filter((e) => !1 === o.includes(e));
-              for (let t = 0; t < l.length; t += 1) {
-                const n = l[t];
-                n in e != 0 &&
-                  (i = b(e[n]) ? `${i}${a}${n}: {${r}${P({ input: e[n], errorLikeKeys: s, excludeLoggerKeys: !1, eol: r, ident: a + a })}${a}}${r}` : `${i}${a}${n}: ${e[n]}${r}`);
-              }
-            }
-            return i;
-          },
-          prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: a = p, prettifier: r, customLevels: s, customLevelNames: n }) {
-            const i = A(e, a);
-            return void 0 === i ? void 0 : r ? r(i) : t(i, { customLevels: s, customLevelNames: n });
-          },
-          prettifyMessage: function ({
-            log: e,
-            messageFormat: t,
-            messageKey: a = d,
-            colorizer: r = l,
-            levelLabel: s = m,
-            levelKey: n = p,
-            customLevels: i,
-            useOnlyCustomProps: o,
-          }) {
-            if (t && 'string' == typeof t) {
-              const a = String(t).replace(/{([^{}]+)}/g, function (t, a) {
-                let r;
-                return a === s && void 0 !== (r = A(e, n)) ? ((o ? void 0 === i : void 0 === i[r]) ? h[r] : i[r]) : A(e, a) || '';
-              });
-              return r.message(a);
-            }
-            if (t && 'function' == typeof t) {
-              const n = t(e, a, s);
-              return r.message(n);
-            }
-            return a in e == 0 || 'string' != typeof e[a] ? void 0 : r.message(e[a]);
-          },
-          prettifyMetadata: function ({ log: e, prettifiers: t = {} }) {
-            let a = '';
-            if (e.name || e.pid || e.hostname) {
-              if (((a += '('), e.name && (a += t.name ? t.name(e.name) : e.name), e.pid)) {
-                const r = t.pid ? t.pid(e.pid) : e.pid;
-                e.name && e.pid ? (a += '/' + r) : (a += r);
-              }
-              e.hostname && (a += `${'(' === a ? 'on' : ' on'} ${t.hostname ? t.hostname(e.hostname) : e.hostname}`), (a += ')');
-            }
-            return e.caller && (a += `${'' === a ? '' : ' '}<${t.caller ? t.caller(e.caller) : e.caller}>`), '' === a ? void 0 : a;
-          },
-          prettifyObject: P,
-          prettifyTime: function ({ log: e, timestampKey: t = f, translateFormat: a, prettifier: r }) {
-            let s = null;
-            if ((t in e ? (s = e[t]) : 'timestamp' in e && (s = e.timestamp), null === s)) return;
-            const n = a ? S(s, a) : s;
-            return r ? r(n) : `[${n}]`;
-          },
-          buildSafeSonicBoom: function (e) {
-            const t = new n(e);
-            return (
-              t.on('error', function e(a) {
-                if ('EPIPE' === a.code) return (t.write = L), (t.end = L), (t.flushSync = L), void (t.destroy = L);
-                t.removeListener('error', e);
-              }),
-              !e.sync &&
-                o &&
-                (function (e) {
-                  if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
-                    const t = a(2067);
-                    t.register(e, k),
-                      e.on('close', function () {
-                        t.unregister(e);
-                      });
-                  }
-                })(t),
-              t
-            );
-          },
-          filterLog: function ({ log: e, ignoreKeys: t, includeKeys: a }) {
-            const r = v(e);
-            if (a) {
-              const e = {};
-              return (
-                a.forEach((t) => {
-                  e[t] = r[t];
-                }),
-                e
-              );
-            }
-            return (
-              t.forEach((e) => {
-                N(r, e);
-              }),
-              r
-            );
-          },
-          handleCustomlevelsOpts: function (e) {
-            return e
-              ? 'string' == typeof e
-                ? e.split(',').reduce(
-                    (e, t, a) => {
-                      const [r, s = a] = t.split(':');
-                      return (e[s] = r.toUpperCase()), e;
-                    },
-                    { default: 'USERLVL' }
-                  )
-                : '[object Object]' === Object.prototype.toString.call(e)
-                ? Object.keys(e).reduce((t, a, r) => ((t[e[a]] = a.toUpperCase()), t), { default: 'USERLVL' })
-                : {}
-              : {};
-          },
-          handleCustomlevelNamesOpts: function (e) {
-            return e
-              ? 'string' == typeof e
-                ? e.split(',').reduce((e, t, a) => {
-                    const [r, s = a] = t.split(':');
-                    return (e[r.toLowerCase()] = s), e;
-                  }, {})
-                : '[object Object]' === Object.prototype.toString.call(e)
-                ? Object.keys(e).reduce((t, a, r) => ((t[a.toLowerCase()] = e[a]), t), {})
-                : {}
-              : {};
-          },
-        }),
-          (e.exports.internals = {
-            formatTime: S,
-            joinLinesWithIndentation: w,
-            prettifyError: E,
-            getPropertyValue: A,
-            deleteLogProperty: N,
-            splitPropertyKey: x,
-            createDate: $,
-            isValidDate: _,
-          });
-      },
-      4147: (e) => {
-        e.exports = JSON.parse(
-          '{"name":"ragate-cli","version":"0.1.3","description":"Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.","engines":{"node":">=18.x"},"scripts":{"test":"echo \'Sorry, test code is in preparation.\\n\'","build:dev":"ENV=development webpack","build:prd":"ENV=production webpack","lint":"eslint . --fix","format":"prettier . --write","prepare":"husky install"},"eslintIgnore":["!/.github",".serverless","bin","tmp","webpack.config.js"],"main":"./lib/app.ts","bin":{"ragate":"./bin/app.js"},"repository":{"type":"git","url":"git+https://github.com/ragate-inc/ragate-cli.git"},"lint-staged":{"*.{ts,js}":["eslint"],"*.{css,html,js,json,md,yaml,yml,ts,js}":["prettier . --write"]},"keywords":["aws","serverless","ragate","cli","amplify","serverless","lambda","amazon"],"author":"Ragate inc.","license":"MIT","bugs":{"url":"https://github.com/ragate-inc/ragate-cli/issues"},"homepage":"https://github.com/ragate-inc/ragate-cli#readme","devDependencies":{"@tsconfig/node-lts":"^18.12.1","@types/figlet":"^1.5.6","@types/fs-extra":"^11.0.1","@types/inquirer":"^9.0.3","@types/inquirer-autocomplete-prompt":"^3.0.0","@types/js-yaml":"^4.0.5","@types/lodash":"^4.14.194","@types/node":"^18.16.3","@types/webpack":"^5.28.1","@types/webpack-node-externals":"^3.0.0","@types/yargs":"^17.0.24","@typescript-eslint/eslint-plugin":"^5.59.2","@typescript-eslint/parser":"^5.59.2","eslint":"^8.39.0","eslint-config-prettier":"^8.8.0","eslint-config-standard-with-typescript":"^34.0.1","husky":"^6.0.0","lint-staged":"^13.2.2","prettier":"2.8.8","ts-loader":"^9.4.2","ts-node":"^10.9.1","tsconfig-paths-webpack-plugin":"^4.0.1","typescript":"^5.0.4","webpack":"^5.81.0","webpack-cli":"^5.0.2","webpack-node-externals":"^3.0.0"},"dependencies":{"@aws-cdk/assert":"^2.68.0","@aws-cdk/aws-iam":"^1.201.0","@aws-cdk/aws-sns":"^1.201.0","@aws-cdk/aws-sns-subscriptions":"^1.201.0","@aws-cdk/aws-sqs":"^1.201.0","aws-cdk-lib":"^2.79.1","figlet":"^1.6.0","fs-extra":"^11.1.1","graphql":"^16.6.0","graphql-compose":"^9.0.10","graphql-tools":"^8.3.20","inquirer":"^8.0.0","inquirer-autocomplete-prompt":"^2.0.0","isomorphic-git":"^1.23.0","js-yaml":"^4.1.0","lodash":"^4.17.21","parent-require":"^1.0.0","pino":"^8.12.1","pino-pretty":"^10.0.0","yaml-cfn":"^0.3.2","yargonaut":"^1.1.4","yargs":"^17.1.1-candidate.0"}}'
+/*
+ * ATTENTION: The "eval" devtool has been used (maybe by default in mode: "development").
+ * This devtool is neither made for production nor for readable output files.
+ * It uses "eval()" calls to create a separate source file in the browser devtools.
+ * If you are trying to read the output file, select a different devtool (https://webpack.js.org/configuration/devtool/)
+ * or disable the default devtool with "devtool: false".
+ * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
+ */
+/******/ (() => {
+  // webpackBootstrap
+  /******/ 'use strict';
+  /******/ var __webpack_modules__ = {
+    /***/ './lib/app.ts':
+      /*!********************!*\
+  !*** ./lib/app.ts ***!
+  \********************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! entry/builder */ "./lib/entry/builder.ts"));\nvoid (async () => {\n    const entry = new builder_1.default();\n    await entry.run();\n})();\n\n\n//# sourceURL=webpack://ragate-cli/./lib/app.ts?'
         );
+
+        /***/
       },
-    },
-    t = {};
-  !(function a(r) {
-    var s = t[r];
-    if (void 0 !== s) return s.exports;
-    var n = (t[r] = { exports: {} });
-    return e[r].call(n.exports, n, n.exports, a), n.exports;
-  })(4712);
+
+    /***/ './lib/config.ts':
+      /*!***********************!*\
+  !*** ./lib/config.ts ***!
+  \***********************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst package_json_1 = __importDefault(__webpack_require__(/*! package.json */ "./package.json"));\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ "lodash"));\nconst path_1 = __importDefault(__webpack_require__(/*! path */ "path"));\n// Additional templates selectable via CLI\n// Consider migrating to a separate file if template types become bloated\nconst templates = [\n    {\n        category: \'Node.js\',\n        name: \'Node.js - aws-node-appsync\',\n        value: \'aws-node-appsync\',\n    },\n];\nconst config = {\n    // current npm package version in package.json\n    npmVersion: package_json_1.default.version,\n    // repository of template\n    repositoyUrl: \'https://github.com/ragate-inc/serverless-starter\',\n    // working directory\n    tmpPath: `${path_1.default.dirname(process.argv[1])}/../tmp`,\n    // current directory\n    currentPath: path_1.default.resolve(),\n    // templates at repository\n    templates: lodash_1.default.chain(templates)\n        .sortBy(\'category\')\n        .map((item) => ({\n        name: `${item.category} - ${item.name}`,\n        value: item.value,\n    }))\n        .value(),\n};\nexports["default"] = config;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/config.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/entry/builder.ts':
+      /*!******************************!*\
+  !*** ./lib/entry/builder.ts ***!
+  \******************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          "\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ \"./lib/utils/logger.ts\"));\nconst yargs_1 = __importDefault(__webpack_require__(/*! yargs/yargs */ \"yargs/yargs\"));\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ \"./lib/utils/yargonaut.ts\");\nconst config_1 = __importDefault(__webpack_require__(/*! config */ \"./lib/config.ts\"));\nconst getLocale_1 = __webpack_require__(/*! entry/utils/getLocale */ \"./lib/entry/utils/getLocale.ts\");\nconst index_1 = __importDefault(__webpack_require__(/*! features/create/index */ \"./lib/features/create/index.ts\"));\nconst index_2 = __importDefault(__webpack_require__(/*! features/add/index */ \"./lib/features/add/index.ts\"));\nconst index_3 = __importDefault(__webpack_require__(/*! features/codegen/index */ \"./lib/features/codegen/index.ts\"));\nconst index_4 = __webpack_require__(/*! types/index */ \"./lib/types/index.ts\");\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\nconst cli_1 = __webpack_require__(/*! utils/cli */ \"./lib/utils/cli.ts\");\n/**\n * yargs typescript : https://github.com/yargs/yargs/blob/main/docs/typescript.md\n * yargs api reference : https://yargs.js.org/docs/\n * Inquirer : https://github.com/SBoudrias/Inquirer.js/tree/master\n */\nclass default_1 {\n    constructor() {\n        try {\n            (0, yargonaut_1.init)();\n            this.chalk = yargonaut_1.chalk;\n            const argv = (0, yargs_1.default)(process.argv.slice(2))\n                .options({\n                lang: {\n                    default: this.langRef.default,\n                    type: this.langRef.type,\n                },\n                verbose: {\n                    type: this.verboseRef.type,\n                },\n                region: {\n                    default: this.regionRef.default,\n                    type: this.regionRef.type,\n                },\n            })\n                .check((argv) => {\n                argv.verbose = lodash_1.default.hasIn(argv, 'verbose');\n                return true;\n            })\n                .help(false)\n                .version(false)\n                .parseSync();\n            this.lang = argv.lang;\n            this.verbose = argv.verbose;\n            this.region = argv.region;\n            this.locale = (0, getLocale_1.getLocaleLang)(argv.lang);\n            this.logger = logger_1.default.getLogger(this.verbose ? 'debug' : 'info');\n            this.npmVersion = config_1.default.npmVersion;\n        }\n        finally {\n            (0, cli_1.cleanUpTmpDirectory)();\n        }\n    }\n    chalk;\n    logger;\n    locale;\n    lang;\n    langRef = {\n        default: process.env.LANG ?? 'en',\n        type: 'string',\n    };\n    verbose;\n    verboseRef = {\n        type: 'flag',\n    };\n    npmVersion;\n    get version() {\n        return `ragate-cli v${this.npmVersion}`;\n    }\n    region;\n    regionRef = {\n        default: 'ap-northeast-1',\n        type: 'string',\n    };\n    handleError(err) {\n        const logger = logger_1.default.getLogger();\n        if (err.name)\n            logger.debug(err.name);\n        if (err.stack)\n            logger.debug(err.stack);\n        console.error('\\n', yargonaut_1.chalk.red(err.message));\n        process.exit(1);\n    }\n    cli() {\n        const { version, chalk, locale, lang } = this;\n        return (0, yargs_1.default)(process.argv.slice(2))\n            .scriptName('')\n            .options({\n            verbose: {\n                describe: chalk.grey(locale.options.describe.verbose),\n                type: this.verboseRef.type,\n            },\n            lang: {\n                describe: chalk.grey(locale.options.describe.lang),\n                default: this.langRef.default,\n                type: this.langRef.type,\n            },\n            region: {\n                alias: 'r',\n                describe: chalk.grey(locale.options.describe.region),\n                default: this.regionRef.default,\n                type: this.regionRef.type,\n                choices: index_4.awsRegions,\n            },\n        })\n            .usage(version)\n            .help('help', chalk.grey(locale.help))\n            .alias('h', 'help')\n            .version('version', chalk.grey(locale.version), version)\n            .alias('v', 'version')\n            .check((argv) => {\n            if (argv._.length === 0)\n                throw new Error(this.locale.unProcessed.required);\n            return true;\n        })\n            .command('create', chalk.grey(locale.command.description.create), (_yargs) => {\n            const args = { lang: this.lang, region: this.region };\n            return new index_1.default.builder(args).build(_yargs);\n        }, (argv) => new index_1.default.handler(argv).run())\n            .command('add', chalk.grey(locale.command.description.add), (_yargs) => {\n            const args = { lang: this.lang, region: this.region };\n            return new index_2.default.builder(args).build(_yargs);\n        })\n            .command('codegen', chalk.grey(locale.command.description.codegen), (_yargs) => {\n            const args = { lang: this.lang, region: this.region };\n            return new index_3.default.builder(args).build(_yargs);\n        })\n            .command('*', '', () => ({}), () => {\n            throw new Error(this.locale.unProcessed.notFound);\n        })\n            .wrap(Math.max((0, yargs_1.default)().terminalWidth() - 5, 60))\n            .locale(lang)\n            .fail((msg, err) => this.handleError(err));\n    }\n    async run() {\n        try {\n            await this.cli().parseAsync();\n        }\n        catch (e) {\n            this.handleError(e);\n        }\n    }\n}\nexports[\"default\"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/entry/builder.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/entry/locale/en.ts':
+      /*!********************************!*\
+  !*** ./lib/entry/locale/en.ts ***!
+  \********************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    help: 'Show help',\n    version: 'Show version',\n    yourInput: 'your input',\n    command: {\n        description: {\n            create: 'Create a new project',\n            add: 'Add aws resouces',\n            codegen: 'Auto generate source code',\n        },\n    },\n    options: {\n        describe: {\n            verbose: 'Show verbose logs',\n            region: 'Aws region',\n            lang: 'Display language',\n        },\n    },\n    unProcessed: {\n        required: 'please input a command. Run \"ragate help\" for a list of all available commands.',\n        notFound: 'The command entered does not exist. Run \"ragate help\" for a list of all available commands.',\n    },\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/entry/locale/en.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/entry/locale/ja.ts':
+      /*!********************************!*\
+  !*** ./lib/entry/locale/ja.ts ***!
+  \********************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    help: 'ヘルプを表示',\n    version: 'バージョンを表示',\n    yourInput: '入力されたコマンド',\n    command: {\n        description: {\n            create: 'プロジェクトを作成',\n            add: 'AWSリソースの追加',\n            codegen: 'ソースコード自動生成',\n        },\n    },\n    options: {\n        describe: {\n            verbose: '詳細なログを出力',\n            region: 'AWSリージョン',\n            lang: '表示言語',\n        },\n    },\n    unProcessed: {\n        required: '指定のコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',\n        notFound: '入力されたコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',\n    },\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/entry/locale/ja.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/entry/utils/getLocale.ts':
+      /*!**************************************!*\
+  !*** ./lib/entry/utils/getLocale.ts ***!
+  \**************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.getLocaleLang = void 0;\nconst ja_1 = __importDefault(__webpack_require__(/*! entry/locale/ja */ "./lib/entry/locale/ja.ts"));\nconst en_1 = __importDefault(__webpack_require__(/*! entry/locale/en */ "./lib/entry/locale/en.ts"));\nconst getLocaleLang = (locale) => {\n    switch (locale) {\n        case \'ja\':\n            return ja_1.default;\n        case \'en\':\n            return en_1.default;\n        default:\n            return en_1.default;\n    }\n};\nexports.getLocaleLang = getLocaleLang;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/entry/utils/getLocale.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/exceptions/index.ts':
+      /*!*********************************!*\
+  !*** ./lib/exceptions/index.ts ***!
+  \*********************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nexports.CLIError = exports.EnvironmentError = exports.BaseClass = void 0;\nclass BaseClass extends Error {\n    constructor(message) {\n        super(message);\n        this.name = new.target.name;\n        if (Error.captureStackTrace)\n            Error.captureStackTrace(this, this.constructor);\n        Object.setPrototypeOf(this, new.target.prototype);\n    }\n}\nexports.BaseClass = BaseClass;\nclass EnvironmentError extends BaseClass {\n    constructor(message) {\n        super(message);\n        this.name = 'EnvironmentError';\n    }\n}\nexports.EnvironmentError = EnvironmentError;\nclass CLIError extends BaseClass {\n    constructor(message) {\n        super(message);\n        this.name = 'CLIError';\n    }\n}\nexports.CLIError = CLIError;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/exceptions/index.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/builder.ts':
+      /*!*************************************!*\
+  !*** ./lib/features/add/builder.ts ***!
+  \*************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ "./lib/utils/logger.ts"));\nconst sns_1 = __importDefault(__webpack_require__(/*! features/add/features/sns */ "./lib/features/add/features/sns/index.ts"));\nconst sqs_1 = __importDefault(__webpack_require__(/*! features/add/features/sqs */ "./lib/features/add/features/sqs/index.ts"));\nconst basicauthlambda_1 = __importDefault(__webpack_require__(/*! features/add/features/basicauthlambda */ "./lib/features/add/features/basicauthlambda/index.ts"));\nconst api_1 = __importDefault(__webpack_require__(/*! features/add/features/api */ "./lib/features/add/features/api/index.ts"));\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ "./lib/utils/yargonaut.ts");\nconst getLocale_1 = __webpack_require__(/*! features/add/utils/getLocale */ "./lib/features/add/utils/getLocale.ts");\nclass default_1 extends index_1.FeatureBuilderAbstract {\n    constructor(args) {\n        super(args);\n    }\n    build(yargs) {\n        const lang = this.args.lang;\n        const locale = (0, getLocale_1.getLocaleLang)(lang);\n        const logger = logger_1.default.getLogger();\n        return yargs\n            .version(false)\n            .usage(\'Usage: add <command> <options>\')\n            .command(\'sns\', yargonaut_1.chalk.grey(locale.command.description.sns), (_yargs) => new sns_1.default.builder(this.args).build(_yargs), (argv) => new sns_1.default.handler(argv).run())\n            .command(\'sqs\', yargonaut_1.chalk.grey(locale.command.description.sns), (_yargs) => new sqs_1.default.builder(this.args).build(_yargs), (argv) => new sqs_1.default.handler(argv).run())\n            .command(\'basicauthlambda\', yargonaut_1.chalk.grey(locale.command.description.basicAuthLambda), (_yargs) => new basicauthlambda_1.default.builder(this.args).build(_yargs), (argv) => new basicauthlambda_1.default.handler(argv).run())\n            .command(\'api\', yargonaut_1.chalk.grey(locale.command.description.api), (_yargs) => new api_1.default.builder(this.args).build(_yargs), (argv) => new api_1.default.handler(argv).run())\n            .command(\'*\', yargonaut_1.chalk.grey(\'<command> <options>\'), () => ({}), () => {\n            logger.error(yargonaut_1.chalk.red(locale.unProcessed));\n        });\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/builder.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/api/builder.ts':
+      /*!**************************************************!*\
+  !*** ./lib/features/add/features/api/builder.ts ***!
+  \**************************************************/
+      /***/ (__unused_webpack_module, exports, __webpack_require__) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nclass default_1 extends index_1.FeatureBuilderAbstract {\n    constructor(args) {\n        super(args);\n    }\n    build(_yargs) {\n        return _yargs.version(false).usage(\'Usage: $0 api\');\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/api/builder.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/api/handler.ts':
+      /*!**************************************************!*\
+  !*** ./lib/features/add/features/api/handler.ts ***!
+  \**************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          "\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ \"./lib/utils/logger.ts\"));\nconst index_1 = __webpack_require__(/*! types/index */ \"./lib/types/index.ts\");\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\nconst serverlessConfigService_1 = __importDefault(__webpack_require__(/*! services/serverlessConfigService */ \"./lib/services/serverlessConfigService.ts\"));\nconst inquirer_1 = __importDefault(__webpack_require__(/*! inquirer */ \"inquirer\"));\nconst validator_1 = __importDefault(__webpack_require__(/*! utils/validator */ \"./lib/utils/validator/index.ts\"));\nconst filter_1 = __importDefault(__webpack_require__(/*! utils/inquirer/filter */ \"./lib/utils/inquirer/filter.ts\"));\nconst transformer_1 = __importDefault(__webpack_require__(/*! utils/inquirer/transformer */ \"./lib/utils/inquirer/transformer.ts\"));\nconst parser_1 = __importDefault(__webpack_require__(/*! utils/parser */ \"./lib/utils/parser.ts\"));\nconst generateMutationService_1 = __importDefault(__webpack_require__(/*! features/add/features/api/services/generateMutationService */ \"./lib/features/add/features/api/services/generateMutationService.ts\"));\nconst generateQueryService_1 = __importDefault(__webpack_require__(/*! features/add/features/api/services/generateQueryService */ \"./lib/features/add/features/api/services/generateQueryService.ts\"));\nconst generateGetItemService_1 = __importDefault(__webpack_require__(/*! features/add/features/api/services/generateGetItemService */ \"./lib/features/add/features/api/services/generateGetItemService.ts\"));\nconst appSyncStackService_1 = __importDefault(__webpack_require__(/*! services/appSyncStackService */ \"./lib/services/appSyncStackService.ts\"));\nclass default_1 extends index_1.FeatureHandlerAbstract {\n    constructor(argv) {\n        super(argv);\n    }\n    get defaultSchemaGrapqlFilePath() {\n        return `appsync/schema.graphql`;\n    }\n    get defaultServerlessConfigPath() {\n        return `serverless/${this.argv.region}/serverless.yml`;\n    }\n    async run() {\n        const logger = logger_1.default.getLogger();\n        const info = (await inquirer_1.default.prompt([\n            {\n                type: 'input',\n                name: 'apiName',\n                message: 'API名を入力',\n                filter: (input) => input.replace(/\\s+/g, ''),\n                transformer: (input) => input.replace(/\\s+/g, ''),\n                validate: (value) => new validator_1.default(value, this.lang).required().mustNoIncludeZenkaku().value(),\n            },\n            {\n                type: 'list',\n                name: 'apiType',\n                choices: ['Mutation', 'Query'],\n                message: 'APIタイプを選択',\n                validate: (value) => new validator_1.default(value, this.lang).required().value(),\n            },\n            {\n                type: 'list',\n                name: 'resolverType',\n                choices: ['UNIT', 'PIPELINE'],\n                message: 'リゾルバータイプを選択',\n                validate: (value) => new validator_1.default(value, this.lang).required().value(),\n            },\n            {\n                type: 'input',\n                name: 'serverlessConfigPath',\n                message: 'input a serverless config file path',\n                default: () => this.defaultServerlessConfigPath,\n                validate: (value) => new validator_1.default(value, this.lang).required().mustBeYamlFilePath().value(),\n                transformer: (input) => new transformer_1.default(input).removeAllSpace().value(),\n                filter: (input) => new filter_1.default(input).removeAllSpace().value(),\n            },\n        ]));\n        logger.debug(`input info values : ${JSON.stringify(info)}}`);\n        const sls = new serverlessConfigService_1.default({ region: this.argv.region, serverlessConfigPath: info.serverlessConfigPath, lang: this.lang });\n        if (!sls.isExistsServelessConfig) {\n            throw new Error('serverless.ymlが存在しません');\n        }\n        const slsConfig = sls.serverlessConfig;\n        if (!(slsConfig.plugins ?? []).includes('serverless-appsync-plugin')) {\n            throw new Error('serverless-appsync-pluginがインストールされていません');\n        }\n        const appSyncStackPath = parser_1.default.parseSlsRecursivelyReference(slsConfig.custom?.appSync);\n        if (lodash_1.default.isEmpty(appSyncStackPath)) {\n            throw new Error('serverless.ymlのcustom.appsyncが不正です、custom.appsyncには、以下のような文字列が設定されている必要があります。\\n${file(./appsync/stack.yml)}');\n        }\n        const appSyncStackService = new appSyncStackService_1.default({ stackFilePath: appSyncStackPath, lang: this.lang, region: this.argv.region });\n        const appSyncStack = appSyncStackService.appSyncStack;\n        if (appSyncStack?.mappingTemplates.some((m) => m.type === info.apiType && m.field === info.apiName)) {\n            throw new Error('既にマッピングテンプレートに定義が存在します');\n        }\n        if (info.resolverType === 'PIPELINE' && appSyncStack?.functionConfigurations.some((m) => m.name === `Mutation${info.apiName}`)) {\n            throw new Error('既にリゾルバー関数がAPIが存在します');\n        }\n        if (info.apiType === 'Mutation') {\n            if (appSyncStack?.schema.isExistsMutationApi(info.apiName))\n                throw new Error('既にschemaにAPI定義が存在します');\n            return (0, generateMutationService_1.default)({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });\n        }\n        if (info.apiType === 'Query') {\n            if (appSyncStack?.schema.isExistsQueryApi(info.apiName))\n                throw new Error('既にschemaにAPI定義が存在します');\n            const { operation } = (await inquirer_1.default.prompt([\n                {\n                    type: 'list',\n                    name: 'operation',\n                    choices: ['Query', 'GetItem'],\n                    message: 'Queryのタイプを選択',\n                    validate: (value) => new validator_1.default(value, this.lang).required().value(),\n                },\n            ]));\n            if (operation === 'Query')\n                return (0, generateQueryService_1.default)({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });\n            if (operation === 'GetItem')\n                return (0, generateGetItemService_1.default)({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });\n        }\n    }\n}\nexports[\"default\"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/api/handler.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/api/index.ts':
+      /*!************************************************!*\
+  !*** ./lib/features/add/features/api/index.ts ***!
+  \************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! features/add/features/api/builder */ "./lib/features/add/features/api/builder.ts"));\nconst handler_1 = __importDefault(__webpack_require__(/*! features/add/features/api/handler */ "./lib/features/add/features/api/handler.ts"));\nexports["default"] = {\n    builder: builder_1.default,\n    handler: handler_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/api/index.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/api/services/generateGetItemService.ts':
+      /*!**************************************************************************!*\
+  !*** ./lib/features/add/features/api/services/generateGetItemService.ts ***!
+  \**************************************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          "\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ \"./lib/utils/logger.ts\"));\nconst inquirer_1 = __importDefault(__webpack_require__(/*! inquirer */ \"inquirer\"));\nconst validator_1 = __importDefault(__webpack_require__(/*! utils/validator */ \"./lib/utils/validator/index.ts\"));\nconst transformer_1 = __importDefault(__webpack_require__(/*! utils/inquirer/transformer */ \"./lib/utils/inquirer/transformer.ts\"));\nconst filter_1 = __importDefault(__webpack_require__(/*! utils/inquirer/filter */ \"./lib/utils/inquirer/filter.ts\"));\nconst codeService_1 = __importDefault(__webpack_require__(/*! services/codeService */ \"./lib/services/codeService/index.ts\"));\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ \"./lib/utils/yargonaut.ts\");\nconst path_1 = __importDefault(__webpack_require__(/*! path */ \"path\"));\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\nconst graphql_1 = __webpack_require__(/*! graphql */ \"graphql\");\nexports[\"default\"] = async (args) => {\n    const { appSyncStackService, lang, slsConfig, info } = args;\n    const logger = logger_1.default.getLogger();\n    logger.debug(`appsyncStack : ${JSON.stringify(appSyncStackService.appSyncStack)}`);\n    const isCreateDataSource = async () => {\n        const { createDataSource } = (await inquirer_1.default.prompt([\n            {\n                type: 'expand',\n                name: 'createDataSource',\n                message: 'データソースを新しく作成しますか？',\n                choices: [\n                    {\n                        key: 'y',\n                        name: 'yes',\n                        value: true,\n                    },\n                    {\n                        key: 'n',\n                        name: 'no',\n                        value: false,\n                    },\n                ],\n                validate: (value) => new validator_1.default(value, lang).required().value(),\n            },\n        ]));\n        if (createDataSource) {\n            return createDataSource;\n        }\n        else if (appSyncStackService.appSyncStack?.dataSources.length === 0) {\n            console.log(yargonaut_1.chalk.red('データソースが存在しません、データソースを作成する必要があります'));\n            return isCreateDataSource();\n        }\n        else {\n            return false;\n        }\n    };\n    const createDataSource = await isCreateDataSource();\n    const dataSourceProcess = async () => {\n        if (createDataSource) {\n            const { lambdaFunctionName, lambdaHandler } = (await inquirer_1.default.prompt([\n                {\n                    type: 'input',\n                    name: 'lambdaFunctionName',\n                    message: 'Lambda関数名を入力',\n                    default: () => info.apiName,\n                    filter: (input) => input.replace(/\\s+/g, ''),\n                    transformer: (input) => input.replace(/\\s+/g, ''),\n                    validate: (value) => new validator_1.default(value, lang).required().mustNoIncludeZenkaku().value(),\n                },\n                {\n                    type: 'input',\n                    name: 'lambdaHandler',\n                    message: 'input a lambda handler path',\n                    default: () => `src/functions/appsync/${info.apiName}.handler`,\n                    validate: (value) => new validator_1.default(value, lang).required().mustBeExtension().value(),\n                    transformer: (input) => new transformer_1.default(input).removeAllSpace().value(),\n                    filter: (input) => new filter_1.default(input).removeAllSpace().value(),\n                },\n            ]));\n            slsConfig.addFunction({\n                lambdaFunctionName,\n                lambdaHandler,\n                code: codeService_1.default.templates.typescript.skeleton,\n            });\n            const dataSource = {\n                type: 'AWS_LAMBDA',\n                name: lambdaFunctionName,\n                description: `It is for ${info.apiType}.${info.apiName}`,\n                config: {\n                    functionName: { Ref: `${lambdaFunctionName}LambdaFunction` },\n                    lambdaFunctionArn: { 'Fn::GetAtt': [`${lambdaFunctionName}LambdaFunction`, 'Arn'] },\n                    serviceRoleArn: { 'Fn::GetAtt': [appSyncStackService.appSyncLambdaRoleName, 'Arn'] },\n                },\n            };\n            appSyncStackService.addIamRoleByDataSource({\n                dataSource: 'AWS_LAMBDA',\n                sls: slsConfig,\n            });\n            appSyncStackService.addDataSource(dataSource);\n            return dataSource;\n        }\n        const { dataSource } = (await inquirer_1.default.prompt([\n            {\n                type: 'list',\n                name: 'dataSource',\n                choices: appSyncStackService.appSyncStack?.dataSources.map((d) => d.name),\n                message: 'データソースを選択',\n                validate: (value) => new validator_1.default(value, lang).required().value(),\n            },\n        ]));\n        const selectedDataSource = appSyncStackService.appSyncStack?.dataSources.find((d) => d.name === dataSource);\n        appSyncStackService.addIamRoleByDataSource({\n            dataSource: selectedDataSource.type,\n            sls: slsConfig,\n        });\n        logger.debug('finished dataSourceProcess');\n        return selectedDataSource;\n    };\n    const getTemplate = async (dataSource) => {\n        if (dataSource.type === 'AMAZON_DYNAMODB') {\n            const { template, primaryKeyName, sortKeyName } = (await inquirer_1.default.prompt([\n                {\n                    type: 'list',\n                    name: 'template',\n                    choices: ['getItem', 'getItemConsistentRead', 'localResolver'],\n                    message: 'テンプレートを選択',\n                    validate: (value) => new validator_1.default(value, lang).required().value(),\n                },\n                {\n                    type: 'input',\n                    name: 'primaryKeyName',\n                    message: 'プライマリーキー名を入力',\n                    default: () => 'Id',\n                    filter: (input) => input.replace(/\\s+/g, ''),\n                    transformer: (input) => input.replace(/\\s+/g, ''),\n                    validate: (value) => new validator_1.default(value, lang).required().mustNoIncludeZenkaku().value(),\n                },\n                {\n                    type: 'input',\n                    name: 'sortKeyName',\n                    message: 'ソートキー名を入力',\n                    default: () => 'Sk',\n                    filter: (input) => input.replace(/\\s+/g, ''),\n                    transformer: (input) => input.replace(/\\s+/g, ''),\n                    validate: (value) => new validator_1.default(value, lang).required().mustNoIncludeZenkaku().value(),\n                },\n            ]));\n            if (template === 'getItem') {\n                return {\n                    before: codeService_1.default.templates.vtl.dynamoGetItemRequest({ consistentRead: false, primaryKeyName, sortKeyName }),\n                    after: codeService_1.default.templates.vtl.dynamoGetItemResponse,\n                };\n            }\n            if (template === 'getItemConsistentRead') {\n                return {\n                    before: codeService_1.default.templates.vtl.dynamoGetItemRequest({ consistentRead: true, primaryKeyName, sortKeyName }),\n                    after: codeService_1.default.templates.vtl.dynamoGetItemResponse,\n                };\n            }\n            if (template === 'localResolver') {\n                return {\n                    before: codeService_1.default.templates.vtl.localResolverRequest,\n                    after: codeService_1.default.templates.vtl.localResolverResponse,\n                };\n            }\n        }\n        else if (dataSource.type === 'AMAZON_ELASTICSEARCH') {\n            const { indexName } = (await inquirer_1.default.prompt([\n                {\n                    type: 'input',\n                    name: 'indexName',\n                    message: 'インデックス名を入力',\n                    default: () => info.apiName,\n                    filter: (input) => input.replace(/\\s+/g, ''),\n                    transformer: (input) => input.replace(/\\s+/g, ''),\n                    validate: (value) => new validator_1.default(value, lang).required().mustNoIncludeZenkaku().value(),\n                },\n            ]));\n            return {\n                before: codeService_1.default.templates.vtl.openSearchQueryRequest({ indexName }),\n                after: codeService_1.default.templates.vtl.openSearchQueryResponse,\n            };\n        }\n        else if (dataSource.type === 'RELATIONAL_DATABASE') {\n            return {\n                before: codeService_1.default.templates.vtl.rdbQueryRequest,\n                after: codeService_1.default.templates.vtl.rdbQueryResponse,\n            };\n        }\n        else if (dataSource.type === 'HTTP') {\n            return {\n                before: codeService_1.default.templates.vtl.httpQueryRequest,\n                after: codeService_1.default.templates.vtl.httpQueryResponse,\n            };\n        }\n        return {\n            before: '{}',\n            after: '{}',\n        };\n    };\n    const functionConfigurationsProcess = async (args) => {\n        const { dataSource } = args;\n        if (info.resolverType === 'UNIT')\n            return Promise.resolve(undefined);\n        // pipeline resolver\n        const basePath = appSyncStackService.appSyncStack?.functionConfigurationsLocation ?? './';\n        const functionConfiguration = {\n            dataSource: dataSource.name,\n            name: `${info.apiType}${lodash_1.default.upperFirst(info.apiName)}`,\n            request: dataSource.type === 'AWS_LAMBDA' ? false : `functions/${info.apiType}.${info.apiName}.request.vtl`,\n            response: dataSource.type === 'AWS_LAMBDA' ? false : `functions/${info.apiType}.${info.apiName}.response.vtl`,\n        };\n        if (dataSource.type !== 'AWS_LAMBDA') {\n            const { before, after } = await getTemplate(dataSource);\n            if (lodash_1.default.isString(functionConfiguration.request)) {\n                new codeService_1.default({\n                    filePath: path_1.default.join(basePath, functionConfiguration.request),\n                    code: before,\n                    type: 'vtl',\n                }).write();\n            }\n            if (lodash_1.default.isString(functionConfiguration.response)) {\n                new codeService_1.default({\n                    filePath: path_1.default.join(basePath, functionConfiguration.response),\n                    code: after,\n                    type: 'vtl',\n                }).write();\n            }\n        }\n        appSyncStackService.addFunctionConfiguration({\n            functionConfiguration,\n        });\n        logger.debug('finished functionConfigurationsProcess');\n        return Promise.resolve(functionConfiguration);\n    };\n    const mappingTemplateProcess = async (args) => {\n        const { dataSource, functionConfigurations } = args;\n        const generateDataSource = async () => {\n            if (info.resolverType === 'PIPELINE') {\n                const basePath = appSyncStackService.appSyncStack?.mappingTemplatesLocation ?? './';\n                const res = {\n                    type: info.apiType,\n                    request: `queries/${info.apiType}.${info.apiName}.request.vtl`,\n                    response: `queries/${info.apiType}.${info.apiName}.response.vtl`,\n                    field: info.apiName,\n                    kind: info.resolverType,\n                    functions: [functionConfigurations?.name],\n                };\n                new codeService_1.default({ filePath: path_1.default.join(basePath, res.request), code: codeService_1.default.templates.vtl.pipelineBefore, type: 'vtl' }).write();\n                new codeService_1.default({ filePath: path_1.default.join(basePath, res.response), code: codeService_1.default.templates.vtl.pipelineAfter, type: 'vtl' }).write();\n                return res;\n            }\n            // unit resolver\n            const mappingTemplate = {\n                dataSource: dataSource.name,\n                type: info.apiType,\n                field: info.apiName,\n                kind: info.resolverType,\n                request: dataSource.type === 'AWS_LAMBDA' ? false : `queries/${info.apiType}.${info.apiName}.request.vtl`,\n                response: dataSource.type === 'AWS_LAMBDA' ? false : `queries/${info.apiType}.${info.apiName}.response.vtl`,\n            };\n            if (dataSource.type !== 'AWS_LAMBDA') {\n                const basePath = appSyncStackService.appSyncStack?.mappingTemplatesLocation ?? './';\n                const { before, after } = await getTemplate(dataSource);\n                if (lodash_1.default.isString(mappingTemplate.request)) {\n                    new codeService_1.default({\n                        filePath: path_1.default.join(basePath, mappingTemplate.request),\n                        code: before,\n                        type: 'vtl',\n                    }).write();\n                }\n                if (lodash_1.default.isString(mappingTemplate.response)) {\n                    new codeService_1.default({\n                        filePath: path_1.default.join(basePath, mappingTemplate.response),\n                        code: after,\n                        type: 'vtl',\n                    }).write();\n                }\n            }\n            return mappingTemplate;\n        };\n        const mappingTemplate = await generateDataSource();\n        appSyncStackService.addMappingTemplate({\n            mappingTemplate,\n        });\n        logger.debug('finished mappingTemplateProcess');\n        return mappingTemplate;\n    };\n    const schemaGraphqlProcess = async () => {\n        const graphqlEditor = appSyncStackService.graphqlEditor;\n        const type = appSyncStackService.graphqlEditor.addExampleType(info.apiName);\n        appSyncStackService.updateCustomSchemaGraphl({\n            query: {\n                apiName: info.apiName,\n                type: type.getType(),\n                args: {\n                    example: {\n                        type: graphql_1.GraphQLString,\n                    },\n                },\n            },\n        });\n        logger.debug('finished scheneGraphqlProcess');\n        return Promise.resolve(graphqlEditor.customSchema);\n    };\n    const resDataSource = await dataSourceProcess();\n    const resFunctionConfigurations = await functionConfigurationsProcess({ dataSource: resDataSource });\n    const resMappingTemplate = await mappingTemplateProcess({ dataSource: resDataSource, functionConfigurations: resFunctionConfigurations });\n    const resSchemaGraphql = await schemaGraphqlProcess();\n    logger.debug({\n        dataSource: resDataSource,\n        functionConfigurations: resFunctionConfigurations,\n        mappingTemplate: resMappingTemplate,\n        schemaGraphql: resSchemaGraphql,\n    });\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/api/services/generateGetItemService.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/api/services/generateMutationService.ts':
+      /*!***************************************************************************!*\
+  !*** ./lib/features/add/features/api/services/generateMutationService.ts ***!
+  \***************************************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          "\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ \"./lib/utils/logger.ts\"));\nconst inquirer_1 = __importDefault(__webpack_require__(/*! inquirer */ \"inquirer\"));\nconst validator_1 = __importDefault(__webpack_require__(/*! utils/validator */ \"./lib/utils/validator/index.ts\"));\nconst transformer_1 = __importDefault(__webpack_require__(/*! utils/inquirer/transformer */ \"./lib/utils/inquirer/transformer.ts\"));\nconst filter_1 = __importDefault(__webpack_require__(/*! utils/inquirer/filter */ \"./lib/utils/inquirer/filter.ts\"));\nconst codeService_1 = __importDefault(__webpack_require__(/*! services/codeService */ \"./lib/services/codeService/index.ts\"));\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ \"./lib/utils/yargonaut.ts\");\nconst path_1 = __importDefault(__webpack_require__(/*! path */ \"path\"));\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\nexports[\"default\"] = async (args) => {\n    const { appSyncStackService, lang, slsConfig, info } = args;\n    const logger = logger_1.default.getLogger();\n    logger.debug(`appsyncStack : ${JSON.stringify(appSyncStackService.appSyncStack)}`);\n    const isCreateDataSource = async () => {\n        const { createDataSource } = (await inquirer_1.default.prompt([\n            {\n                type: 'expand',\n                name: 'createDataSource',\n                message: 'データソースを新しく作成しますか？',\n                choices: [\n                    {\n                        key: 'y',\n                        name: 'yes',\n                        value: true,\n                    },\n                    {\n                        key: 'n',\n                        name: 'no',\n                        value: false,\n                    },\n                ],\n                validate: (value) => new validator_1.default(value, lang).required().value(),\n            },\n        ]));\n        if (createDataSource) {\n            return createDataSource;\n        }\n        else if (appSyncStackService.appSyncStack?.dataSources.length === 0) {\n            console.log(yargonaut_1.chalk.red('データソースが存在しません、データソースを作成する必要があります'));\n            return isCreateDataSource();\n        }\n        else {\n            return false;\n        }\n    };\n    const createDataSource = await isCreateDataSource();\n    const dataSourceProcess = async () => {\n        if (createDataSource) {\n            const { lambdaFunctionName, lambdaHandler } = (await inquirer_1.default.prompt([\n                {\n                    type: 'input',\n                    name: 'lambdaFunctionName',\n                    message: 'Lambda関数名を入力',\n                    default: () => info.apiName,\n                    filter: (input) => input.replace(/\\s+/g, ''),\n                    transformer: (input) => input.replace(/\\s+/g, ''),\n                    validate: (value) => new validator_1.default(value, lang).required().mustNoIncludeZenkaku().value(),\n                },\n                {\n                    type: 'input',\n                    name: 'lambdaHandler',\n                    message: 'input a lambda handler path',\n                    default: () => `src/functions/appsync/${info.apiName}.handler`,\n                    validate: (value) => new validator_1.default(value, lang).required().mustBeExtension().value(),\n                    transformer: (input) => new transformer_1.default(input).removeAllSpace().value(),\n                    filter: (input) => new filter_1.default(input).removeAllSpace().value(),\n                },\n            ]));\n            slsConfig.addFunction({\n                lambdaFunctionName,\n                lambdaHandler,\n                code: codeService_1.default.templates.typescript.skeleton,\n            });\n            const dataSource = {\n                type: 'AWS_LAMBDA',\n                name: lambdaFunctionName,\n                description: `It is for ${info.apiType}.${info.apiName}`,\n                config: {\n                    functionName: { Ref: `${lambdaFunctionName}LambdaFunction` },\n                    lambdaFunctionArn: { 'Fn::GetAtt': [`${lambdaFunctionName}LambdaFunction`, 'Arn'] },\n                    serviceRoleArn: { 'Fn::GetAtt': [appSyncStackService.appSyncLambdaRoleName, 'Arn'] },\n                },\n            };\n            appSyncStackService.addIamRoleByDataSource({\n                dataSource: 'AWS_LAMBDA',\n                sls: slsConfig,\n            });\n            appSyncStackService.addDataSource(dataSource);\n            return dataSource;\n        }\n        const { dataSource } = (await inquirer_1.default.prompt([\n            {\n                type: 'list',\n                name: 'dataSource',\n                choices: appSyncStackService.appSyncStack?.dataSources.map((d) => d.name),\n                message: 'データソースを選択',\n                validate: (value) => new validator_1.default(value, lang).required().value(),\n            },\n        ]));\n        const selectedDataSource = appSyncStackService.appSyncStack?.dataSources.find((d) => d.name === dataSource);\n        appSyncStackService.addIamRoleByDataSource({\n            dataSource: selectedDataSource.type,\n            sls: slsConfig,\n        });\n        logger.debug('finished dataSourceProcess');\n        return selectedDataSource;\n    };\n    const functionConfigurationsProcess = (args) => {\n        const { dataSource } = args;\n        if (info.resolverType === 'UNIT')\n            return Promise.resolve(undefined);\n        // pipeline resolver\n        const functionConfiguration = {\n            dataSource: dataSource.name,\n            name: `${info.apiType}${lodash_1.default.upperFirst(info.apiName)}`,\n            request: false,\n            response: false,\n        };\n        appSyncStackService.addFunctionConfiguration({\n            functionConfiguration,\n        });\n        logger.debug('finished functionConfigurationsProcess');\n        return Promise.resolve(functionConfiguration);\n    };\n    const mappingTemplateProcess = async (args) => {\n        const { dataSource, functionConfigurations } = args;\n        const generateDataSource = () => {\n            if (info.resolverType === 'PIPELINE') {\n                const basePath = appSyncStackService.appSyncStack?.mappingTemplatesLocation ?? './';\n                const res = {\n                    type: info.apiType,\n                    request: `mutations/${info.apiType}.${info.apiName}.request.vtl`,\n                    response: `mutations/${info.apiType}.${info.apiName}.response.vtl`,\n                    field: info.apiName,\n                    kind: info.resolverType,\n                    functions: [functionConfigurations?.name],\n                };\n                new codeService_1.default({ filePath: path_1.default.join(basePath, res.request), code: codeService_1.default.templates.vtl.pipelineBefore, type: 'vtl' }).write();\n                new codeService_1.default({ filePath: path_1.default.join(basePath, res.response), code: codeService_1.default.templates.vtl.pipelineAfter, type: 'vtl' }).write();\n                return res;\n            }\n            // unit resolver\n            return {\n                dataSource: dataSource.name,\n                type: info.apiType,\n                field: info.apiName,\n                kind: info.resolverType,\n                request: false,\n                response: false,\n            };\n        };\n        const mappingTemplate = generateDataSource();\n        appSyncStackService.addMappingTemplate({\n            mappingTemplate,\n        });\n        logger.debug('finished mappingTemplateProcess');\n        return mappingTemplate;\n    };\n    const schemaGraphqlProcess = async () => {\n        const graphqlEditor = appSyncStackService.graphqlEditor;\n        const type = appSyncStackService.graphqlEditor.addExampleType(info.apiName);\n        const input = appSyncStackService.graphqlEditor.addExampleInput(info.apiName);\n        appSyncStackService.updateCustomSchemaGraphl({\n            mutation: {\n                apiName: info.apiName,\n                type: type.getType(),\n                input: input.getType(),\n            },\n        });\n        logger.debug('finished scheneGraphqlProcess');\n        return Promise.resolve(graphqlEditor.customSchema);\n    };\n    const resDataSource = await dataSourceProcess();\n    const resFunctionConfigurations = await functionConfigurationsProcess({ dataSource: resDataSource });\n    const resMappingTemplate = await mappingTemplateProcess({ dataSource: resDataSource, functionConfigurations: resFunctionConfigurations });\n    const resSchemaGraphql = await schemaGraphqlProcess();\n    logger.debug({\n        dataSource: resDataSource,\n        functionConfigurations: resFunctionConfigurations,\n        mappingTemplate: resMappingTemplate,\n        schemaGraphql: resSchemaGraphql,\n    });\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/api/services/generateMutationService.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/api/services/generateQueryService.ts':
+      /*!************************************************************************!*\
+  !*** ./lib/features/add/features/api/services/generateQueryService.ts ***!
+  \************************************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          "\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ \"./lib/utils/logger.ts\"));\nconst inquirer_1 = __importDefault(__webpack_require__(/*! inquirer */ \"inquirer\"));\nconst validator_1 = __importDefault(__webpack_require__(/*! utils/validator */ \"./lib/utils/validator/index.ts\"));\nconst transformer_1 = __importDefault(__webpack_require__(/*! utils/inquirer/transformer */ \"./lib/utils/inquirer/transformer.ts\"));\nconst filter_1 = __importDefault(__webpack_require__(/*! utils/inquirer/filter */ \"./lib/utils/inquirer/filter.ts\"));\nconst codeService_1 = __importDefault(__webpack_require__(/*! services/codeService */ \"./lib/services/codeService/index.ts\"));\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ \"./lib/utils/yargonaut.ts\");\nconst path_1 = __importDefault(__webpack_require__(/*! path */ \"path\"));\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\nconst graphql_1 = __webpack_require__(/*! graphql */ \"graphql\");\nexports[\"default\"] = async (args) => {\n    const { appSyncStackService, lang, slsConfig, info } = args;\n    const logger = logger_1.default.getLogger();\n    logger.debug(`appsyncStack : ${JSON.stringify(appSyncStackService.appSyncStack)}`);\n    const isCreateDataSource = async () => {\n        const { createDataSource } = (await inquirer_1.default.prompt([\n            {\n                type: 'expand',\n                name: 'createDataSource',\n                message: 'データソースを新しく作成しますか？',\n                choices: [\n                    {\n                        key: 'y',\n                        name: 'yes',\n                        value: true,\n                    },\n                    {\n                        key: 'n',\n                        name: 'no',\n                        value: false,\n                    },\n                ],\n                validate: (value) => new validator_1.default(value, lang).required().value(),\n            },\n        ]));\n        if (createDataSource) {\n            return createDataSource;\n        }\n        else if (appSyncStackService.appSyncStack?.dataSources.length === 0) {\n            console.log(yargonaut_1.chalk.red('データソースが存在しません、データソースを作成する必要があります'));\n            return isCreateDataSource();\n        }\n        else {\n            return false;\n        }\n    };\n    const createDataSource = await isCreateDataSource();\n    const dataSourceProcess = async () => {\n        if (createDataSource) {\n            const { lambdaFunctionName, lambdaHandler } = (await inquirer_1.default.prompt([\n                {\n                    type: 'input',\n                    name: 'lambdaFunctionName',\n                    message: 'Lambda関数名を入力',\n                    default: () => info.apiName,\n                    filter: (input) => input.replace(/\\s+/g, ''),\n                    transformer: (input) => input.replace(/\\s+/g, ''),\n                    validate: (value) => new validator_1.default(value, lang).required().mustNoIncludeZenkaku().value(),\n                },\n                {\n                    type: 'input',\n                    name: 'lambdaHandler',\n                    message: 'input a lambda handler path',\n                    default: () => `src/functions/appsync/${info.apiName}.handler`,\n                    validate: (value) => new validator_1.default(value, lang).required().mustBeExtension().value(),\n                    transformer: (input) => new transformer_1.default(input).removeAllSpace().value(),\n                    filter: (input) => new filter_1.default(input).removeAllSpace().value(),\n                },\n            ]));\n            slsConfig.addFunction({\n                lambdaFunctionName,\n                lambdaHandler,\n                code: codeService_1.default.templates.typescript.skeleton,\n            });\n            const dataSource = {\n                type: 'AWS_LAMBDA',\n                name: lambdaFunctionName,\n                description: `It is for ${info.apiType}.${info.apiName}`,\n                config: {\n                    functionName: { Ref: `${lambdaFunctionName}LambdaFunction` },\n                    lambdaFunctionArn: { 'Fn::GetAtt': [`${lambdaFunctionName}LambdaFunction`, 'Arn'] },\n                    serviceRoleArn: { 'Fn::GetAtt': [appSyncStackService.appSyncLambdaRoleName, 'Arn'] },\n                },\n            };\n            appSyncStackService.addIamRoleByDataSource({\n                dataSource: 'AWS_LAMBDA',\n                sls: slsConfig,\n            });\n            appSyncStackService.addDataSource(dataSource);\n            return dataSource;\n        }\n        const { dataSource } = (await inquirer_1.default.prompt([\n            {\n                type: 'list',\n                name: 'dataSource',\n                choices: appSyncStackService.appSyncStack?.dataSources.map((d) => d.name),\n                message: 'データソースを選択',\n                validate: (value) => new validator_1.default(value, lang).required().value(),\n            },\n        ]));\n        const selectedDataSource = appSyncStackService.appSyncStack?.dataSources.find((d) => d.name === dataSource);\n        appSyncStackService.addIamRoleByDataSource({\n            dataSource: selectedDataSource.type,\n            sls: slsConfig,\n        });\n        logger.debug('finished dataSourceProcess');\n        return selectedDataSource;\n    };\n    const getTemplate = async (dataSource) => {\n        if (dataSource.type === 'AMAZON_DYNAMODB') {\n            const { template, primaryKeyName, sortKeyName } = (await inquirer_1.default.prompt([\n                {\n                    type: 'list',\n                    name: 'template',\n                    choices: ['query', 'queryWithGsi', 'scan'],\n                    message: 'テンプレートを選択',\n                    validate: (value) => new validator_1.default(value, lang).required().value(),\n                },\n                {\n                    type: 'input',\n                    name: 'primaryKeyName',\n                    message: 'プライマリーキー名を入力',\n                    default: () => 'Id',\n                    filter: (input) => input.replace(/\\s+/g, ''),\n                    transformer: (input) => input.replace(/\\s+/g, ''),\n                    validate: (value) => new validator_1.default(value, lang).required().mustNoIncludeZenkaku().value(),\n                },\n                {\n                    type: 'input',\n                    name: 'sortKeyName',\n                    message: 'ソートキー名を入力',\n                    default: () => 'Sk',\n                    filter: (input) => input.replace(/\\s+/g, ''),\n                    transformer: (input) => input.replace(/\\s+/g, ''),\n                    validate: (value) => new validator_1.default(value, lang).required().mustNoIncludeZenkaku().value(),\n                },\n            ]));\n            if (template === 'query') {\n                return {\n                    before: codeService_1.default.templates.vtl.dynamoQueryRequest({ primaryKeyName, sortKeyName }),\n                    after: codeService_1.default.templates.vtl.dynamoGetItemResponse,\n                };\n            }\n            if (template === 'queryWithGsi') {\n                const { gsiName } = (await inquirer_1.default.prompt([\n                    {\n                        type: 'input',\n                        name: 'gsiName',\n                        message: 'GSI名を入力',\n                        default: () => 'ExampleIndex',\n                        filter: (input) => input.replace(/\\s+/g, ''),\n                        transformer: (input) => input.replace(/\\s+/g, ''),\n                        validate: (value) => new validator_1.default(value, lang).required().mustNoIncludeZenkaku().value(),\n                    },\n                ]));\n                return {\n                    before: codeService_1.default.templates.vtl.dynamoQueryRequest({ gsiName, primaryKeyName, sortKeyName }),\n                    after: codeService_1.default.templates.vtl.dynamoGetItemResponse,\n                };\n            }\n            if (template === 'scan') {\n                return {\n                    before: codeService_1.default.templates.vtl.dynamoScanRequest,\n                    after: codeService_1.default.templates.vtl.dynamoScanResponse,\n                };\n            }\n        }\n        else if (dataSource.type === 'AMAZON_ELASTICSEARCH') {\n            const { indexName } = (await inquirer_1.default.prompt([\n                {\n                    type: 'input',\n                    name: 'indexName',\n                    message: 'インデックス名を入力',\n                    default: () => info.apiName,\n                    filter: (input) => input.replace(/\\s+/g, ''),\n                    transformer: (input) => input.replace(/\\s+/g, ''),\n                    validate: (value) => new validator_1.default(value, lang).required().mustNoIncludeZenkaku().value(),\n                },\n            ]));\n            return {\n                before: codeService_1.default.templates.vtl.openSearchQueryRequest({ indexName }),\n                after: codeService_1.default.templates.vtl.openSearchQueryResponse,\n            };\n        }\n        else if (dataSource.type === 'RELATIONAL_DATABASE') {\n            return {\n                before: codeService_1.default.templates.vtl.rdbQueryRequest,\n                after: codeService_1.default.templates.vtl.rdbQueryResponse,\n            };\n        }\n        else if (dataSource.type === 'HTTP') {\n            return {\n                before: codeService_1.default.templates.vtl.httpQueryRequest,\n                after: codeService_1.default.templates.vtl.httpQueryResponse,\n            };\n        }\n        return {\n            before: '{}',\n            after: '{}',\n        };\n    };\n    const functionConfigurationsProcess = async (args) => {\n        const { dataSource } = args;\n        if (info.resolverType === 'UNIT')\n            return Promise.resolve(undefined);\n        // pipeline resolver\n        const basePath = appSyncStackService.appSyncStack?.functionConfigurationsLocation ?? './';\n        const functionConfiguration = {\n            dataSource: dataSource.name,\n            name: `${info.apiType}${lodash_1.default.upperFirst(info.apiName)}`,\n            request: dataSource.type === 'AWS_LAMBDA' ? false : `functions/${info.apiType}.${info.apiName}.request.vtl`,\n            response: dataSource.type === 'AWS_LAMBDA' ? false : `functions/${info.apiType}.${info.apiName}.response.vtl`,\n        };\n        if (dataSource.type !== 'AWS_LAMBDA') {\n            const { before, after } = await getTemplate(dataSource);\n            if (lodash_1.default.isString(functionConfiguration.request)) {\n                new codeService_1.default({\n                    filePath: path_1.default.join(basePath, functionConfiguration.request),\n                    code: before,\n                    type: 'vtl',\n                }).write();\n            }\n            if (lodash_1.default.isString(functionConfiguration.response)) {\n                new codeService_1.default({\n                    filePath: path_1.default.join(basePath, functionConfiguration.response),\n                    code: after,\n                    type: 'vtl',\n                }).write();\n            }\n        }\n        appSyncStackService.addFunctionConfiguration({\n            functionConfiguration,\n        });\n        logger.debug('finished functionConfigurationsProcess');\n        return Promise.resolve(functionConfiguration);\n    };\n    const mappingTemplateProcess = async (args) => {\n        const { dataSource, functionConfigurations } = args;\n        const generateDataSource = async () => {\n            if (info.resolverType === 'PIPELINE') {\n                const basePath = appSyncStackService.appSyncStack?.mappingTemplatesLocation ?? './';\n                const res = {\n                    type: info.apiType,\n                    request: `queries/${info.apiType}.${info.apiName}.request.vtl`,\n                    response: `queries/${info.apiType}.${info.apiName}.response.vtl`,\n                    field: info.apiName,\n                    kind: info.resolverType,\n                    functions: [functionConfigurations?.name],\n                };\n                new codeService_1.default({ filePath: path_1.default.join(basePath, res.request), code: codeService_1.default.templates.vtl.pipelineBefore, type: 'vtl' }).write();\n                new codeService_1.default({ filePath: path_1.default.join(basePath, res.response), code: codeService_1.default.templates.vtl.pipelineAfter, type: 'vtl' }).write();\n                return res;\n            }\n            // unit resolver\n            const mappingTemplate = {\n                dataSource: dataSource.name,\n                type: info.apiType,\n                field: info.apiName,\n                kind: info.resolverType,\n                request: dataSource.type === 'AWS_LAMBDA' ? false : `queries/${info.apiType}.${info.apiName}.request.vtl`,\n                response: dataSource.type === 'AWS_LAMBDA' ? false : `queries/${info.apiType}.${info.apiName}.response.vtl`,\n            };\n            if (dataSource.type !== 'AWS_LAMBDA') {\n                const basePath = appSyncStackService.appSyncStack?.mappingTemplatesLocation ?? './';\n                const { before, after } = await getTemplate(dataSource);\n                if (lodash_1.default.isString(mappingTemplate.request)) {\n                    new codeService_1.default({\n                        filePath: path_1.default.join(basePath, mappingTemplate.request),\n                        code: before,\n                        type: 'vtl',\n                    }).write();\n                }\n                if (lodash_1.default.isString(mappingTemplate.response)) {\n                    new codeService_1.default({\n                        filePath: path_1.default.join(basePath, mappingTemplate.response),\n                        code: after,\n                        type: 'vtl',\n                    }).write();\n                }\n            }\n            return mappingTemplate;\n        };\n        const mappingTemplate = await generateDataSource();\n        appSyncStackService.addMappingTemplate({\n            mappingTemplate,\n        });\n        logger.debug('finished mappingTemplateProcess');\n        return mappingTemplate;\n    };\n    const schemaGraphqlProcess = async () => {\n        const graphqlEditor = appSyncStackService.graphqlEditor;\n        const type = appSyncStackService.graphqlEditor.addExampleType(info.apiName);\n        appSyncStackService.updateCustomSchemaGraphl({\n            query: {\n                apiName: info.apiName,\n                type: type.getType(),\n                args: {\n                    example: {\n                        type: graphql_1.GraphQLString,\n                    },\n                },\n            },\n        });\n        logger.debug('finished scheneGraphqlProcess');\n        return Promise.resolve(graphqlEditor.customSchema);\n    };\n    const resDataSource = await dataSourceProcess();\n    const resFunctionConfigurations = await functionConfigurationsProcess({ dataSource: resDataSource });\n    const resMappingTemplate = await mappingTemplateProcess({ dataSource: resDataSource, functionConfigurations: resFunctionConfigurations });\n    const resSchemaGraphql = await schemaGraphqlProcess();\n    logger.debug({\n        dataSource: resDataSource,\n        functionConfigurations: resFunctionConfigurations,\n        mappingTemplate: resMappingTemplate,\n        schemaGraphql: resSchemaGraphql,\n    });\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/api/services/generateQueryService.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/basicauthlambda/builder.ts':
+      /*!**************************************************************!*\
+  !*** ./lib/features/add/features/basicauthlambda/builder.ts ***!
+  \**************************************************************/
+      /***/ (__unused_webpack_module, exports, __webpack_require__) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nclass default_1 extends index_1.FeatureBuilderAbstract {\n    constructor(args) {\n        super(args);\n    }\n    build(_yargs) {\n        return _yargs.version(false).usage(\'Usage: $0 basic-auth-lambda\');\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/basicauthlambda/builder.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/basicauthlambda/handler.ts':
+      /*!**************************************************************!*\
+  !*** ./lib/features/add/features/basicauthlambda/handler.ts ***!
+  \**************************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          "\nvar __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {\n    if (k2 === undefined) k2 = k;\n    var desc = Object.getOwnPropertyDescriptor(m, k);\n    if (!desc || (\"get\" in desc ? !m.__esModule : desc.writable || desc.configurable)) {\n      desc = { enumerable: true, get: function() { return m[k]; } };\n    }\n    Object.defineProperty(o, k2, desc);\n}) : (function(o, m, k, k2) {\n    if (k2 === undefined) k2 = k;\n    o[k2] = m[k];\n}));\nvar __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {\n    Object.defineProperty(o, \"default\", { enumerable: true, value: v });\n}) : function(o, v) {\n    o[\"default\"] = v;\n});\nvar __importStar = (this && this.__importStar) || function (mod) {\n    if (mod && mod.__esModule) return mod;\n    var result = {};\n    if (mod != null) for (var k in mod) if (k !== \"default\" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);\n    __setModuleDefault(result, mod);\n    return result;\n};\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ \"./lib/utils/logger.ts\"));\nconst index_1 = __webpack_require__(/*! types/index */ \"./lib/types/index.ts\");\nconst inquirer_1 = __importDefault(__webpack_require__(/*! inquirer */ \"inquirer\"));\nconst validator_1 = __importDefault(__webpack_require__(/*! utils/validator */ \"./lib/utils/validator/index.ts\"));\nconst transformer_1 = __importDefault(__webpack_require__(/*! utils/inquirer/transformer */ \"./lib/utils/inquirer/transformer.ts\"));\nconst filter_1 = __importDefault(__webpack_require__(/*! utils/inquirer/filter */ \"./lib/utils/inquirer/filter.ts\"));\nconst iam = __importStar(__webpack_require__(/*! @aws-cdk/aws-iam */ \"@aws-cdk/aws-iam\"));\nconst cdk = __importStar(__webpack_require__(/*! aws-cdk-lib */ \"aws-cdk-lib\"));\nconst codeService_1 = __importDefault(__webpack_require__(/*! services/codeService */ \"./lib/services/codeService/index.ts\"));\nconst serverlessConfigService_1 = __importDefault(__webpack_require__(/*! services/serverlessConfigService */ \"./lib/services/serverlessConfigService.ts\"));\nconst cloudformationService_1 = __importDefault(__webpack_require__(/*! services/cloudformationService */ \"./lib/services/cloudformationService.ts\"));\nconst serverlessConfigService_2 = __importDefault(__webpack_require__(/*! services/serverlessConfigService */ \"./lib/services/serverlessConfigService.ts\"));\nclass default_1 extends index_1.FeatureHandlerAbstract {\n    constructor(argv) {\n        super(argv);\n    }\n    // lambda edge must be in us-east-1\n    defaultServerlessConfigPath = `serverless/us-east-1/serverless.yml`;\n    defaultFunctionYamlPath = `serverless/us-east-1/resources/functions.yml`;\n    defaultIamRolePath = `serverless/us-east-1/resources/iamrole/defaultLambdarole.yml`;\n    defaultBasicLambdaPath = `src/functions/lambdaedge/basicAuth.handler`;\n    defaultLambdaRoleName = 'DefaultLambdaRole';\n    lambdaEdgeTimeout = 5;\n    lambdaEdgeMemorySize = 128;\n    generateLambdaIamRoleCf() {\n        return cloudformationService_1.default.generateCloudFormation(this.defaultLambdaRoleName, (c) => {\n            const role = new iam.Role(c, this.defaultLambdaRoleName, {\n                assumedBy: new iam.ServicePrincipal('edgelambda.amazonaws.com'),\n            });\n            role.addToPolicy(new iam.PolicyStatement({\n                effect: iam.Effect.ALLOW,\n                resources: [cdk.Fn.join(':', ['arn:aws:logs', cdk.Fn.ref('AWS::Region'), cdk.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],\n                actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],\n            }));\n            role.addToPolicy(new iam.PolicyStatement({\n                effect: iam.Effect.ALLOW,\n                resources: [cdk.Fn.join(':', ['arn:aws:logs', this.argv.region, cdk.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],\n                actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],\n            }));\n            return role;\n        });\n    }\n    get defaultServerlessConfig() {\n        return serverlessConfigService_1.default.generateServerlessConfig({\n            service: 'basic-lambda-auth',\n            provider: {\n                region: 'us-east-1',\n                environment: {\n                    LOG_LEVEL: 'WARN',\n                },\n                iam: { role: this.defaultLambdaRoleName },\n            },\n            custom: {\n                awsResourcePrefix: '${self:service}-${self:provider.region}-${self:provider.stage}-',\n            },\n            functions: `\\${file(./${this.defaultFunctionYamlPath})}`,\n            resources: [`\\${file(./${this.defaultIamRolePath})}`],\n        });\n    }\n    async prompt() {\n        const res = (await inquirer_1.default\n            .prompt([\n            {\n                type: 'input',\n                name: 'functionName',\n                message: 'input a functions name',\n                default: 'BasicAuth',\n                validate: (value) => new validator_1.default(value, this.lang).required().mustNoIncludeZenkaku().value(),\n                transformer: (input) => new transformer_1.default(input).removeAllSpace().value(),\n                filter: (input) => new filter_1.default(input).removeAllSpace().value(),\n            },\n            {\n                type: 'input',\n                name: 'lamndaRoleCfPath',\n                message: 'input a lambda iam role cloudformation path',\n                default: () => this.defaultIamRolePath,\n                validate: (value) => new validator_1.default(value, this.lang).required().mustBeYamlFilePath().value(),\n                transformer: (input) => new transformer_1.default(input).removeAllSpace().value(),\n                filter: (input) => new filter_1.default(input).removeAllSpace().value(),\n            },\n            {\n                type: 'input',\n                name: 'lambdaHandler',\n                message: 'input a lambda handler path',\n                default: () => this.defaultBasicLambdaPath,\n                validate: (value) => new validator_1.default(value, this.lang).required().mustBeExtension().value(),\n                transformer: (input) => new transformer_1.default(input).removeAllSpace().value(),\n                filter: (input) => new filter_1.default(input).removeAllSpace().value(),\n            },\n            {\n                type: 'input',\n                name: 'lamndaRoleName',\n                message: 'input a lambda iam role name',\n                default: () => this.defaultLambdaRoleName,\n                validate: (value) => new validator_1.default(value, this.lang).required().value(),\n                transformer: (input) => new transformer_1.default(input).removeAllSpace().value(),\n                filter: (input) => new filter_1.default(input).removeAllSpace().value(),\n            },\n            {\n                type: 'input',\n                name: 'serverlessConfigPath',\n                message: 'input a serverless config file path',\n                default: () => this.defaultServerlessConfigPath,\n                validate: (value) => new validator_1.default(value, this.lang).required().mustBeYamlFilePath().value(),\n                transformer: (input) => new transformer_1.default(input).removeAllSpace().value(),\n                filter: (input) => new filter_1.default(input).removeAllSpace().value(),\n            },\n        ])\n            .then((answers) => {\n            return answers;\n        }));\n        return res;\n    }\n    async run() {\n        const logger = logger_1.default.getLogger();\n        const res = await this.prompt();\n        logger.debug(`input values : ${JSON.stringify(res)}}`);\n        const { functionName, serverlessConfigPath, lamndaRoleCfPath, lamndaRoleName, lambdaHandler } = res;\n        const sls = new serverlessConfigService_2.default({ region: this.argv.region, serverlessConfigPath, lang: this.lang });\n        if (sls.region !== 'us-east-1')\n            throw new Error('lambda edge must be in us-east-1');\n        sls.addFunction({\n            lambdaFunctionName: functionName,\n            lambdaHandler: lambdaHandler,\n            memorySize: this.lambdaEdgeMemorySize,\n            timeout: this.lambdaEdgeTimeout,\n            code: codeService_1.default.templates.typescript.basicauthlambda,\n        });\n        sls.addResource({\n            filePath: lamndaRoleCfPath,\n            resourceName: lamndaRoleName,\n            cf: this.generateLambdaIamRoleCf(),\n        });\n    }\n}\nexports[\"default\"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/basicauthlambda/handler.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/basicauthlambda/index.ts':
+      /*!************************************************************!*\
+  !*** ./lib/features/add/features/basicauthlambda/index.ts ***!
+  \************************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! features/add/features/basicauthlambda/builder */ "./lib/features/add/features/basicauthlambda/builder.ts"));\nconst handler_1 = __importDefault(__webpack_require__(/*! features/add/features/basicauthlambda/handler */ "./lib/features/add/features/basicauthlambda/handler.ts"));\nexports["default"] = {\n    builder: builder_1.default,\n    handler: handler_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/basicauthlambda/index.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/sns/builder.ts':
+      /*!**************************************************!*\
+  !*** ./lib/features/add/features/sns/builder.ts ***!
+  \**************************************************/
+      /***/ (__unused_webpack_module, exports, __webpack_require__) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nclass default_1 extends index_1.FeatureBuilderAbstract {\n    constructor(args) {\n        super(args);\n    }\n    build(_yargs) {\n        return _yargs.version(false).usage(\'Usage: $0 sns\');\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sns/builder.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/sns/handler.ts':
+      /*!**************************************************!*\
+  !*** ./lib/features/add/features/sns/handler.ts ***!
+  \**************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          "\nvar __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {\n    if (k2 === undefined) k2 = k;\n    var desc = Object.getOwnPropertyDescriptor(m, k);\n    if (!desc || (\"get\" in desc ? !m.__esModule : desc.writable || desc.configurable)) {\n      desc = { enumerable: true, get: function() { return m[k]; } };\n    }\n    Object.defineProperty(o, k2, desc);\n}) : (function(o, m, k, k2) {\n    if (k2 === undefined) k2 = k;\n    o[k2] = m[k];\n}));\nvar __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {\n    Object.defineProperty(o, \"default\", { enumerable: true, value: v });\n}) : function(o, v) {\n    o[\"default\"] = v;\n});\nvar __importStar = (this && this.__importStar) || function (mod) {\n    if (mod && mod.__esModule) return mod;\n    var result = {};\n    if (mod != null) for (var k in mod) if (k !== \"default\" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);\n    __setModuleDefault(result, mod);\n    return result;\n};\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ \"./lib/utils/logger.ts\"));\nconst index_1 = __webpack_require__(/*! types/index */ \"./lib/types/index.ts\");\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\nconst getLocale_1 = __webpack_require__(/*! features/add/features/sns/utils/getLocale */ \"./lib/features/add/features/sns/utils/getLocale.ts\");\nconst inquirer_1 = __importDefault(__webpack_require__(/*! inquirer */ \"inquirer\"));\nconst validator_1 = __importDefault(__webpack_require__(/*! utils/validator */ \"./lib/utils/validator/index.ts\"));\nconst filter_1 = __importDefault(__webpack_require__(/*! utils/inquirer/filter */ \"./lib/utils/inquirer/filter.ts\"));\nconst transformer_1 = __importDefault(__webpack_require__(/*! utils/inquirer/transformer */ \"./lib/utils/inquirer/transformer.ts\"));\nconst cloudformationService_1 = __importDefault(__webpack_require__(/*! services/cloudformationService */ \"./lib/services/cloudformationService.ts\"));\nconst sns = __importStar(__webpack_require__(/*! @aws-cdk/aws-sns */ \"@aws-cdk/aws-sns\"));\nconst sqs = __importStar(__webpack_require__(/*! @aws-cdk/aws-sqs */ \"@aws-cdk/aws-sqs\"));\nconst subs = __importStar(__webpack_require__(/*! @aws-cdk/aws-sns-subscriptions */ \"@aws-cdk/aws-sns-subscriptions\"));\nconst lambda = __importStar(__webpack_require__(/*! @aws-cdk/aws-lambda */ \"@aws-cdk/aws-lambda\"));\nconst cdk = __importStar(__webpack_require__(/*! aws-cdk-lib */ \"aws-cdk-lib\"));\nconst serverlessConfigService_1 = __importDefault(__webpack_require__(/*! services/serverlessConfigService */ \"./lib/services/serverlessConfigService.ts\"));\nclass default_1 extends index_1.FeatureHandlerAbstract {\n    constructor(argv) {\n        super(argv);\n    }\n    defaultResourcePath(resourceName) {\n        return `serverless/${this.argv.region}/resources/sns/${resourceName}.yml`;\n    }\n    get defaultServerlessConfigPath() {\n        return `serverless/${this.argv.region}/serverless.yml`;\n    }\n    generateSnsCf(topicName, subscriptions) {\n        return cloudformationService_1.default.generateCloudFormation(topicName, (c) => {\n            const topic = new sns.Topic(c, topicName, {\n                topicName: topicName,\n            });\n            subscriptions.forEach((s) => {\n                if (s === 'email')\n                    topic.addSubscription(new subs.EmailSubscription('****@****.com'));\n                else if (s === 'lambda')\n                    topic.addSubscription(new subs.LambdaSubscription(lambda.Function.fromFunctionArn(c, `${topicName}Lambda`, `arn:aws:lambda:${this.argv.region}:${cdk.Fn.ref('AWS::AccountId')}:function:*****`)));\n                else if (s === 'sms')\n                    topic.addSubscription(new subs.SmsSubscription(`0000000000`));\n                else if (s === 'url')\n                    topic.addSubscription(new subs.UrlSubscription('https://*****.com'));\n                else if (s === 'sqs')\n                    topic.addSubscription(new subs.SqsSubscription(new sqs.Queue(c, `${topicName}SubscribeQueue`)));\n            });\n            return topic;\n        });\n    }\n    async run() {\n        const logger = logger_1.default.getLogger();\n        const locale = (0, getLocale_1.getLocaleLang)(this.lang);\n        const res = await inquirer_1.default\n            .prompt([\n            {\n                type: 'input',\n                name: 'resourceName',\n                message: 'input a sns resource name',\n                filter: (input) => input.replace(/\\s+/g, ''),\n                transformer: (input) => input.replace(/\\s+/g, ''),\n                validate: (value) => new validator_1.default(value, this.lang).required().mustNoIncludeZenkaku().value(),\n            },\n        ])\n            .then(async (answers) => {\n            const res = (await inquirer_1.default.prompt([\n                {\n                    type: 'checkbox',\n                    name: 'subscriptions',\n                    message: 'select a sns subscriptions',\n                    choices: ['email', 'lambda', 'sms', 'url', 'sqs'],\n                    validate: (value) => {\n                        if (lodash_1.default.isEmpty(value))\n                            return locale.error.reqiredSubscriptions;\n                        return true;\n                    },\n                },\n                {\n                    type: 'input',\n                    name: 'filePath',\n                    message: 'input a cloudformation file path',\n                    default: () => this.defaultResourcePath(answers.resourceName),\n                    validate: (value) => new validator_1.default(value, this.lang).required().mustBeYamlFilePath().value(),\n                    transformer: (input) => new transformer_1.default(input).filePath().value(),\n                    filter: (input) => new filter_1.default(input).filePath().value(),\n                },\n                {\n                    type: 'input',\n                    name: 'serverlessConfigPath',\n                    message: 'input a serverless config file path',\n                    default: () => this.defaultServerlessConfigPath,\n                    validate: (value) => new validator_1.default(value, this.lang).required().mustBeYamlFilePath().value(),\n                    transformer: (input) => new transformer_1.default(input).removeAllSpace().value(),\n                    filter: (input) => new filter_1.default(input).removeAllSpace().value(),\n                },\n            ]));\n            return {\n                ...res,\n                ...answers,\n            };\n        });\n        logger.debug(`input values : ${JSON.stringify(res)}}`);\n        const { resourceName, filePath, subscriptions, serverlessConfigPath } = res;\n        const sls = new serverlessConfigService_1.default({ region: this.argv.region, serverlessConfigPath, lang: this.lang });\n        const resource = this.generateSnsCf(resourceName, subscriptions);\n        sls.addResource({ filePath, resourceName, cf: resource });\n    }\n}\nexports[\"default\"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sns/handler.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/sns/index.ts':
+      /*!************************************************!*\
+  !*** ./lib/features/add/features/sns/index.ts ***!
+  \************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! features/add/features/sns/builder */ "./lib/features/add/features/sns/builder.ts"));\nconst handler_1 = __importDefault(__webpack_require__(/*! features/add/features/sns/handler */ "./lib/features/add/features/sns/handler.ts"));\nexports["default"] = {\n    builder: builder_1.default,\n    handler: handler_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sns/index.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/sns/locale/en.ts':
+      /*!****************************************************!*\
+  !*** ./lib/features/add/features/sns/locale/en.ts ***!
+  \****************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst locale = {\n    error: {\n        reqiredSubscriptions: \'required select a subscriptions\',\n    },\n};\nexports["default"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sns/locale/en.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/sns/locale/ja.ts':
+      /*!****************************************************!*\
+  !*** ./lib/features/add/features/sns/locale/ja.ts ***!
+  \****************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst locale = {\n    error: {\n        reqiredSubscriptions: \'サブスクリプションを選択して下さい\',\n    },\n};\nexports["default"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sns/locale/ja.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/sns/utils/getLocale.ts':
+      /*!**********************************************************!*\
+  !*** ./lib/features/add/features/sns/utils/getLocale.ts ***!
+  \**********************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.getLocaleLang = void 0;\nconst ja_1 = __importDefault(__webpack_require__(/*! features/add/features/sns/locale/ja */ "./lib/features/add/features/sns/locale/ja.ts"));\nconst en_1 = __importDefault(__webpack_require__(/*! features/add/features/sns/locale/en */ "./lib/features/add/features/sns/locale/en.ts"));\nconst getLocaleLang = (locale) => {\n    switch (locale) {\n        case \'ja\':\n            return ja_1.default;\n        case \'en\':\n            return en_1.default;\n        default:\n            return en_1.default;\n    }\n};\nexports.getLocaleLang = getLocaleLang;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sns/utils/getLocale.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/sqs/builder.ts':
+      /*!**************************************************!*\
+  !*** ./lib/features/add/features/sqs/builder.ts ***!
+  \**************************************************/
+      /***/ (__unused_webpack_module, exports, __webpack_require__) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nclass default_1 extends index_1.FeatureBuilderAbstract {\n    constructor(args) {\n        super(args);\n    }\n    build(_yargs) {\n        return _yargs.version(false).usage(\'Usage: $0 sqs\');\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sqs/builder.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/sqs/handler.ts':
+      /*!**************************************************!*\
+  !*** ./lib/features/add/features/sqs/handler.ts ***!
+  \**************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          "\nvar __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {\n    if (k2 === undefined) k2 = k;\n    var desc = Object.getOwnPropertyDescriptor(m, k);\n    if (!desc || (\"get\" in desc ? !m.__esModule : desc.writable || desc.configurable)) {\n      desc = { enumerable: true, get: function() { return m[k]; } };\n    }\n    Object.defineProperty(o, k2, desc);\n}) : (function(o, m, k, k2) {\n    if (k2 === undefined) k2 = k;\n    o[k2] = m[k];\n}));\nvar __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {\n    Object.defineProperty(o, \"default\", { enumerable: true, value: v });\n}) : function(o, v) {\n    o[\"default\"] = v;\n});\nvar __importStar = (this && this.__importStar) || function (mod) {\n    if (mod && mod.__esModule) return mod;\n    var result = {};\n    if (mod != null) for (var k in mod) if (k !== \"default\" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);\n    __setModuleDefault(result, mod);\n    return result;\n};\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ \"./lib/utils/logger.ts\"));\nconst index_1 = __webpack_require__(/*! types/index */ \"./lib/types/index.ts\");\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\nconst inquirer_1 = __importDefault(__webpack_require__(/*! inquirer */ \"inquirer\"));\nconst validator_1 = __importDefault(__webpack_require__(/*! utils/validator */ \"./lib/utils/validator/index.ts\"));\nconst filter_1 = __importDefault(__webpack_require__(/*! utils/inquirer/filter */ \"./lib/utils/inquirer/filter.ts\"));\nconst transformer_1 = __importDefault(__webpack_require__(/*! utils/inquirer/transformer */ \"./lib/utils/inquirer/transformer.ts\"));\nconst sqs = __importStar(__webpack_require__(/*! @aws-cdk/aws-sqs */ \"@aws-cdk/aws-sqs\"));\nconst cloudformationService_1 = __importDefault(__webpack_require__(/*! services/cloudformationService */ \"./lib/services/cloudformationService.ts\"));\nconst serverlessConfigService_1 = __importDefault(__webpack_require__(/*! services/serverlessConfigService */ \"./lib/services/serverlessConfigService.ts\"));\nclass default_1 extends index_1.FeatureHandlerAbstract {\n    constructor(argv) {\n        super(argv);\n    }\n    defaultResourcePath(resourceName) {\n        return `serverless/${this.argv.region}/resources/sqs/${resourceName}.yml`;\n    }\n    get defaultServerlessConfigPath() {\n        return `serverless/${this.argv.region}/serverless.yml`;\n    }\n    defaultMaxMessageSizeBytes = 262144;\n    defaultMaxReceiveCount = 3;\n    generateSqsCf(queueName, input) {\n        return cloudformationService_1.default.generateCloudFormation(queueName, (c) => {\n            const isFifo = input.queueType === 'Fifo';\n            if (input.useDeadLetterQueue) {\n                const dlqParams = {\n                    queueName: `${queueName}DeadLetter`,\n                };\n                if (isFifo) {\n                    lodash_1.default.assign(dlqParams, {\n                        queueName: `${queueName}DeadLetter.fifo`,\n                        fifo: true,\n                    });\n                }\n                const dlq = new sqs.Queue(c, `${queueName}DeadLetter`, dlqParams);\n                const params = {\n                    queueName: queueName,\n                    fifo: isFifo,\n                    maxMessageSizeBytes: this.defaultMaxMessageSizeBytes,\n                    deadLetterQueue: {\n                        maxReceiveCount: this.defaultMaxReceiveCount,\n                        queue: dlq,\n                    },\n                };\n                if (isFifo) {\n                    lodash_1.default.assign(params, {\n                        queueName: `${queueName}.fifo`,\n                        contentBasedDeduplication: input.contentBasedDeduplication,\n                    });\n                }\n                const queue = new sqs.Queue(c, queueName, params);\n                return queue;\n            }\n            const params = {\n                queueName: queueName,\n                fifo: isFifo,\n                maxMessageSizeBytes: this.defaultMaxMessageSizeBytes,\n            };\n            if (isFifo) {\n                lodash_1.default.assign(params, {\n                    queueName: `${queueName}.fifo`,\n                    contentBasedDeduplication: input.contentBasedDeduplication,\n                });\n            }\n            const queue = new sqs.Queue(c, queueName, params);\n            return queue;\n        });\n    }\n    async run() {\n        const logger = logger_1.default.getLogger();\n        const res = await inquirer_1.default\n            .prompt([\n            {\n                type: 'input',\n                name: 'resourceName',\n                message: 'input a sqs resource name',\n                filter: (input) => input.replace(/\\s+/g, ''),\n                transformer: (input) => input.replace(/\\s+/g, ''),\n                validate: (value) => new validator_1.default(value, this.lang).required().mustNoIncludeZenkaku().value(),\n            },\n        ])\n            .then(async (answers) => {\n            const res = (await inquirer_1.default.prompt([\n                {\n                    type: 'list',\n                    name: 'queueType',\n                    default: 'Standard',\n                    choices: ['Standard', 'Fifo'],\n                    message: 'Is it a FIFO queue?',\n                },\n                {\n                    type: 'expand',\n                    name: 'useDeadLetterQueue',\n                    message: 'Do you use dead letter queue?',\n                    choices: [\n                        {\n                            key: 'y',\n                            name: 'yes',\n                            value: true,\n                        },\n                        {\n                            key: 'n',\n                            name: 'no',\n                            value: false,\n                        },\n                    ],\n                },\n                {\n                    type: 'expand',\n                    name: 'contentBasedDeduplication',\n                    message: 'Do you use content-based deduplication?',\n                    choices: [\n                        {\n                            key: 'y',\n                            name: 'yes',\n                            value: true,\n                        },\n                        {\n                            key: 'n',\n                            name: 'no',\n                            value: false,\n                        },\n                    ],\n                },\n                {\n                    type: 'input',\n                    name: 'filePath',\n                    message: 'input a cloudformation file path',\n                    default: () => this.defaultResourcePath(answers.resourceName),\n                    validate: (value) => new validator_1.default(value, this.lang).required().mustBeYamlFilePath().value(),\n                    transformer: (input) => new transformer_1.default(input).filePath().value(),\n                    filter: (input) => new filter_1.default(input).filePath().value(),\n                },\n                {\n                    type: 'input',\n                    name: 'serverlessConfigPath',\n                    message: 'input a serverless config file path',\n                    default: () => this.defaultServerlessConfigPath,\n                    validate: (value) => new validator_1.default(value, this.lang).required().mustBeYamlFilePath().value(),\n                    transformer: (input) => new transformer_1.default(input).removeAllSpace().value(),\n                    filter: (input) => new filter_1.default(input).removeAllSpace().value(),\n                },\n            ]));\n            return {\n                ...res,\n                ...answers,\n            };\n        });\n        logger.debug(`input values : ${JSON.stringify(res)}}`);\n        const { resourceName, queueType, useDeadLetterQueue, contentBasedDeduplication, filePath, serverlessConfigPath } = res;\n        const sls = new serverlessConfigService_1.default({ region: this.argv.region, serverlessConfigPath, lang: this.lang });\n        const resources = this.generateSqsCf(resourceName, {\n            queueType,\n            useDeadLetterQueue,\n            contentBasedDeduplication,\n        });\n        sls.addResource({ filePath, resourceName, cf: resources });\n    }\n}\nexports[\"default\"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sqs/handler.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/features/sqs/index.ts':
+      /*!************************************************!*\
+  !*** ./lib/features/add/features/sqs/index.ts ***!
+  \************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! features/add/features/sqs/builder */ "./lib/features/add/features/sqs/builder.ts"));\nconst handler_1 = __importDefault(__webpack_require__(/*! features/add/features/sqs/handler */ "./lib/features/add/features/sqs/handler.ts"));\nexports["default"] = {\n    builder: builder_1.default,\n    handler: handler_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/features/sqs/index.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/index.ts':
+      /*!***********************************!*\
+  !*** ./lib/features/add/index.ts ***!
+  \***********************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! features/add/builder */ "./lib/features/add/builder.ts"));\nexports["default"] = {\n    builder: builder_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/index.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/locale/en.ts':
+      /*!***************************************!*\
+  !*** ./lib/features/add/locale/en.ts ***!
+  \***************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    command: {\n        description: {\n            sns: 'add AWS SQS',\n            sqs: 'add AWS SQS',\n            basicAuthLambda: 'add AWS Basic lambda auth in us-east-1',\n            api: 'add graphql api',\n        },\n    },\n    unProcessed: 'The command entered does not exist. Run \"ragate add help\" for a list of all available commands.',\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/locale/en.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/locale/ja.ts':
+      /*!***************************************!*\
+  !*** ./lib/features/add/locale/ja.ts ***!
+  \***************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    command: {\n        description: {\n            sns: 'AWS SQS を追加',\n            sqs: 'AWS SQS を追加',\n            basicAuthLambda: 'us-east-1 リージョンに Basic 認証用の Lambda を追加',\n            api: 'Graphql API を追加',\n        },\n    },\n    unProcessed: '入力されたコマンドは存在しません。「ragate add help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/locale/ja.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/add/utils/getLocale.ts':
+      /*!*********************************************!*\
+  !*** ./lib/features/add/utils/getLocale.ts ***!
+  \*********************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.getLocaleLang = void 0;\nconst ja_1 = __importDefault(__webpack_require__(/*! features/add/locale/ja */ "./lib/features/add/locale/ja.ts"));\nconst en_1 = __importDefault(__webpack_require__(/*! features/add/locale/en */ "./lib/features/add/locale/en.ts"));\nconst getLocaleLang = (locale) => {\n    switch (locale) {\n        case \'ja\':\n            return ja_1.default;\n        case \'en\':\n            return en_1.default;\n        default:\n            return en_1.default;\n    }\n};\nexports.getLocaleLang = getLocaleLang;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/add/utils/getLocale.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/codegen/builder.ts':
+      /*!*****************************************!*\
+  !*** ./lib/features/codegen/builder.ts ***!
+  \*****************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ "./lib/utils/yargonaut.ts");\nconst index_2 = __importDefault(__webpack_require__(/*! features/create/index */ "./lib/features/create/index.ts"));\nconst getLocale_1 = __webpack_require__(/*! features/codegen/utils/getLocale */ "./lib/features/codegen/utils/getLocale.ts");\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ "./lib/utils/logger.ts"));\nconst crud_1 = __importDefault(__webpack_require__(/*! features/codegen/features/crud */ "./lib/features/codegen/features/crud/index.ts"));\nclass default_1 extends index_1.FeatureBuilderAbstract {\n    constructor(args) {\n        super(args);\n    }\n    build(yargs) {\n        const lang = this.args.lang;\n        const locale = (0, getLocale_1.getLocaleLang)(lang);\n        const logger = logger_1.default.getLogger();\n        return yargs\n            .version(false)\n            .usage(\'Usage: codegen <command> <options>\')\n            .command(\'crud\', yargonaut_1.chalk.grey(locale.command.description.crud), (_yargs) => new crud_1.default.builder(this.args).build(_yargs), (argv) => new crud_1.default.handler(argv).run())\n            .command(\'*\', yargonaut_1.chalk.grey(\'<command> <options>\'), () => ({}), (argv) => {\n            if (argv._.length === 1)\n                return new index_2.default.handler(argv).run();\n            throw new Error(\'locale.error.unProcessed\');\n        });\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/codegen/builder.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/codegen/features/crud/index.ts':
+      /*!*****************************************************!*\
+  !*** ./lib/features/codegen/features/crud/index.ts ***!
+  \*****************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! features/add/features/sns/builder */ "./lib/features/add/features/sns/builder.ts"));\nconst handler_1 = __importDefault(__webpack_require__(/*! features/add/features/sns/handler */ "./lib/features/add/features/sns/handler.ts"));\nexports["default"] = {\n    builder: builder_1.default,\n    handler: handler_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/codegen/features/crud/index.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/codegen/index.ts':
+      /*!***************************************!*\
+  !*** ./lib/features/codegen/index.ts ***!
+  \***************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! features/codegen/builder */ "./lib/features/codegen/builder.ts"));\nexports["default"] = {\n    builder: builder_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/codegen/index.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/codegen/locale/en.ts':
+      /*!*******************************************!*\
+  !*** ./lib/features/codegen/locale/en.ts ***!
+  \*******************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst locale = {\n    command: {\n        description: {\n            crud: \'Generate CRUD code based on schema.graphql\',\n        },\n    },\n};\nexports["default"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/codegen/locale/en.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/codegen/locale/ja.ts':
+      /*!*******************************************!*\
+  !*** ./lib/features/codegen/locale/ja.ts ***!
+  \*******************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst locale = {\n    command: {\n        description: {\n            crud: \'schema.graphql を元に CRUD のコードを生成\',\n        },\n    },\n};\nexports["default"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/codegen/locale/ja.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/codegen/utils/getLocale.ts':
+      /*!*************************************************!*\
+  !*** ./lib/features/codegen/utils/getLocale.ts ***!
+  \*************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.getLocaleLang = void 0;\nconst ja_1 = __importDefault(__webpack_require__(/*! features/codegen/locale/ja */ "./lib/features/codegen/locale/ja.ts"));\nconst en_1 = __importDefault(__webpack_require__(/*! features/codegen/locale/en */ "./lib/features/codegen/locale/en.ts"));\nconst getLocaleLang = (locale) => {\n    switch (locale) {\n        case \'ja\':\n            return ja_1.default;\n        case \'en\':\n            return en_1.default;\n        default:\n            return en_1.default;\n    }\n};\nexports.getLocaleLang = getLocaleLang;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/codegen/utils/getLocale.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/create/builder.ts':
+      /*!****************************************!*\
+  !*** ./lib/features/create/builder.ts ***!
+  \****************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ "./lib/utils/yargonaut.ts");\nconst index_2 = __importDefault(__webpack_require__(/*! features/create/index */ "./lib/features/create/index.ts"));\nclass default_1 extends index_1.FeatureBuilderAbstract {\n    constructor(args) {\n        super(args);\n    }\n    build(yargs) {\n        return yargs\n            .version(false)\n            .usage(\'Usage: create <options>\')\n            .command(\'*\', yargonaut_1.chalk.grey(\'<command> <options>\'), () => ({}), (argv) => {\n            if (argv._.length === 1)\n                return new index_2.default.handler(argv).run();\n            throw new Error(\'locale.error.unProcessed\');\n        });\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/create/builder.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/create/handler.ts':
+      /*!****************************************!*\
+  !*** ./lib/features/create/handler.ts ***!
+  \****************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst inquirer_1 = __importDefault(__webpack_require__(/*! inquirer */ "inquirer"));\nconst config_1 = __importDefault(__webpack_require__(/*! config */ "./lib/config.ts"));\nconst getLocale_1 = __webpack_require__(/*! features/create/utils/getLocale */ "./lib/features/create/utils/getLocale.ts");\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ "lodash"));\nconst inquirer_autocomplete_prompt_1 = __importDefault(__webpack_require__(/*! inquirer-autocomplete-prompt */ "inquirer-autocomplete-prompt"));\nconst cli_1 = __webpack_require__(/*! utils/cli */ "./lib/utils/cli.ts");\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ "./lib/utils/logger.ts"));\nconst index_1 = __webpack_require__(/*! types/index */ "./lib/types/index.ts");\nconst path_1 = __importDefault(__webpack_require__(/*! path */ "path"));\nclass default_1 extends index_1.FeatureHandlerAbstract {\n    constructor(argv) {\n        super(argv);\n        inquirer_1.default.registerPrompt(\'autocomplete\', inquirer_autocomplete_prompt_1.default);\n    }\n    async run() {\n        const { argv } = this;\n        const logger = logger_1.default.getLogger();\n        logger.debug(\'create hander : \', argv);\n        const locale = (0, getLocale_1.getLocaleLang)(this.lang);\n        const res = (await inquirer_1.default\n            .prompt([\n            {\n                type: \'autocomplete\',\n                name: \'template\',\n                emptyText: locale.inquirer.template.autocomplete.emptyText,\n                message: locale.inquirer.template.choiceTemplate,\n                source: (answersSoFar, input) => (lodash_1.default.isEmpty(input) ? config_1.default.templates : config_1.default.templates.filter((item) => item.name.includes(input))),\n            },\n            {\n                type: \'input\',\n                name: \'projectName\',\n                message: \'input a project name\',\n                default: (answers) => answers.template,\n                validate: (value) => {\n                    if (lodash_1.default.isEmpty(value))\n                        return \'required input a project name\';\n                    return true;\n                },\n            },\n        ])\n            .then((answers) => {\n            return answers;\n        }));\n        logger.debug(`input values : ${JSON.stringify(res)}}`);\n        const { template, projectName } = res;\n        logger.info(`template : ${template}`);\n        logger.info(`projectName : ${projectName}`);\n        logger.debug(`check exists directory : ${path_1.default.join(config_1.default.currentPath, projectName)}`);\n        if ((0, cli_1.isExistsDirectory)(path_1.default.join(config_1.default.currentPath, projectName))) {\n            throw new Error(`${locale.error.alreadyExistsDirectory} : ${path_1.default.join(config_1.default.currentPath, projectName)}`);\n        }\n        await (0, cli_1.gitClone)(config_1.default.repositoyUrl, config_1.default.tmpPath);\n        (0, cli_1.moveDirectory)(path_1.default.join(config_1.default.tmpPath, template), path_1.default.join(config_1.default.currentPath, projectName));\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/create/handler.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/create/index.ts':
+      /*!**************************************!*\
+  !*** ./lib/features/create/index.ts ***!
+  \**************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst builder_1 = __importDefault(__webpack_require__(/*! features/create/builder */ "./lib/features/create/builder.ts"));\nconst handler_1 = __importDefault(__webpack_require__(/*! features/create/handler */ "./lib/features/create/handler.ts"));\nexports["default"] = {\n    builder: builder_1.default,\n    handler: handler_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/create/index.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/create/locale/en.ts':
+      /*!******************************************!*\
+  !*** ./lib/features/create/locale/en.ts ***!
+  \******************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    error: {\n        alreadyExistsDirectory: 'already exists directory',\n        unProcessed: 'The command entered does not exist. Run \"ragate create help\" for a list of all available commands.',\n    },\n    inquirer: {\n        template: {\n            choiceTemplate: 'Choose a project template',\n            autocomplete: {\n                emptyText: 'No result',\n            },\n        },\n    },\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/create/locale/en.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/create/locale/ja.ts':
+      /*!******************************************!*\
+  !*** ./lib/features/create/locale/ja.ts ***!
+  \******************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    error: {\n        alreadyExistsDirectory: '既にディレクトリが存在します',\n        unProcessed: '入力されたコマンドは存在しません。「ragate create help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',\n    },\n    inquirer: {\n        template: {\n            choiceTemplate: 'プロジェクトの雛形を選択してください。',\n            autocomplete: {\n                emptyText: '該当するテンプレートが見つかりません',\n            },\n        },\n    },\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/create/locale/ja.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/features/create/utils/getLocale.ts':
+      /*!************************************************!*\
+  !*** ./lib/features/create/utils/getLocale.ts ***!
+  \************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.getLocaleLang = void 0;\nconst ja_1 = __importDefault(__webpack_require__(/*! features/create/locale/ja */ "./lib/features/create/locale/ja.ts"));\nconst en_1 = __importDefault(__webpack_require__(/*! features/create/locale/en */ "./lib/features/create/locale/en.ts"));\nconst getLocaleLang = (locale) => {\n    switch (locale) {\n        case \'ja\':\n            return ja_1.default;\n        case \'en\':\n            return en_1.default;\n        default:\n            return en_1.default;\n    }\n};\nexports.getLocaleLang = getLocaleLang;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/features/create/utils/getLocale.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/appSyncStackService.ts':
+      /*!*********************************************!*\
+  !*** ./lib/services/appSyncStackService.ts ***!
+  \*********************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          "\nvar __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {\n    if (k2 === undefined) k2 = k;\n    var desc = Object.getOwnPropertyDescriptor(m, k);\n    if (!desc || (\"get\" in desc ? !m.__esModule : desc.writable || desc.configurable)) {\n      desc = { enumerable: true, get: function() { return m[k]; } };\n    }\n    Object.defineProperty(o, k2, desc);\n}) : (function(o, m, k, k2) {\n    if (k2 === undefined) k2 = k;\n    o[k2] = m[k];\n}));\nvar __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {\n    Object.defineProperty(o, \"default\", { enumerable: true, value: v });\n}) : function(o, v) {\n    o[\"default\"] = v;\n});\nvar __importStar = (this && this.__importStar) || function (mod) {\n    if (mod && mod.__esModule) return mod;\n    var result = {};\n    if (mod != null) for (var k in mod) if (k !== \"default\" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);\n    __setModuleDefault(result, mod);\n    return result;\n};\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst path_1 = __importDefault(__webpack_require__(/*! path */ \"path\"));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ \"./lib/utils/logger.ts\"));\nconst yaml_1 = __webpack_require__(/*! utils/yaml */ \"./lib/utils/yaml.ts\");\nconst analyzer_1 = __importDefault(__webpack_require__(/*! utils/graphql/analyzer */ \"./lib/utils/graphql/analyzer.ts\"));\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\nconst fs_1 = __importDefault(__webpack_require__(/*! fs */ \"fs\"));\nconst config_1 = __importDefault(__webpack_require__(/*! config */ \"./lib/config.ts\"));\nconst parser_1 = __importDefault(__webpack_require__(/*! utils/parser */ \"./lib/utils/parser.ts\"));\nconst cloudformationService_1 = __importDefault(__webpack_require__(/*! services/cloudformationService */ \"./lib/services/cloudformationService.ts\"));\nconst iam = __importStar(__webpack_require__(/*! @aws-cdk/aws-iam */ \"@aws-cdk/aws-iam\"));\nconst cdk = __importStar(__webpack_require__(/*! aws-cdk-lib */ \"aws-cdk-lib\"));\nconst yargonaut_1 = __webpack_require__(/*! yargonaut */ \"yargonaut\");\nconst editor_1 = __importDefault(__webpack_require__(/*! utils/graphql/editor */ \"./lib/utils/graphql/editor.ts\"));\nclass default_1 {\n    constructor(args) {\n        this.logger = logger_1.default.getLogger();\n        this._stackFilePath = args.stackFilePath;\n        this._lang = args.lang;\n        this._region = args.region;\n        this._defaultIamRolePath = `serverless/${args.region}/resources/iamrole/appsync.yml`;\n        this._graphqlEditor = new editor_1.default();\n        this.setAppSyncStackObject();\n    }\n    _graphqlEditor;\n    get graphqlEditor() {\n        return this._graphqlEditor;\n    }\n    appSyncDynamoDBRoleName = 'AppSyncDynamoDBRole';\n    appSyncRDSRoleName = 'AppSyncRDSRole';\n    appSyncOpenSearchRoleName = 'AppSyncOpenSearchRole';\n    appSyncLambdaRoleName = 'AppSyncLambdaRole';\n    defaultCustomDataSourcePath = 'appsync/custom_datasources.yml';\n    defaultCustomMappingtemplatePath = 'appsync/custom_mappingtemplate.yml';\n    defaultCustomFunctionConfigurationsPath = 'appsync/custom_functionConfigurations.yml';\n    defaultAppSyncStackIndex = 0;\n    logger;\n    _defaultIamRolePath;\n    get defaultIamRolePath() {\n        return this._defaultIamRolePath;\n    }\n    _appSyncStack;\n    get appSyncStack() {\n        return this._appSyncStack;\n    }\n    _stackFilePath;\n    get stackFilePath() {\n        return this._stackFilePath;\n    }\n    _lang;\n    get lang() {\n        return this._lang;\n    }\n    _region;\n    get region() {\n        return this._region;\n    }\n    getAppSyncStackConfig() {\n        const stackDoc = (0, yaml_1.loadYaml)(this.stackFilePath);\n        const index = this.defaultAppSyncStackIndex;\n        return {\n            ...stackDoc[index],\n            functionConfigurations: stackDoc[index].functionConfigurations ?? [],\n            dataSources: stackDoc[index].dataSources ?? [],\n            mappingTemplates: stackDoc[index].mappingTemplates ?? [],\n            schema: stackDoc[index].schema ?? [],\n        };\n    }\n    writeAppSyncStackConfig(config) {\n        const stackDoc = (0, yaml_1.loadYaml)(this.stackFilePath);\n        const index = this.defaultAppSyncStackIndex;\n        stackDoc[index] = config;\n        const yamlText = (0, yaml_1.writeYaml)(this.stackFilePath, stackDoc);\n        this.logger.info((0, yargonaut_1.chalk)().green(yamlText));\n    }\n    setAppSyncStackObject() {\n        const res = this.getAppSyncStackConfig();\n        const { schema, dataSources, mappingTemplates, mappingTemplatesLocation, functionConfigurationsLocation, functionConfigurations } = res;\n        this._appSyncStack = {\n            mappingTemplatesLocation,\n            functionConfigurationsLocation,\n            functionConfigurations: lodash_1.default.chain(functionConfigurations)\n                .map((p) => (0, yaml_1.loadYaml)(parser_1.default.parseSlsRecursivelyReference(p)))\n                .flatten()\n                .filter((p) => p && !lodash_1.default.isEmpty(p))\n                .value() ?? [],\n            dataSources: lodash_1.default.chain(dataSources)\n                .map((p) => (0, yaml_1.loadYaml)(parser_1.default.parseSlsRecursivelyReference(p)))\n                .flatten()\n                .filter((p) => p && !lodash_1.default.isEmpty(p))\n                .value() ?? [],\n            mappingTemplates: lodash_1.default.chain(mappingTemplates)\n                .map((p) => (0, yaml_1.loadYaml)(parser_1.default.parseSlsRecursivelyReference(p)))\n                .flatten()\n                .filter((p) => p && !lodash_1.default.isEmpty(p))\n                .value() ?? [],\n            schema: lodash_1.default.chain(schema)\n                .thru((value) => {\n                if (lodash_1.default.isString(value) && !lodash_1.default.isEmpty(value)) {\n                    const _schema = fs_1.default.readFileSync(path_1.default.join(config_1.default.currentPath, value), 'utf8');\n                    if (lodash_1.default.isEmpty(_schema))\n                        return [];\n                    return [_schema];\n                }\n                if (lodash_1.default.isArray(value) && !lodash_1.default.isEmpty(value)) {\n                    return value\n                        .map((v) => {\n                        const _schema = fs_1.default.readFileSync(path_1.default.join(config_1.default.currentPath, v), 'utf8');\n                        if (lodash_1.default.isEmpty(_schema))\n                            return '';\n                        return _schema;\n                    })\n                        .filter((v) => !lodash_1.default.isEmpty(v));\n                }\n                return [];\n            })\n                .thru((schemas) => new analyzer_1.default(schemas))\n                .value(),\n        };\n    }\n    addDataSource(dataSource) {\n        // update custom_datasources.yml\n        let isWrite = false;\n        if (this.appSyncStack?.dataSources.some((p) => p.name === dataSource.name)) {\n            this.logger.warn(`DataSource ${dataSource.name} is already exists.`);\n            isWrite = false;\n        }\n        else {\n            try {\n                const dataSourceDoc = (0, yaml_1.loadYaml)(this.defaultCustomDataSourcePath);\n                const newDataSources = [...dataSourceDoc, dataSource];\n                const yamlText = (0, yaml_1.writeYaml)(this.defaultCustomDataSourcePath, newDataSources);\n                this.logger.info((0, yargonaut_1.chalk)().green(yamlText));\n            }\n            catch (e) {\n                const yamlText = (0, yaml_1.writeYaml)(this.defaultCustomDataSourcePath, [dataSource]);\n                this.logger.info((0, yargonaut_1.chalk)().green(yamlText));\n            }\n            isWrite = true;\n        }\n        // update appsync stack yml\n        if (isWrite) {\n            const stackDoc = this.getAppSyncStackConfig();\n            if (stackDoc.dataSources.every((str) => !str.includes(this.defaultCustomDataSourcePath))) {\n                this.writeAppSyncStackConfig({\n                    ...stackDoc,\n                    dataSources: [...stackDoc.dataSources, `\\${file(./${this.defaultCustomDataSourcePath})}`],\n                });\n            }\n        }\n        this.setAppSyncStackObject();\n    }\n    addMappingTemplate(args) {\n        const { mappingTemplate } = args;\n        // update custom_datasources.yml\n        let isWrite = false;\n        if (this.appSyncStack?.mappingTemplates.some((p) => p.type === mappingTemplate.type && p.field === mappingTemplate.field)) {\n            this.logger.warn(`MappingTemplate ${mappingTemplate.type}.${mappingTemplate.field} is already exists.`);\n            isWrite = false;\n        }\n        else {\n            try {\n                const mappingTemplateDoc = (0, yaml_1.loadYaml)(this.defaultCustomMappingtemplatePath);\n                const newMappingTemplates = [...mappingTemplateDoc, mappingTemplate];\n                const yamlText = (0, yaml_1.writeYaml)(this.defaultCustomMappingtemplatePath, newMappingTemplates);\n                this.logger.info((0, yargonaut_1.chalk)().green(yamlText));\n            }\n            catch (e) {\n                const yamlText = (0, yaml_1.writeYaml)(this.defaultCustomMappingtemplatePath, [mappingTemplate]);\n                this.logger.info((0, yargonaut_1.chalk)().green(yamlText));\n            }\n            isWrite = true;\n        }\n        // update appsync stack yml\n        if (isWrite) {\n            const stackDoc = this.getAppSyncStackConfig();\n            if (stackDoc.mappingTemplates.every((str) => !str.includes(this.defaultCustomMappingtemplatePath))) {\n                this.writeAppSyncStackConfig({\n                    ...stackDoc,\n                    mappingTemplates: [...stackDoc.mappingTemplates, `\\${file(./${this.defaultCustomMappingtemplatePath})}`],\n                });\n            }\n        }\n        this.setAppSyncStackObject();\n    }\n    addFunctionConfiguration(args) {\n        const { functionConfiguration } = args;\n        // update custom_datasources.yml\n        let isWrite = false;\n        if (this.appSyncStack?.functionConfigurations.some((p) => p.name === functionConfiguration.name)) {\n            this.logger.warn(`FunctionConfiguration ${functionConfiguration.name} is already exists.`);\n            isWrite = false;\n        }\n        else {\n            try {\n                const functionConfigurationDoc = (0, yaml_1.loadYaml)(this.defaultCustomFunctionConfigurationsPath);\n                const newFunctionConfigurationDoc = [...functionConfigurationDoc, functionConfiguration];\n                const yamlText = (0, yaml_1.writeYaml)(this.defaultCustomFunctionConfigurationsPath, newFunctionConfigurationDoc);\n                this.logger.info((0, yargonaut_1.chalk)().green(yamlText));\n            }\n            catch (e) {\n                const yamlText = (0, yaml_1.writeYaml)(this.defaultCustomFunctionConfigurationsPath, [functionConfiguration]);\n                this.logger.info((0, yargonaut_1.chalk)().green(yamlText));\n            }\n            isWrite = true;\n        }\n        // update appsync stack yml\n        if (isWrite) {\n            const stackDoc = this.getAppSyncStackConfig();\n            if (stackDoc.functionConfigurations.every((str) => !str.includes(this.defaultCustomFunctionConfigurationsPath))) {\n                this.writeAppSyncStackConfig({\n                    ...stackDoc,\n                    functionConfigurations: [...stackDoc.functionConfigurations, `\\${file(./${this.defaultCustomFunctionConfigurationsPath})}`],\n                });\n            }\n        }\n        this.setAppSyncStackObject();\n    }\n    updateCustomSchemaGraphl(args) {\n        // update custom_schema.graphql\n        const callback = (updated, opt) => {\n            if (updated) {\n                // update appsync stack yml\n                const { schemaPath } = opt;\n                const stackDoc = this.getAppSyncStackConfig();\n                if (lodash_1.default.isString(stackDoc.schema) && !stackDoc.schema.includes(schemaPath)) {\n                    this.writeAppSyncStackConfig({\n                        ...stackDoc,\n                        schema: [stackDoc.schema, schemaPath],\n                    });\n                }\n                else if (lodash_1.default.isArray(stackDoc.schema) && !stackDoc.schema.includes(schemaPath)) {\n                    this.writeAppSyncStackConfig({\n                        ...stackDoc,\n                        schema: [...stackDoc.schema, schemaPath],\n                    });\n                }\n                this.setAppSyncStackObject();\n            }\n            else {\n                this.logger.warn('skip update custom_schema.graphql.');\n            }\n        };\n        this.graphqlEditor.updateCustomSchemaGraphl({ ...args, callback });\n    }\n    addIamRoleByDataSource(args) {\n        const { dataSource, sls } = args;\n        switch (dataSource) {\n            case 'AMAZON_DYNAMODB':\n                sls.addResource({\n                    resourceName: this.appSyncDynamoDBRoleName,\n                    filePath: this.defaultIamRolePath,\n                    cf: cloudformationService_1.default.generateCloudFormation(this.appSyncDynamoDBRoleName, (c) => {\n                        const role = new iam.Role(c, this.appSyncDynamoDBRoleName, {\n                            assumedBy: new iam.ServicePrincipal('appsync.amazonaws.com'),\n                        });\n                        role.addToPolicy(new iam.PolicyStatement({\n                            effect: iam.Effect.ALLOW,\n                            resources: [cdk.Fn.join(':', ['arn:aws:dynamodb', this.region, cdk.Fn.ref('AWS::AccountId'), 'table/*'])],\n                            actions: ['dynamodb:*'],\n                        }));\n                        return role;\n                    }),\n                });\n                break;\n            case 'RELATIONAL_DATABASE':\n                sls.addResource({\n                    resourceName: this.appSyncRDSRoleName,\n                    filePath: this.defaultIamRolePath,\n                    cf: cloudformationService_1.default.generateCloudFormation(this.appSyncRDSRoleName, (c) => {\n                        const role = new iam.Role(c, this.appSyncRDSRoleName, {\n                            assumedBy: new iam.ServicePrincipal('appsync.amazonaws.com'),\n                        });\n                        role.addToPolicy(new iam.PolicyStatement({\n                            effect: iam.Effect.ALLOW,\n                            resources: [cdk.Fn.join(':', ['arn:aws:rds', this.region, cdk.Fn.ref('AWS::AccountId'), 'secret:*'])],\n                            actions: ['rds-data:DeleteItems', 'rds-data:ExecuteSql', 'rds-data:ExecuteStatement', 'rds-data:GetItems', 'rds-data:InsertItems', 'rds-data:UpdateItems'],\n                        }));\n                        role.addToPolicy(new iam.PolicyStatement({\n                            effect: iam.Effect.ALLOW,\n                            resources: [cdk.Fn.join(':', ['arn:aws:secretsmanager', this.region, cdk.Fn.ref('AWS::AccountId'), 'table/*'])],\n                            actions: ['secretsmanager:GetSecretValue'],\n                        }));\n                        return role;\n                    }),\n                });\n                break;\n            case 'AMAZON_ELASTICSEARCH':\n                sls.addResource({\n                    resourceName: this.appSyncOpenSearchRoleName,\n                    filePath: this.defaultIamRolePath,\n                    cf: cloudformationService_1.default.generateCloudFormation(this.appSyncOpenSearchRoleName, (c) => {\n                        const role = new iam.Role(c, this.appSyncOpenSearchRoleName, {\n                            assumedBy: new iam.ServicePrincipal('appsync.amazonaws.com'),\n                        });\n                        return role;\n                    }),\n                });\n                break;\n            case 'AWS_LAMBDA':\n                sls.addResource({\n                    resourceName: this.appSyncLambdaRoleName,\n                    filePath: this.defaultIamRolePath,\n                    cf: cloudformationService_1.default.generateCloudFormation(this.appSyncLambdaRoleName, (c) => {\n                        const role = new iam.Role(c, this.appSyncLambdaRoleName, {\n                            assumedBy: new iam.ServicePrincipal('appsync.amazonaws.com'),\n                        });\n                        role.addToPolicy(new iam.PolicyStatement({\n                            effect: iam.Effect.ALLOW,\n                            resources: [cdk.Fn.join(':', ['arn:aws:lambda', this.region, cdk.Fn.ref('AWS::AccountId'), 'function:*'])],\n                            actions: ['lambda:invokeFunction'],\n                        }));\n                        return role;\n                    }),\n                });\n                break;\n            case 'HTTP':\n                sls.addResource({\n                    resourceName: 'AppSyncHttpRole',\n                    filePath: this.defaultIamRolePath,\n                    cf: cloudformationService_1.default.generateCloudFormation('AppSyncHttpRole', (c) => {\n                        const role = new iam.Role(c, 'AppSyncHttpRole', {\n                            assumedBy: new iam.ServicePrincipal('appsync.amazonaws.com'),\n                        });\n                        return role;\n                    }),\n                });\n                break;\n            default:\n                break;\n        }\n    }\n}\nexports[\"default\"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/appSyncStackService.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/cloudformationService.ts':
+      /*!***********************************************!*\
+  !*** ./lib/services/cloudformationService.ts ***!
+  \***********************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ "./lib/utils/logger.ts"));\nconst core_1 = __webpack_require__(/*! @aws-cdk/core */ "@aws-cdk/core");\nconst assert_1 = __webpack_require__(/*! @aws-cdk/assert */ "@aws-cdk/assert");\nclass default_1 {\n    static generateCloudFormation = (resourceName, resource) => {\n        class DevStack extends core_1.Stack {\n            constructor(scope, id, props) {\n                super(scope, id, props);\n                const res = resource(this);\n                const cfn = res.node.defaultChild;\n                cfn.overrideLogicalId(resourceName);\n            }\n        }\n        const logger = logger_1.default.getLogger();\n        const stack = new DevStack(new core_1.App(), \'ragate\');\n        // Convert to CloudFormation template\n        // eslint-disable-next-line @typescript-eslint/ban-ts-comment\n        // @ts-ignore\n        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment\n        const cfn = assert_1.SynthUtils.toCloudFormation(stack);\n        logger.debug(\'generated cloudFormation template:\');\n        logger.debug(cfn);\n        return cfn.Resources;\n    };\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/cloudformationService.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/index.ts':
+      /*!*******************************************!*\
+  !*** ./lib/services/codeService/index.ts ***!
+  \*******************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst parser_1 = __importDefault(__webpack_require__(/*! utils/parser */ "./lib/utils/parser.ts"));\nconst typescript_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/typescript */ "./lib/services/codeService/templates/typescript/index.ts"));\nconst vtl_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl */ "./lib/services/codeService/templates/vtl/index.ts"));\nconst cli_1 = __webpack_require__(/*! utils/cli */ "./lib/utils/cli.ts");\nconst fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ "./lib/utils/logger.ts"));\nconst yargonaut_1 = __webpack_require__(/*! yargonaut */ "yargonaut");\nclass CodeService {\n    static get templates() {\n        return {\n            typescript: typescript_1.default,\n            vtl: vtl_1.default,\n        };\n    }\n    constructor(args) {\n        const { filePath, code, type } = args;\n        const [directories, fileName] = parser_1.default.parseFilePath(filePath);\n        this.type = type;\n        this.filePath = filePath;\n        this.code = code;\n        this.destinationPath = directories.join(\'/\') + \'/\';\n        if (type === \'typescript\') {\n            this.fileName = parser_1.default.extractFilename(fileName);\n        }\n        else {\n            this.fileName = fileName;\n        }\n        this.logger = logger_1.default.getLogger();\n    }\n    filePath;\n    type;\n    destinationPath;\n    fileName;\n    code;\n    logger;\n    get extension() {\n        switch (this.type) {\n            case \'typescript\':\n                return \'ts\';\n            case \'vtl\':\n                return \'vtl\';\n            default:\n                this.logger.error(`An unsupported file type was specified. : ${this.filePath}`);\n                throw Error(\'An unsupported file type was specified.\');\n        }\n    }\n    write() {\n        const destination = `${(0, cli_1.asFullPath)(this.destinationPath)}${this.fileName}.${this.extension}`;\n        if ((0, cli_1.isFileExists)(destination)) {\n            this.logger.info(`already exists file, skip write : ${destination}`);\n            return;\n        }\n        (0, cli_1.createDirectories)(this.destinationPath);\n        this.logger.info(`create directories : ${this.destinationPath}`);\n        fs_1.default.writeFileSync(destination, this.code, \'utf8\');\n        this.logger.info(`write : ${destination}`);\n        this.logger.info((0, yargonaut_1.chalk)().green(this.code));\n    }\n}\nexports["default"] = CodeService;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/index.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/typescript/basicauthlambda.ts':
+      /*!**************************************************************************!*\
+  !*** ./lib/services/codeService/templates/typescript/basicauthlambda.ts ***!
+  \**************************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nexports[\"default\"] = `import { Context, CloudFrontRequest, Callback, CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda';\n\nexport const handler = (event: CloudFrontRequestEvent, _context: Context, callback: Callback): void => {\n  const request: CloudFrontRequest = event.Records[0].cf.request;\n  const headers = request.headers;\n\n  const authUser = 'ragate'; // Basic認証のユーザー名\n  const authPass = '20210525'; // Basic認証のパスワード\n\n  const authString = 'Basic ' + Buffer.from(authUser + ':' + authPass).toString('base64');\n  if (typeof headers.authorization === 'undefined' || headers.authorization[0].value !== authString) {\n    const body = 'Unauthorized';\n    const response: CloudFrontResultResponse = {\n      status: '401',\n      statusDescription: 'Unauthorized',\n      body: body,\n      headers: {\n        'www-authenticate': [{ key: 'WWW-Authenticate', value: 'Basic' }],\n      },\n    };\n    callback(null, response);\n  }\n  callback(null, request);\n};\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/typescript/basicauthlambda.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/typescript/index.ts':
+      /*!****************************************************************!*\
+  !*** ./lib/services/codeService/templates/typescript/index.ts ***!
+  \****************************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst basicauthlambda_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/typescript/basicauthlambda */ "./lib/services/codeService/templates/typescript/basicauthlambda.ts"));\nconst skeleton_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/typescript/skeleton */ "./lib/services/codeService/templates/typescript/skeleton.ts"));\nexports["default"] = {\n    basicauthlambda: basicauthlambda_1.default,\n    skeleton: skeleton_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/typescript/index.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/typescript/skeleton.ts':
+      /*!*******************************************************************!*\
+  !*** ./lib/services/codeService/templates/typescript/skeleton.ts ***!
+  \*******************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nexports[\"default\"] = `import { asyncHandlerWrapper } from 'functions/wrapper';\nimport { AppSyncResolverEvent, Context } from 'aws-lambda';\n\ntype Input = {\n  example: string;\n};\n\ntype Response = {\n  example: string;\n};\n\nexport const handler = asyncHandlerWrapper<AppSyncResolverEvent<Input>, Context, Response>(async (event) => {\n  console.log('It is skeleton 👻');\n});\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/typescript/skeleton.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/dynamo.getItem.request.ts':
+      /*!**************************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/dynamo.getItem.request.ts ***!
+  \**************************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = (args) => `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n## [Start] 共通設定\n#set( $primaryValue = "your primary key value" )\n#set( $sortKeyValue = "your sort key value" )\n## [End] 共通設定\n\n## [Start] 自動設定\n#set( $consistentRead = ${args.consistentRead.toString()} )\n#set( $primaryKey = "${args.primaryKeyName}" )\n#set( $sortKeyName = "${args.sortKeyName}" )\n## [End] 自動設定\n\n## [Start] バリデーション\n#set( $modelExpression = {\n    "version" : "2017-02-28",\n    "operation" : "GetItem",\n    "key" : {},\n    "consistentRead" : $consistentRead\n} )\n#if( $util.isNullOrEmpty($primaryValue) )\n  $util.error("PrimaryValue is null.", "InvalidIndexValueError")\n#else\n  $util.qr($modelExpression.key.put($primaryKey, $util.dynamodb.toDynamoDB($primaryValue)))\n#end\n#if( !$util.isNullOrEmpty($sortKeyName) && $util.isNullOrEmpty($sortKeyValue) )\n  $util.error("sortKeyValue is null.", "InvalidIndexValueError")\n#elseif( !$util.isNullOrEmpty($sortKeyName) && !$util.isNullOrEmpty($sortKeyValue) )\n  $util.qr($modelExpression.key.put($sortKeyName, $util.dynamodb.toDynamoDB($sortKeyValue)))\n#end\n## [End] バリデーション\n\n$util.toJson($modelExpression)\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/dynamo.getItem.request.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/dynamo.getItem.response.ts':
+      /*!***************************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/dynamo.getItem.response.ts ***!
+  \***************************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/dynamo.getItem.response.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/dynamo.query.request.ts':
+      /*!************************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/dynamo.query.request.ts ***!
+  \************************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = (args) => `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n## [Start] 手動設定\n#set( $primaryValue = "your primary key value" )\n#set( $sortKeyValue = "your sort key value" )\n## [End] 手動設定\n\n## [Start] 自動設定\n${args?.gsiName ? `#set( $indexName = "${args?.gsiName}" )` : \'\'}\n#set( $args = $ctx.args )\n#set( $primaryKey = "${args.primaryKeyName}" )\n#set( $sortKeyName = "${args.sortKeyName}" )\n## [End] 自動設定\n\n## [Start] バリデーション\n#set( $modelQueryExpression = {} )\n#if( $util.isNullOrEmpty($primaryValue) )\n  $util.error("PrimaryValue is null.", "InvalidIndexValueError")\n#else\n  #set( $modelQueryExpression.expression = "#$primaryKey = :$primaryKey" )\n  #set( $modelQueryExpression.expressionNames = {\n    "#$primaryKey": $primaryKey\n  })\n  #set( $modelQueryExpression.expressionValues = {\n    ":$primaryKey": $util.dynamodb.toDynamoDB($primaryValue)\n  })\n#end\n## [End] バリデーション\n\n## [Start] ソートキー用クエリー生成\n#if( !$util.isNullOrEmpty($sortKeyName) && !$util.isNullOrEmpty($sortKeyValue) )\n  #if( !$util.isNull($sortKeyValue.beginsWith) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND begins_with(#sortKey, :sortKey)" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey",  $util.dynamodb.toDynamoDB("$sortKeyValue.beginsWith") ))\n  #elseif( !$util.isNull($sortKeyValue.between) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey BETWEEN :sortKey0 AND :sortKey1" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey0", $util.dynamodb.toDynamoDB("$sortKeyValue.between[0]") ))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey1", $util.dynamodb.toDynamoDB("$sortKeyValue.between[1]") ))\n  #elseif( !$util.isNull($sortKeyValue.eq) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey = :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.eq") ))\n  #elseif( !$util.isNull($sortKeyValue.lt) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey < :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.lt") ))\n  #elseif( !$util.isNull($sortKeyValue.le) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey <= :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.le") ))\n  #elseif( !$util.isNull($sortKeyValue.gt) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey > :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.gt") ))\n  #elseif( !$util.isNull($sortKeyValue.ge) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey >= :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.ge") ))\n  #elseif( !$util.isNull($sortKeyValue.contains) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND contains(#sortKey, :sortKey)" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.contains") ))\n  #elseif( !$util.isNull($sortKeyValue.notContains) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND notContains(#sortKey, :sortKey)" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.notContains") ))\n  #else\n  #end\n#end\n## [End] ソートキー用クエリー生成\n\n## [Start] VTL文字列出力\n#set( $limit = $util.defaultIfNull($args.limit, 100) )\n#set( $request = {\n  "version": "2018-05-29",\n  "limit": $limit\n} )\n#if( $args.nextToken && !$util.isNullOrEmpty($args.nextToken) )\n  #set( $request.nextToken = $args.nextToken )\n#end\n#if( $args.filter )\n  #set( $request.filter = $util.parseJson("$util.transform.toDynamoDBFilterExpression($args.filter)") )\n#end\n#if( !$util.isNull($modelQueryExpression) && !$util.isNullOrEmpty($modelQueryExpression.expression) )\n  $util.qr($request.put("operation", "Query"))\n  $util.qr($request.put("query", $modelQueryExpression))\n  #if( $util.isNullOrEmpty($args.sortDirection) )\n    #set( $request.scanIndexForward = false )\n  #elseif( $args.sortDirection == "ASC" )\n    #set( $request.scanIndexForward = true )\n  #elseif( $args.sortDirection == "DESC" )\n    #set( $request.scanIndexForward = false )\n  #end\n#else\n  $util.qr($request.put("operation", "Scan"))\n#end\n#if(!$util.isNull($indexName))\n    $util.qr($request.put("index", $indexName))\n#end\n$util.toJson($request)\n## [End] VTL文字列出力`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/dynamo.query.request.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/dynamo.query.response.ts':
+      /*!*************************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/dynamo.query.response.ts ***!
+  \*************************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/dynamo.query.response.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/dynamo.scan.request.ts':
+      /*!***********************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/dynamo.scan.request.ts ***!
+  \***********************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n#set( $args = $ctx.args )\n\n## [Start] VTL文字列出力\n#set( $limit = $util.defaultIfNull($args.limit, 100) )\n#set( $request = {\n  "version": "2018-05-29",\n  "limit": $limit\n} )\n#if( $args.nextToken && !$util.isNullOrEmpty($args.nextToken) )\n  #set( $request.nextToken = $args.nextToken )\n#end\n#if( $args.filter )\n  #set( $request.filter = $util.parseJson("$util.transform.toDynamoDBFilterExpression($args.filter)") )\n#end\n$util.qr($request.put("operation", "Scan"))\n$util.toJson($request)\n## [End] VTL文字列出力\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/dynamo.scan.request.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/dynamo.scan.response.ts':
+      /*!************************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/dynamo.scan.response.ts ***!
+  \************************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/dynamo.scan.response.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/http.query.request.ts':
+      /*!**********************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/http.query.request.ts ***!
+  \**********************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-http.html\n\n{\n    "version": "2018-05-29",\n    "method": "PUT|POST|GET|DELETE|PATCH",\n    "params": {\n        "query": Map,\n        "headers": Map,\n        "body": string\n    },\n    "resourcePath": string\n}\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/http.query.request.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/http.query.response.ts':
+      /*!***********************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/http.query.response.ts ***!
+  \***********************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-http.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/http.query.response.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/index.ts':
+      /*!*********************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/index.ts ***!
+  \*********************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst pipeline_after_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/pipeline.after */ "./lib/services/codeService/templates/vtl/pipeline.after.ts"));\nconst pipeline_before_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/pipeline.before */ "./lib/services/codeService/templates/vtl/pipeline.before.ts"));\nconst localResolver_request_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/localResolver.request */ "./lib/services/codeService/templates/vtl/localResolver.request.ts"));\nconst localResolver_response_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/localResolver.response */ "./lib/services/codeService/templates/vtl/localResolver.response.ts"));\nconst dynamo_query_request_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/dynamo.query.request */ "./lib/services/codeService/templates/vtl/dynamo.query.request.ts"));\nconst dynamo_query_response_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/dynamo.query.response */ "./lib/services/codeService/templates/vtl/dynamo.query.response.ts"));\nconst dynamo_scan_request_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/dynamo.scan.request */ "./lib/services/codeService/templates/vtl/dynamo.scan.request.ts"));\nconst dynamo_scan_response_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/dynamo.scan.response */ "./lib/services/codeService/templates/vtl/dynamo.scan.response.ts"));\nconst dynamo_getItem_request_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/dynamo.getItem.request */ "./lib/services/codeService/templates/vtl/dynamo.getItem.request.ts"));\nconst dynamo_getItem_response_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/dynamo.getItem.response */ "./lib/services/codeService/templates/vtl/dynamo.getItem.response.ts"));\nconst opensearch_query_request_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/opensearch.query.request */ "./lib/services/codeService/templates/vtl/opensearch.query.request.ts"));\nconst opensearch_query_response_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/opensearch.query.response */ "./lib/services/codeService/templates/vtl/opensearch.query.response.ts"));\nconst http_query_request_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/http.query.request */ "./lib/services/codeService/templates/vtl/http.query.request.ts"));\nconst http_query_response_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/http.query.response */ "./lib/services/codeService/templates/vtl/http.query.response.ts"));\nconst rdb_query_request_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/rdb.query.request */ "./lib/services/codeService/templates/vtl/rdb.query.request.ts"));\nconst rdb_query_response_1 = __importDefault(__webpack_require__(/*! services/codeService/templates/vtl/rdb.query.response */ "./lib/services/codeService/templates/vtl/rdb.query.response.ts"));\nexports["default"] = {\n    pipelineAfter: pipeline_after_1.default,\n    pipelineBefore: pipeline_before_1.default,\n    dynamoGetItemRequest: dynamo_getItem_request_1.default,\n    dynamoGetItemResponse: dynamo_getItem_response_1.default,\n    dynamoQueryRequest: dynamo_query_request_1.default,\n    dynamoQueryResponse: dynamo_query_response_1.default,\n    localResolverRequest: localResolver_request_1.default,\n    localResolverResponse: localResolver_response_1.default,\n    dynamoScanRequest: dynamo_scan_request_1.default,\n    dynamoScanResponse: dynamo_scan_response_1.default,\n    openSearchQueryRequest: opensearch_query_request_1.default,\n    openSearchQueryResponse: opensearch_query_response_1.default,\n    httpQueryRequest: http_query_request_1.default,\n    httpQueryResponse: http_query_response_1.default,\n    rdbQueryRequest: rdb_query_request_1.default,\n    rdbQueryResponse: rdb_query_response_1.default,\n};\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/index.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/localResolver.request.ts':
+      /*!*************************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/localResolver.request.ts ***!
+  \*************************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `\n## [Start] 共通設定\n#set($payload = $ctx.args )\n#set($primaryValue = "your primary key value" )\n## [End] 共通設定\n\n#if( $util.isNullOrEmpty($primaryValue) )\n  #return\n#end\n\n{\n  "version": "2017-02-28",\n  "payload": $util.toJson($payload)\n}\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/localResolver.request.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/localResolver.response.ts':
+      /*!**************************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/localResolver.response.ts ***!
+  \**************************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/localResolver.response.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/opensearch.query.request.ts':
+      /*!****************************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/opensearch.query.request.ts ***!
+  \****************************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = (args) => `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-elasticsearch.html\n\n## [START] 共通設定\n#set( $args = $ctx.args )\n#set( $indexName = "${args.indexName}" )\n#set( $allowedAggFields = ["ALLOWED_ALL_FIELDS"] ) ## アグリゲーション指定許可するフィールド名(ALLOWED_ALL_FIELDSを指定時は全フィールド許可)\n## [END] 共通設定\n\n## [START] ソート条件生成\n#set( $sortValues = [] )\n#set( $sortFields = [] )\n#if( !$util.isNullOrEmpty($args.sort) )\n  #foreach( $sortItem in $args.sort )\n    #set( $temp = {\n      $sortItem.field : $sortItem.direction\n    } )\n    $util.qr($sortValues.add($temp))\n  #end\n#end\n## [END] ソート条件生成\n\n## [START] Aggregates適用(分析対象フィールド)\n#set( $aggregateValues = {} )\n#foreach( $aggItem in $args.aggregates )\n  #if( $allowedAggFields[0] == "ALLOWED_ALL_FIELDS" )\n    #set( $aggFilter = { "match_all": {} } )\n  #elseif( $allowedAggFields.contains($aggItem.field) )\n    #set( $aggFilter = { "match_all": {} } )\n  #else\n    $util.error("Unauthorized to run aggregation on field: \\${aggItem.field}", "Unauthorized")\n  #end\n  $util.qr($aggregateValues.put("$aggItem.name", { "filter": $aggFilter, "aggs": { "$aggItem.name": { "$aggItem.type": { "field": "$aggItem.field" }}} }))\n#end\n## [END] Aggregates適用(分析対象フィールド)\n\n## [START] フィルター適用\n#if( $util.isNullOrEmpty($args.filter) )\n  #set( $filter = {\n    "match_all": {}\n  } )\n#else\n  #set( $filter = $util.parseJson($util.transform.toElasticsearchQueryDSL($args.filter)) )\n#end\n## [END] フィルター適用\n\n{\n  "version": "2018-05-29",\n  "operation": "GET",\n  "path": "/$indexName/_doc/_search",\n  "params": {\n      "body": {\n                #if( !$util.isNullOrEmpty($args.nextToken) )"search_after": $util.base64Decode($args.nextToken), #end\n                #if( $args.from )"from": $args.from, #end\n                "size": #if( $args.limit ) $args.limit #else 100 #end,\n                "sort": $util.toJson($sortValues),\n                "version": false,\n                "query": $util.toJson($filter),\n                "aggs": $util.toJson($aggregateValues)\n              }\n  }\n}\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/opensearch.query.request.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/opensearch.query.response.ts':
+      /*!*****************************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/opensearch.query.response.ts ***!
+  \*****************************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-elasticsearch.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#end\n\n#set( $es_items = [] )\n#set( $aggregateValues = [] )\n#foreach( $entry in $context.result.hits.hits )\n  #if( !$foreach.hasNext )\n    #set( $nextToken = $util.base64Encode($util.toJson($entry.sort)) )\n  #end\n  $util.qr($es_items.add($entry.get("_source")))\n#end\n#foreach( $aggItem in $context.result.aggregations.keySet() )\n  #set( $aggResult = {} )\n  #set( $aggResultValue = {} )\n  #set( $currentAggItem = $ctx.result.aggregations.get($aggItem) )\n  $util.qr($aggResult.put("name", $aggItem))\n  #if( !$util.isNullOrEmpty($currentAggItem) )\n    #if( !$util.isNullOrEmpty($currentAggItem.get($aggItem).buckets) )\n      ## $util.qr($aggResultValue.put("__typename", "SearchableAggregateBucketResult"))\n      $util.qr($aggResultValue.put("buckets", $currentAggItem.get($aggItem).buckets))\n    #end\n    #if( !$util.isNullOrEmpty($currentAggItem.get($aggItem).value) )\n      ## $util.qr($aggResultValue.put("__typename", "SearchableAggregateScalarResult"))\n      $util.qr($aggResultValue.put("value", $currentAggItem.get($aggItem).value))\n    #end\n  #end\n  $util.qr($aggResult.put("result", $aggResultValue))\n  $util.qr($aggregateValues.add($aggResult))\n#end\n$util.toJson({\n  "items": $es_items,\n  "total": $ctx.result.hits.total.value,\n  "nextToken": $nextToken,\n  "aggregateItems": $aggregateValues\n})\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/opensearch.query.response.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/pipeline.after.ts':
+      /*!******************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/pipeline.after.ts ***!
+  \******************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `$util.toJson($ctx.prev.result)`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/pipeline.after.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/pipeline.before.ts':
+      /*!*******************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/pipeline.before.ts ***!
+  \*******************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `{}`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/pipeline.before.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/rdb.query.request.ts':
+      /*!*********************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/rdb.query.request.ts ***!
+  \*********************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-rds.html\n\n{\n    "version": "2018-05-29",\n    "statements": [],\n    "variableMap": {}\n}\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/rdb.query.request.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/codeService/templates/vtl/rdb.query.response.ts':
+      /*!**********************************************************************!*\
+  !*** ./lib/services/codeService/templates/vtl/rdb.query.response.ts ***!
+  \**********************************************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports["default"] = `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-rds.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n`;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/codeService/templates/vtl/rdb.query.response.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/services/serverlessConfigService.ts':
+      /*!*************************************************!*\
+  !*** ./lib/services/serverlessConfigService.ts ***!
+  \*************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          "\nvar __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {\n    if (k2 === undefined) k2 = k;\n    var desc = Object.getOwnPropertyDescriptor(m, k);\n    if (!desc || (\"get\" in desc ? !m.__esModule : desc.writable || desc.configurable)) {\n      desc = { enumerable: true, get: function() { return m[k]; } };\n    }\n    Object.defineProperty(o, k2, desc);\n}) : (function(o, m, k, k2) {\n    if (k2 === undefined) k2 = k;\n    o[k2] = m[k];\n}));\nvar __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {\n    Object.defineProperty(o, \"default\", { enumerable: true, value: v });\n}) : function(o, v) {\n    o[\"default\"] = v;\n});\nvar __importStar = (this && this.__importStar) || function (mod) {\n    if (mod && mod.__esModule) return mod;\n    var result = {};\n    if (mod != null) for (var k in mod) if (k !== \"default\" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);\n    __setModuleDefault(result, mod);\n    return result;\n};\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst path_1 = __importDefault(__webpack_require__(/*! path */ \"path\"));\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ \"./lib/utils/logger.ts\"));\nconst yargonaut_1 = __webpack_require__(/*! yargonaut */ \"yargonaut\");\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\nconst yaml_1 = __webpack_require__(/*! utils/yaml */ \"./lib/utils/yaml.ts\");\nconst parser_1 = __importDefault(__webpack_require__(/*! utils/parser */ \"./lib/utils/parser.ts\"));\nconst codeService_1 = __importDefault(__webpack_require__(/*! services/codeService */ \"./lib/services/codeService/index.ts\"));\nconst cloudformationService_1 = __importDefault(__webpack_require__(/*! services/cloudformationService */ \"./lib/services/cloudformationService.ts\"));\nconst iam = __importStar(__webpack_require__(/*! @aws-cdk/aws-iam */ \"@aws-cdk/aws-iam\"));\nconst cdk = __importStar(__webpack_require__(/*! aws-cdk-lib */ \"aws-cdk-lib\"));\nclass default_1 {\n    constructor(args) {\n        this.logger = logger_1.default.getLogger();\n        this._serverlessConfigPath = args.serverlessConfigPath;\n        this._lang = args.lang;\n        this._defaultFunctionYamlPath = `serverless/${args.region}/resources/functions.yml`;\n        try {\n            const doc = (0, yaml_1.loadYaml)(this.serverlessConfigPath);\n            this._serverlessConfig = doc;\n            if (lodash_1.default.isString(doc.functions)) {\n                const functionsFilePath = parser_1.default.parseSlsRecursivelyReference(doc.functions);\n                this._functionsYamlPath = functionsFilePath;\n            }\n            this._region = doc.provider.region ?? args.region;\n        }\n        catch (e) {\n            this._region = args.region;\n        }\n        this._isExistsServelessConfig = this.getIsExistsServelessConfig(this.serverlessConfigPath);\n    }\n    defaultLambdaTimeOut = 30;\n    defaultMemorySize = 1024;\n    logger;\n    _isExistsServelessConfig;\n    get isExistsServelessConfig() {\n        return this._isExistsServelessConfig;\n    }\n    _lang;\n    get lang() {\n        return this._lang;\n    }\n    _defaultFunctionYamlPath;\n    get defaultFunctionYamlPath() {\n        return this._defaultFunctionYamlPath;\n    }\n    _region;\n    get region() {\n        return this._region;\n    }\n    _serverlessConfigPath;\n    get serverlessConfigPath() {\n        return this._serverlessConfigPath;\n    }\n    _functionsYamlPath;\n    get functionsYamlPath() {\n        return this._functionsYamlPath;\n    }\n    _serverlessConfig;\n    get serverlessConfig() {\n        return this._serverlessConfig;\n    }\n    /**\n     * Whether or not the serverlessConfigService process can be executed\n     * @returns boolean\n     */\n    cannotProces() {\n        const logger = this.logger;\n        if (!this.isExistsServelessConfig) {\n            logger.warn('not found serverless config file, skip update');\n            logger.warn(`please check a input path : ${this.serverlessConfigPath}`);\n            return true;\n        }\n        if (lodash_1.default.isEmpty(this.region)) {\n            logger.warn('not found region property, skip update');\n            logger.warn(`please check a input path : ${this.serverlessConfigPath}`);\n            return true;\n        }\n        return false;\n    }\n    /**\n     * Adding Cloudformation Resources\n     * @param args\n     * @returns\n     */\n    addResource = (args) => {\n        if (this.cannotProces())\n            return;\n        const logger = this.logger;\n        const { filePath, resourceName, cf } = args;\n        // update serverless.yml\n        const updateServerlessYaml = () => {\n            const doc = this.serverlessConfig;\n            const destinationPath = path_1.default.join('./', filePath);\n            const resources = doc.resources ?? [];\n            if (resources.some((v) => v.includes(destinationPath))) {\n                logger.warn(`already exists resource file path : ${destinationPath}`);\n            }\n            else {\n                resources.push(`\\${file(./${destinationPath})}`);\n                const yamlText = (0, yaml_1.writeYaml)(this.serverlessConfigPath, {\n                    ...doc,\n                    resources,\n                });\n                logger.info(destinationPath);\n                logger.info((0, yargonaut_1.chalk)().green(yamlText));\n            }\n        };\n        // update cloudformation yaml\n        const updateCloudFormationYaml = () => {\n            try {\n                const doc = (0, yaml_1.loadYaml)(filePath) ?? {};\n                if (lodash_1.default.has(doc, `Resources.${resourceName}`)) {\n                    logger.warn(`resource name : ${resourceName}`);\n                    logger.warn(`already exists resource file path : ${filePath}`);\n                }\n                else {\n                    const yamlText = (0, yaml_1.writeYaml)(filePath, {\n                        ...doc,\n                        Resources: {\n                            ...doc.Resources,\n                            ...cf,\n                        },\n                    });\n                    logger.info(filePath);\n                    logger.info(`over right : ${filePath}`);\n                    logger.info((0, yargonaut_1.chalk)().green(yamlText));\n                }\n            }\n            catch (e) {\n                const yamlText = (0, yaml_1.writeYaml)(filePath, {\n                    Resources: {\n                        ...cf,\n                    },\n                });\n                logger.info(`created yaml file : ${filePath}`);\n                logger.info((0, yargonaut_1.chalk)().green(yamlText));\n            }\n        };\n        updateServerlessYaml();\n        updateCloudFormationYaml();\n    };\n    /**\n     * Adding Lambda Functions\n     * @param input\n     * @returns\n     */\n    addFunction = (input) => {\n        if (this.cannotProces())\n            return;\n        const { lambdaFunctionName, lambdaHandler, memorySize, timeout, code } = input;\n        const logger = this.logger;\n        logger.debug(`functionsYamlPath', functionsYamlPath`);\n        // update serverless.yml\n        const updateServerlessYaml = () => {\n            const serverlessConfig = this.serverlessConfig;\n            if (lodash_1.default.isEmpty(serverlessConfig.functions)) {\n                const yamlText = (0, yaml_1.writeYaml)(this.serverlessConfigPath, {\n                    ...serverlessConfig,\n                    functions: `\\${file(./${this.defaultFunctionYamlPath})}`,\n                });\n                logger.info('write functions property');\n                logger.info((0, yargonaut_1.chalk)().green(yamlText));\n            }\n        };\n        // update functions.yml\n        const updateCloudFormationYaml = () => {\n            const functionsYamlPath = this.functionsYamlPath ?? this.defaultFunctionYamlPath;\n            try {\n                const doc = (0, yaml_1.loadYaml)(functionsYamlPath) ?? {};\n                if (lodash_1.default.has(doc, lambdaFunctionName)) {\n                    logger.warn(`already exists lambda function at, skip update : ${lambdaFunctionName}`);\n                }\n                else {\n                    const yamlText = (0, yaml_1.writeYaml)(functionsYamlPath, {\n                        ...doc,\n                        ...this.generateFunctionYamlProperty(lambdaFunctionName, {\n                            handler: lambdaHandler,\n                            memorySize: memorySize ?? this.defaultMemorySize,\n                            timeout: timeout ?? this.defaultLambdaTimeOut,\n                        }),\n                    });\n                    logger.info('write functions property');\n                    logger.info((0, yargonaut_1.chalk)().green(yamlText));\n                }\n            }\n            catch (e) {\n                const yamlText = (0, yaml_1.writeYaml)(functionsYamlPath, {\n                    ...this.generateFunctionYamlProperty(lambdaFunctionName, {\n                        handler: lambdaHandler,\n                        memorySize: memorySize ?? this.defaultMemorySize,\n                        timeout: timeout ?? this.defaultLambdaTimeOut,\n                    }),\n                });\n                logger.info('write functions property');\n                logger.info((0, yargonaut_1.chalk)().green(yamlText));\n            }\n        };\n        // write a function handler file (typescript)\n        const createHandlerFile = () => {\n            new codeService_1.default({ filePath: lambdaHandler, code, type: 'typescript' }).write();\n        };\n        // write iam role\n        const updateIamRole = () => {\n            this.addResource({\n                filePath: `serverless/${this.region}/resources/iam-role.yml`,\n                resourceName: 'DefaultLambdaRole',\n                cf: this.generateDefaultLambdaRoleCf(lambdaFunctionName),\n            });\n        };\n        updateServerlessYaml();\n        updateCloudFormationYaml();\n        createHandlerFile();\n        updateIamRole();\n    };\n    generateFunctionYamlProperty = (resourceName, input) => {\n        return {\n            [resourceName]: {\n                handler: input?.handler ?? 'index.handler',\n                name: input?.name ?? resourceName,\n                memorySize: input?.memorySize ?? this.defaultMemorySize,\n                timeout: input?.timeout ?? this.defaultLambdaTimeOut,\n            },\n        };\n    };\n    getIsExistsServelessConfig(filePath) {\n        if (lodash_1.default.isEmpty(filePath)) {\n            this.logger.warn('not found serverless config file, skip update');\n            this.logger.warn(`please check a input path : ${filePath}`);\n            return false;\n        }\n        try {\n            (0, yaml_1.loadYaml)(filePath) ?? {};\n            return true;\n        }\n        catch (e) {\n            this.logger.warn('not found serverless config file, skip update');\n            this.logger.warn(`please check a input path : ${filePath}`);\n            return false;\n        }\n    }\n    generateDefaultLambdaRoleCf(roleName) {\n        return cloudformationService_1.default.generateCloudFormation(roleName, (c) => {\n            const role = new iam.Role(c, roleName, {\n                assumedBy: new iam.ServicePrincipal('lambda.amazonaws.com'),\n            });\n            role.addToPolicy(new iam.PolicyStatement({\n                effect: iam.Effect.ALLOW,\n                resources: [cdk.Fn.join(':', ['arn:aws:logs', cdk.Fn.ref('AWS::Region'), cdk.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],\n                actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],\n            }));\n            role.addToPolicy(new iam.PolicyStatement({\n                effect: iam.Effect.ALLOW,\n                resources: [cdk.Fn.join(':', ['arn:aws:logs', this.region, cdk.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],\n                actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],\n            }));\n            return role;\n        });\n    }\n    static generateServerlessConfig = (config) => {\n        return {\n            service: config?.service ?? 'starter',\n            useDotenv: config?.useDotenv ?? true,\n            provider: {\n                name: config?.provider?.name ?? 'aws',\n                runtime: config?.provider?.runtime ?? 'nodejs18.x',\n                stage: config?.provider?.stage ?? '${opt:stage}',\n                region: config?.provider?.region ?? 'ap-northeast-1',\n                iam: {\n                    role: config?.provider?.iam?.role ?? 'DefaultLambdaRole',\n                },\n                environment: {\n                    STAGE: config?.provider?.environment?.STAGE ?? '${self:provider.stage}',\n                    REGION: config?.provider?.environment?.REGION ?? '${self:provider.region}',\n                    AWS_RESOURCE_PRIFIX: config?.provider?.environment?.AWS_RESOURCE_PRIFIX ?? '${self:custom.awsResourcePrefix}',\n                    LOG_LEVEL: config?.provider?.environment?.LOG_LEVEL ?? 'INFO',\n                },\n            },\n            plugins: config?.plugins ?? ['serverless-webpack', 'serverless-prune-plugin'],\n            functions: config?.functions ?? '${file(./serverless/ap-northeast-1/resources/functions.yml)}',\n            resources: config?.resources ?? [],\n            package: {\n                individually: config?.package?.individually ?? true,\n                includeModules: config?.package?.includeModules ?? true,\n                patterns: config?.package?.patterns ?? ['!appsync/*,*', '!node_modules/**', '!resources/**', '!__tests__/**', '!.git/**', '!tmp/**'],\n            },\n            custom: {\n                awsResourcePrefix: config?.custom?.awsResourcePrefix ?? '${self:service}-${self:provider.stage}-',\n                webpack: config?.custom?.webpack ?? {\n                    includeModules: true,\n                    packager: 'npm',\n                },\n                prune: config?.custom?.prune ?? {\n                    automatic: true,\n                    number: 3,\n                },\n            },\n        };\n    };\n}\nexports[\"default\"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/services/serverlessConfigService.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/types/index.ts':
+      /*!****************************!*\
+  !*** ./lib/types/index.ts ***!
+  \****************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          "\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nexports.awsRegions = exports.FeatureBuilderAbstract = exports.FeatureHandlerAbstract = void 0;\nconst config_1 = __importDefault(__webpack_require__(/*! config */ \"./lib/config.ts\"));\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ \"./lib/utils/yargonaut.ts\");\nclass FeatureHandlerAbstract {\n    _argv;\n    _lang;\n    constructor(argv) {\n        this._argv = argv;\n        this._lang = argv.lang;\n    }\n    get argv() {\n        return this._argv;\n    }\n    get lang() {\n        return this._lang;\n    }\n}\nexports.FeatureHandlerAbstract = FeatureHandlerAbstract;\nclass FeatureBuilderAbstract {\n    _args;\n    _npmVersion;\n    _chalk;\n    constructor(args) {\n        this._chalk = yargonaut_1.chalk;\n        this._args = args;\n        this._npmVersion = config_1.default.npmVersion;\n    }\n    get args() {\n        return this._args;\n    }\n    get npmVersion() {\n        return this._npmVersion;\n    }\n    get chalk() {\n        return this._chalk;\n    }\n}\nexports.FeatureBuilderAbstract = FeatureBuilderAbstract;\nexports.awsRegions = [\n    'us-east-2',\n    'us-east-1',\n    'us-west-1',\n    'us-west-2',\n    'af-south-1',\n    'ap-east-1',\n    'ap-south-2',\n    'ap-southeast-3',\n    'ap-southeast-4',\n    'ap-south-1',\n    'ap-northeast-3',\n    'ap-northeast-2',\n    'ap-southeast-1',\n    'ap-southeast-2',\n    'ap-northeast-1',\n    'ca-central-1',\n    'eu-central-1',\n    'eu-west-1',\n    'eu-west-2',\n    'eu-south-1',\n    'eu-west-3',\n    'eu-south-2',\n    'eu-north-1',\n    'eu-central-2',\n    'me-south-1',\n    'me-central-1',\n    'sa-east-1',\n    'us-gov-east-1',\n    'us-gov-west-1',\n];\n\n\n//# sourceURL=webpack://ragate-cli/./lib/types/index.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/cli.ts':
+      /*!**************************!*\
+  !*** ./lib/utils/cli.ts ***!
+  \**************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.asFullPath = exports.createDirectories = exports.isFileExists = exports.isExistsDirectory = exports.cleanUpTmpDirectory = exports.moveDirectory = exports.gitClone = void 0;\nconst index_1 = __webpack_require__(/*! exceptions/index */ "./lib/exceptions/index.ts");\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ "./lib/utils/logger.ts"));\nconst fs_extra_1 = __importDefault(__webpack_require__(/*! fs-extra */ "fs-extra"));\nconst config_1 = __importDefault(__webpack_require__(/*! config */ "./lib/config.ts"));\nconst isomorphic_git_1 = __importDefault(__webpack_require__(/*! isomorphic-git */ "isomorphic-git"));\nconst node_1 = __importDefault(__webpack_require__(/*! isomorphic-git/http/node */ "isomorphic-git/http/node"));\nconst path_1 = __importDefault(__webpack_require__(/*! path */ "path"));\nasync function gitClone(repositoryUrl, destinationPath) {\n    const logger = logger_1.default.getLogger();\n    try {\n        logger.debug(`git clone : ${repositoryUrl} -> ${destinationPath}`);\n        await fs_extra_1.default.promises.mkdir(destinationPath, { recursive: true });\n        await isomorphic_git_1.default.clone({\n            fs: fs_extra_1.default,\n            http: node_1.default,\n            dir: destinationPath,\n            url: repositoryUrl,\n            singleBranch: true,\n            depth: 1,\n        });\n    }\n    catch (error) {\n        const err = error;\n        throw new index_1.CLIError(err.message);\n    }\n}\nexports.gitClone = gitClone;\nfunction moveDirectory(sourcePath, destinationPath) {\n    const logger = logger_1.default.getLogger();\n    try {\n        logger.debug(`move : ${sourcePath} -> ${destinationPath}`);\n        fs_extra_1.default.renameSync(sourcePath, destinationPath);\n    }\n    catch (error) {\n        const err = error;\n        throw new index_1.CLIError(err.message);\n    }\n}\nexports.moveDirectory = moveDirectory;\nfunction cleanUpTmpDirectory() {\n    const logger = logger_1.default.getLogger();\n    try {\n        logger.debug(`clean up tmp directory : ${config_1.default.tmpPath}`);\n        fs_extra_1.default.removeSync(config_1.default.tmpPath);\n        logger.debug(`create tmp directory : ${config_1.default.tmpPath}`);\n        fs_extra_1.default.mkdirSync(config_1.default.tmpPath, { recursive: true });\n    }\n    catch (error) {\n        const err = error;\n        throw new index_1.CLIError(err.message);\n    }\n}\nexports.cleanUpTmpDirectory = cleanUpTmpDirectory;\nfunction isExistsDirectory(directoryPath) {\n    const logger = logger_1.default.getLogger();\n    try {\n        logger.debug(`check exists directory : ${directoryPath}`);\n        const stats = fs_extra_1.default.statSync(directoryPath);\n        return stats.isDirectory();\n    }\n    catch (error) {\n        if (error.code === \'ENOENT\') {\n            return false;\n        }\n        else {\n            throw error;\n        }\n    }\n}\nexports.isExistsDirectory = isExistsDirectory;\nfunction isFileExists(filePath) {\n    try {\n        fs_extra_1.default.accessSync(filePath);\n        return true;\n    }\n    catch (error) {\n        return false;\n    }\n}\nexports.isFileExists = isFileExists;\nconst createDirectories = (filePath) => {\n    const directories = filePath.split(path_1.default.sep).slice(0, -1);\n    directories.reduce((currentPath, directory) => {\n        currentPath = path_1.default.join(currentPath, directory);\n        if (!fs_extra_1.default.existsSync(currentPath)) {\n            fs_extra_1.default.mkdirSync(currentPath);\n        }\n        return currentPath;\n    }, \'\');\n};\nexports.createDirectories = createDirectories;\nconst asFullPath = (destinationPath) => {\n    return path_1.default.join(config_1.default.currentPath, destinationPath);\n};\nexports.asFullPath = asFullPath;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/cli.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/graphql/analyzer.ts':
+      /*!***************************************!*\
+  !*** ./lib/utils/graphql/analyzer.ts ***!
+  \***************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst graphql_compose_1 = __webpack_require__(/*! graphql-compose */ "graphql-compose");\nconst schema_1 = __webpack_require__(/*! @graphql-tools/schema */ "@graphql-tools/schema");\nconst appsyncScalars_1 = __webpack_require__(/*! utils/graphql/appsyncScalars */ "./lib/utils/graphql/appsyncScalars.ts");\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ "lodash"));\n/**\n * Parsing existing Graphql syntax\n */\nclass GraphqlAnalyzer {\n    constructor(schema) {\n        this._schema = schema;\n        this._schemaComposer = lodash_1.default.isEmpty(schema) ? [new graphql_compose_1.SchemaComposer()] : schema.map((s) => new graphql_compose_1.SchemaComposer((0, appsyncScalars_1.addScalrs)(s)));\n        this._mergedSchema = (0, schema_1.mergeSchemas)({ schemas: this._schemaComposer.map((s) => s.buildSchema()) });\n        this._mutations = this._schemaComposer.map((s) => {\n            try {\n                const res = s.getOTC(\'Mutation\').getFields();\n                return res;\n            }\n            catch (e) {\n                return {};\n            }\n        });\n        this._queries = this._schemaComposer.map((s) => {\n            try {\n                const res = s.getOTC(\'Query\').getFields();\n                return res;\n            }\n            catch (e) {\n                return {};\n            }\n        });\n        this._subscriptions = this._schemaComposer.map((s) => {\n            try {\n                const res = s.getOTC(\'Subscription\').getFields();\n                return res;\n            }\n            catch (e) {\n                return {};\n            }\n        });\n    }\n    _mutations;\n    get mutations() {\n        return this._mutations;\n    }\n    _queries;\n    get queries() {\n        return this._queries;\n    }\n    _subscriptions;\n    get subscriptions() {\n        return this._subscriptions;\n    }\n    _schema;\n    get schema() {\n        return this._schema;\n    }\n    _schemaComposer;\n    get schemaComposer() {\n        return this._schemaComposer;\n    }\n    _mergedSchema;\n    get mergedSchema() {\n        return this._mergedSchema;\n    }\n    isExistsMutationApi(apiName) {\n        return lodash_1.default.some(this.mutations, (s) => lodash_1.default.has(s, apiName));\n    }\n    isExistsQueryApi(apiName) {\n        return lodash_1.default.some(this.queries, (s) => lodash_1.default.has(s, apiName));\n    }\n    isExistsSubscriptionApi(apiName) {\n        return lodash_1.default.some(this.subscriptions, (s) => lodash_1.default.has(s, apiName));\n    }\n}\nexports["default"] = GraphqlAnalyzer;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/graphql/analyzer.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/graphql/appsyncScalars.ts':
+      /*!*********************************************!*\
+  !*** ./lib/utils/graphql/appsyncScalars.ts ***!
+  \*********************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          '\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.removeScalars = exports.addScalrs = void 0;\nconst scalrsString = `\n  scalar ID\n  scalar String\n  scalar Int\n  scalar Float\n  scalar Boolean\n  scalar AWSDate\n  scalar AWSTime\n  scalar AWSDateTime\n  scalar AWSTimestamp\n  scalar AWSEmail\n  scalar AWSJSON\n  scalar AWSPhone\n  scalar AWSURL\n  scalar AWSIPAddress\n`;\nconst addScalrs = (schema) => {\n    return `${scalrsString}\n  ${schema}`;\n};\nexports.addScalrs = addScalrs;\nconst removeScalars = (schema) => {\n    return schema.replace(scalrsString, \'\');\n};\nexports.removeScalars = removeScalars;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/graphql/appsyncScalars.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/graphql/editor.ts':
+      /*!*************************************!*\
+  !*** ./lib/utils/graphql/editor.ts ***!
+  \*************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst graphql_compose_1 = __webpack_require__(/*! graphql-compose */ "graphql-compose");\nconst graphql_1 = __webpack_require__(/*! graphql */ "graphql");\nconst logger_1 = __importDefault(__webpack_require__(/*! utils/logger */ "./lib/utils/logger.ts"));\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ "lodash"));\nconst cli_1 = __webpack_require__(/*! utils/cli */ "./lib/utils/cli.ts");\nconst fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));\nconst yargonaut_1 = __webpack_require__(/*! yargonaut */ "yargonaut");\nconst appsyncScalars_1 = __webpack_require__(/*! utils/graphql/appsyncScalars */ "./lib/utils/graphql/appsyncScalars.ts");\nclass GraphqlEditor {\n    constructor(opt) {\n        const initAllSchemaComposer = () => {\n            if (this.customSchema) {\n                this.allSchemaComposer.merge((0, graphql_1.buildSchema)(this.customSchema));\n            }\n            if (this.defaultSchema) {\n                this.allSchemaComposer.merge((0, graphql_1.buildSchema)(this.defaultSchema));\n            }\n        };\n        const initCustomSchemaComposer = () => {\n            if (this.customSchema) {\n                this.customSchemaComposer.merge((0, graphql_1.buildSchema)(this.customSchema));\n            }\n        };\n        this.logger = logger_1.default.getLogger();\n        this._customSchemaPath = opt?.customSchemaPath ?? this.defaultCustomSchemaPath;\n        this._defaultSchemaPath = opt?.defaultSchemaPath ?? this.defaultDefaultSchemaPath;\n        this.readOrSetCustomSchema();\n        this.readOrSetDefaultSchema();\n        initAllSchemaComposer();\n        initCustomSchemaComposer();\n    }\n    logger;\n    defaultCustomSchemaPath = \'appsync/custom_schema.graphql\';\n    defaultDefaultSchemaPath = \'appsync/schema.graphql\';\n    _customSchemaPath;\n    _defaultSchemaPath;\n    _customSchemaComposer = new graphql_compose_1.SchemaComposer();\n    _allSchemaComposer = new graphql_compose_1.SchemaComposer();\n    _defaultSchema;\n    _customSchema;\n    get defaultSchemaPath() {\n        return this._defaultSchemaPath;\n    }\n    get customSchemaPath() {\n        return this._customSchemaPath;\n    }\n    get defaultSchema() {\n        if (!this._defaultSchema)\n            return;\n        return (0, appsyncScalars_1.addScalrs)(this._defaultSchema);\n    }\n    get customSchema() {\n        if (!this._customSchema)\n            return;\n        return (0, appsyncScalars_1.addScalrs)(this._customSchema);\n    }\n    get customSchemaComposer() {\n        return this._customSchemaComposer;\n    }\n    get allSchemaComposer() {\n        return this._allSchemaComposer;\n    }\n    readOrSetCustomSchema() {\n        try {\n            this._customSchema = fs_1.default.readFileSync((0, cli_1.asFullPath)(this.customSchemaPath), \'utf8\');\n        }\n        catch (e) {\n            this.logger.debug(e);\n            this.logger.warn(`custom_schema.graphql is not found.`);\n        }\n    }\n    readOrSetDefaultSchema() {\n        try {\n            this._defaultSchema = fs_1.default.readFileSync((0, cli_1.asFullPath)(this.defaultSchemaPath), \'utf8\');\n        }\n        catch (e) {\n            this.logger.debug(e);\n            this.logger.warn(`schema.graphql is not found.`);\n        }\n    }\n    listQueies() {\n        return this.allSchemaComposer.getOTC(\'Query\').getFields();\n    }\n    listMutation() {\n        return this.allSchemaComposer.getOTC(\'Mutation\').getFields();\n    }\n    listSubscription() {\n        return this.allSchemaComposer.getOTC(\'Subscription\').getFields();\n    }\n    addExampleInput(apiName) {\n        return graphql_compose_1.InputTypeComposer.create(`\n      input ${apiName}Input {\n        example: String!\n      },\n    `, this.customSchemaComposer);\n    }\n    addExampleType(apiName) {\n        return graphql_compose_1.ObjectTypeComposer.create(`\n      type ${apiName}Response {\n        example: String!\n      }\n    `, this.customSchemaComposer);\n    }\n    addMutationField(_args) {\n        const { apiName, input, type } = _args;\n        this.customSchemaComposer.Mutation.addFields({\n            [apiName]: {\n                type,\n                args: {\n                    input: new graphql_1.GraphQLNonNull(input),\n                },\n            },\n        });\n        return this;\n    }\n    addQueryField(_args) {\n        const { apiName, args, type } = _args;\n        this.customSchemaComposer.Query.addFields({\n            [apiName]: {\n                type,\n                args,\n            },\n        });\n        return this;\n    }\n    updateCustomSchemaGraphl(args) {\n        const { query, mutation, callback } = args;\n        // update custom_schema.graphql\n        let updated = false;\n        if (query || mutation) {\n            if (query) {\n                if (lodash_1.default.has(this.listQueies(), query.apiName)) {\n                    this.logger.warn(`Query ${query.apiName} is already exists.`);\n                    updated = false;\n                }\n                else {\n                    this.addQueryField(query);\n                    updated = true;\n                }\n            }\n            if (mutation) {\n                if (lodash_1.default.has(this.listMutation(), mutation.apiName)) {\n                    this.logger.warn(`Mutation ${mutation.apiName} is already exists.`);\n                    updated = false;\n                }\n                else {\n                    this.addMutationField(mutation);\n                    updated = true;\n                }\n            }\n        }\n        else {\n            this.logger.warn(\'query or mutation is empty.\');\n        }\n        if (updated) {\n            const schema = this.printSchema();\n            fs_1.default.writeFileSync((0, cli_1.asFullPath)(this.defaultCustomSchemaPath), schema, \'utf8\');\n            this.logger.info((0, yargonaut_1.chalk)().green(schema));\n            this.readOrSetCustomSchema();\n        }\n        if (callback) {\n            callback(updated, {\n                schemaPath: this.defaultCustomSchemaPath,\n            });\n        }\n    }\n    removeEmptyLines(schemaString) {\n        const lines = schemaString.split(\'\\n\');\n        const filteredLines = lines.filter((line) => !line.includes(\'""""""\'));\n        return filteredLines.join(\'\\n\');\n    }\n    printSchema() {\n        const res = (0, graphql_compose_1.printSchema)(this.customSchemaComposer.buildSchema());\n        const trimmedSchema = this.removeEmptyLines(res);\n        return (0, appsyncScalars_1.removeScalars)(trimmedSchema);\n    }\n}\nexports["default"] = GraphqlEditor;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/graphql/editor.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/inquirer/filter.ts':
+      /*!**************************************!*\
+  !*** ./lib/utils/inquirer/filter.ts ***!
+  \**************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ "lodash"));\nclass Filter {\n    constructor(input) {\n        this.input = input;\n    }\n    input;\n    filters = [];\n    filePath = () => {\n        if (lodash_1.default.isString(this.input)) {\n            this.filters.push((value) => {\n                return value.replace(/\\s+/g, \'\');\n            });\n        }\n        return this;\n    };\n    removeAllSpace = () => {\n        if (lodash_1.default.isString(this.input)) {\n            this.filters.push((value) => {\n                return value.replace(/\\s+/g, \'\');\n            });\n        }\n        return this;\n    };\n    value() {\n        if (lodash_1.default.isEmpty(this.filters))\n            return this.input;\n        return lodash_1.default.reduce(this.filters, (result, filter) => {\n            return filter(result);\n        }, this.input);\n    }\n}\nexports["default"] = Filter;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/inquirer/filter.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/inquirer/transformer.ts':
+      /*!*******************************************!*\
+  !*** ./lib/utils/inquirer/transformer.ts ***!
+  \*******************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ "lodash"));\nclass Transformer {\n    constructor(input) {\n        this.input = input;\n    }\n    input;\n    transforms = [];\n    filePath = () => {\n        if (lodash_1.default.isString(this.input)) {\n            this.transforms.push((value) => {\n                return value.replace(/\\s+/g, \'\');\n            });\n        }\n        return this;\n    };\n    removeAllSpace = () => {\n        if (lodash_1.default.isString(this.input)) {\n            this.transforms.push((value) => {\n                return value.replace(/\\s+/g, \'\');\n            });\n        }\n        return this;\n    };\n    value() {\n        if (lodash_1.default.isEmpty(this.transforms))\n            return this.input;\n        return lodash_1.default.reduce(this.transforms, (result, filter) => {\n            return filter(result);\n        }, this.input);\n    }\n}\nexports["default"] = Transformer;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/inquirer/transformer.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/logger.ts':
+      /*!*****************************!*\
+  !*** ./lib/utils/logger.ts ***!
+  \*****************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          "\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { \"default\": mod };\n};\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst pino_1 = __importDefault(__webpack_require__(/*! pino */ \"pino\"));\nconst pino_pretty_1 = __importDefault(__webpack_require__(/*! pino-pretty */ \"./node_modules/pino-pretty/index.js\"));\nconst yargonaut_1 = __webpack_require__(/*! utils/yargonaut */ \"./lib/utils/yargonaut.ts\");\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ \"lodash\"));\nconst stream = (0, pino_pretty_1.default)({\n    colorize: true,\n    messageFormat: (log, messageKey) => {\n        const adjust = (msg) => {\n            if (log.level === 30)\n                return yargonaut_1.chalk.white(msg);\n            if (log.level < 30)\n                return yargonaut_1.chalk.grey(msg);\n            if (log.level === 40)\n                return yargonaut_1.chalk.yellow(msg);\n            if (log.level >= 50)\n                return yargonaut_1.chalk.red(msg);\n            return msg;\n        };\n        const message = log[messageKey];\n        if (lodash_1.default.isEmpty(message)) {\n            return lodash_1.default.chain(log)\n                .omit(['level', 'time', 'pid', 'hostname'])\n                .thru((v) => JSON.stringify(v, null, 2))\n                .thru((v) => adjust(v))\n                .value();\n        }\n        if (log.requestId)\n            return `[${log.requestId}] ${adjust(message)}`;\n        return adjust(message);\n    },\n    timestampKey: 'time',\n    ignore: 'pid,hostname',\n    include: 'level,time',\n    singleLine: false,\n    translateTime: 'yyyy-mm-dd HH:MM:ss',\n    sync: true, // by default we write asynchronously\n});\nclass default_1 {\n    constructor() {\n        throw new Error('singleton cannot be instantiated');\n    }\n    static logger;\n    static getLogger(logLevel) {\n        if (logLevel) {\n            this.logger = (0, pino_1.default)({\n                level: logLevel ?? 'info',\n            }, stream);\n            return this.logger;\n        }\n        if (this.logger)\n            return this.logger;\n        this.logger = (0, pino_1.default)({\n            level: logLevel ?? 'info',\n        }, stream);\n        return this.logger;\n    }\n}\nexports[\"default\"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/logger.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/parser.ts':
+      /*!*****************************!*\
+  !*** ./lib/utils/parser.ts ***!
+  \*****************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ "lodash"));\nclass default_1 {\n    static parseFilePath(input) {\n        const parts = input.split(\'/\');\n        const path = parts.slice(0, -1);\n        const filename = parts[parts.length - 1];\n        return [path.length > 0 ? path : [], filename];\n    }\n    static parseSlsRecursivelyReference = (str) => {\n        if (lodash_1.default.isEmpty(str))\n            return undefined;\n        const regex = /\\${file\\((.*?)\\)}/;\n        const match = str.match(regex);\n        if (match) {\n            const pathInfo = match[1];\n            return pathInfo;\n        }\n    };\n    static extractFilename(input) {\n        const array = input.split(\'.\');\n        if (array.length === 1)\n            return input;\n        else if (array.length === 2)\n            return array[0];\n        array.pop();\n        return array.join(\'.\');\n    }\n}\nexports["default"] = default_1;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/parser.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/validator/index.ts':
+      /*!**************************************!*\
+  !*** ./lib/utils/validator/index.ts ***!
+  \**************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nconst lodash_1 = __importDefault(__webpack_require__(/*! lodash */ "lodash"));\nconst getLocale_1 = __webpack_require__(/*! utils/validator/utils/getLocale */ "./lib/utils/validator/utils/getLocale.ts");\nclass Validator {\n    constructor(input, lang) {\n        this._input = input;\n        this._lang = lang;\n        this._locale = (0, getLocale_1.getLocaleLang)(this._lang);\n    }\n    _input;\n    _lang;\n    _locale;\n    validations = [];\n    get locale() {\n        return this._locale;\n    }\n    get input() {\n        return this._input;\n    }\n    required = () => {\n        this.validations.push(() => {\n            if (lodash_1.default.isUndefined(this.input) || lodash_1.default.isNull(this.input))\n                return this.locale.required;\n            if (lodash_1.default.isString(this.input) && lodash_1.default.isEmpty(this.input))\n                return this.locale.required;\n            return true;\n        });\n        return this;\n    };\n    mustNoIncludeZenkaku = () => {\n        this.validations.push(() => {\n            if (!lodash_1.default.isString(this.input))\n                return true;\n            // eslint-disable-next-line no-control-regex\n            const containsFullWidthCharacter = /[^\\x01-\\x7E]/.test(this.input.toString());\n            if (containsFullWidthCharacter)\n                return this.locale.mustNoIncludeZenkaku;\n            return true;\n        });\n        return this;\n    };\n    mustBeYamlFilePath = () => {\n        this.validations.push(() => {\n            if (!lodash_1.default.isString(this.input))\n                return true;\n            if (!this.input.endsWith(\'.yml\') && !this.input.endsWith(\'.yaml\'))\n                return this.locale.mustBeYamlFilePath;\n            return true;\n        });\n        return this;\n    };\n    mustBeExtension = () => {\n        this.validations.push(() => {\n            const pattern = /\\.[^.]*$/;\n            if (!lodash_1.default.isString(this.input))\n                return true;\n            if (!pattern.test(this.input))\n                return this.locale.mustBeExtension;\n            return true;\n        });\n        return this;\n    };\n    value() {\n        for (let i = 0; i < this.validations.length; i++) {\n            const result = this.validations[i]();\n            if (lodash_1.default.isString(result))\n                return result;\n        }\n        return true;\n    }\n}\nexports["default"] = Validator;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/validator/index.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/validator/locale/en.ts':
+      /*!******************************************!*\
+  !*** ./lib/utils/validator/locale/en.ts ***!
+  \******************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    mustBeYamlFilePath: 'input a yaml file path',\n    mustNoIncludeZenkaku: 'must no include zenkaku',\n    mustBeExtension: 'must be extension',\n    required: 'required input',\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/validator/locale/en.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/validator/locale/ja.ts':
+      /*!******************************************!*\
+  !*** ./lib/utils/validator/locale/ja.ts ***!
+  \******************************************/
+      /***/ (__unused_webpack_module, exports) => {
+        eval(
+          "\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\nconst locale = {\n    mustBeYamlFilePath: 'Yamlファイルを指定して下さい',\n    mustNoIncludeZenkaku: '全角を含めないでください',\n    mustBeExtension: '文字列の最後は「.＋文字列」を入力して下さい',\n    required: '入力必須',\n};\nexports[\"default\"] = locale;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/validator/locale/ja.ts?"
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/validator/utils/getLocale.ts':
+      /*!************************************************!*\
+  !*** ./lib/utils/validator/utils/getLocale.ts ***!
+  \************************************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.getLocaleLang = void 0;\nconst ja_1 = __importDefault(__webpack_require__(/*! utils/validator/locale/ja */ "./lib/utils/validator/locale/ja.ts"));\nconst en_1 = __importDefault(__webpack_require__(/*! utils/validator/locale/en */ "./lib/utils/validator/locale/en.ts"));\nconst getLocaleLang = (locale) => {\n    switch (locale) {\n        case \'ja\':\n            return ja_1.default;\n        case \'en\':\n            return en_1.default;\n        default:\n            return en_1.default;\n    }\n};\nexports.getLocaleLang = getLocaleLang;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/validator/utils/getLocale.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/yaml.ts':
+      /*!***************************!*\
+  !*** ./lib/utils/yaml.ts ***!
+  \***************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.loadYaml = exports.writeYaml = void 0;\nconst fs_1 = __importDefault(__webpack_require__(/*! fs */ "fs"));\nconst js_yaml_1 = __importDefault(__webpack_require__(/*! js-yaml */ "js-yaml"));\nconst yaml_cfn_1 = __webpack_require__(/*! yaml-cfn */ "yaml-cfn");\nconst cli_1 = __webpack_require__(/*! utils/cli */ "./lib/utils/cli.ts");\nconst writeYaml = (destinationPath, data) => {\n    const yamlText = js_yaml_1.default.dump(data, { schema: yaml_cfn_1.schema, indent: 2, lineWidth: -1 });\n    (0, cli_1.createDirectories)(destinationPath);\n    fs_1.default.writeFileSync((0, cli_1.asFullPath)(destinationPath), yamlText, \'utf8\');\n    return yamlText;\n};\nexports.writeYaml = writeYaml;\nconst loadYaml = (sourcePath) => {\n    return js_yaml_1.default.load(fs_1.default.readFileSync((0, cli_1.asFullPath)(sourcePath), \'utf8\'), { schema: yaml_cfn_1.schema });\n};\nexports.loadYaml = loadYaml;\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/yaml.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ './lib/utils/yargonaut.ts':
+      /*!********************************!*\
+  !*** ./lib/utils/yargonaut.ts ***!
+  \********************************/
+      /***/ function (__unused_webpack_module, exports, __webpack_require__) {
+        eval(
+          '\nvar __importDefault = (this && this.__importDefault) || function (mod) {\n    return (mod && mod.__esModule) ? mod : { "default": mod };\n};\nObject.defineProperty(exports, "__esModule", ({ value: true }));\nexports.chalk = exports.init = void 0;\nconst yargonaut_1 = __importDefault(__webpack_require__(/*! yargonaut */ "yargonaut"));\nconst init = () => yargonaut_1.default.font(\'SansSerif\').helpStyle(\'grey\').errorsStyle(\'red\');\nexports.init = init;\nexports.chalk = yargonaut_1.default.chalk();\n// const listFonts = (): string[] => {\n//   return yargonaut.listFonts();\n// };\n\n\n//# sourceURL=webpack://ragate-cli/./lib/utils/yargonaut.ts?'
+        );
+
+        /***/
+      },
+
+    /***/ '@aws-cdk/assert':
+      /*!**********************************!*\
+  !*** external "@aws-cdk/assert" ***!
+  \**********************************/
+      /***/ (module) => {
+        module.exports = require('@aws-cdk/assert');
+
+        /***/
+      },
+
+    /***/ '@aws-cdk/aws-iam':
+      /*!***********************************!*\
+  !*** external "@aws-cdk/aws-iam" ***!
+  \***********************************/
+      /***/ (module) => {
+        module.exports = require('@aws-cdk/aws-iam');
+
+        /***/
+      },
+
+    /***/ '@aws-cdk/aws-lambda':
+      /*!**************************************!*\
+  !*** external "@aws-cdk/aws-lambda" ***!
+  \**************************************/
+      /***/ (module) => {
+        module.exports = require('@aws-cdk/aws-lambda');
+
+        /***/
+      },
+
+    /***/ '@aws-cdk/aws-sns':
+      /*!***********************************!*\
+  !*** external "@aws-cdk/aws-sns" ***!
+  \***********************************/
+      /***/ (module) => {
+        module.exports = require('@aws-cdk/aws-sns');
+
+        /***/
+      },
+
+    /***/ '@aws-cdk/aws-sns-subscriptions':
+      /*!*************************************************!*\
+  !*** external "@aws-cdk/aws-sns-subscriptions" ***!
+  \*************************************************/
+      /***/ (module) => {
+        module.exports = require('@aws-cdk/aws-sns-subscriptions');
+
+        /***/
+      },
+
+    /***/ '@aws-cdk/aws-sqs':
+      /*!***********************************!*\
+  !*** external "@aws-cdk/aws-sqs" ***!
+  \***********************************/
+      /***/ (module) => {
+        module.exports = require('@aws-cdk/aws-sqs');
+
+        /***/
+      },
+
+    /***/ '@aws-cdk/core':
+      /*!********************************!*\
+  !*** external "@aws-cdk/core" ***!
+  \********************************/
+      /***/ (module) => {
+        module.exports = require('@aws-cdk/core');
+
+        /***/
+      },
+
+    /***/ '@graphql-tools/schema':
+      /*!****************************************!*\
+  !*** external "@graphql-tools/schema" ***!
+  \****************************************/
+      /***/ (module) => {
+        module.exports = require('@graphql-tools/schema');
+
+        /***/
+      },
+
+    /***/ 'aws-cdk-lib':
+      /*!******************************!*\
+  !*** external "aws-cdk-lib" ***!
+  \******************************/
+      /***/ (module) => {
+        module.exports = require('aws-cdk-lib');
+
+        /***/
+      },
+
+    /***/ colorette:
+      /*!****************************!*\
+  !*** external "colorette" ***!
+  \****************************/
+      /***/ (module) => {
+        module.exports = require('colorette');
+
+        /***/
+      },
+
+    /***/ dateformat:
+      /*!*****************************!*\
+  !*** external "dateformat" ***!
+  \*****************************/
+      /***/ (module) => {
+        module.exports = require('dateformat');
+
+        /***/
+      },
+
+    /***/ 'fast-copy':
+      /*!****************************!*\
+  !*** external "fast-copy" ***!
+  \****************************/
+      /***/ (module) => {
+        module.exports = require('fast-copy');
+
+        /***/
+      },
+
+    /***/ 'fast-safe-stringify':
+      /*!**************************************!*\
+  !*** external "fast-safe-stringify" ***!
+  \**************************************/
+      /***/ (module) => {
+        module.exports = require('fast-safe-stringify');
+
+        /***/
+      },
+
+    /***/ 'fs-extra':
+      /*!***************************!*\
+  !*** external "fs-extra" ***!
+  \***************************/
+      /***/ (module) => {
+        module.exports = require('fs-extra');
+
+        /***/
+      },
+
+    /***/ graphql:
+      /*!**************************!*\
+  !*** external "graphql" ***!
+  \**************************/
+      /***/ (module) => {
+        module.exports = require('graphql');
+
+        /***/
+      },
+
+    /***/ 'graphql-compose':
+      /*!**********************************!*\
+  !*** external "graphql-compose" ***!
+  \**********************************/
+      /***/ (module) => {
+        module.exports = require('graphql-compose');
+
+        /***/
+      },
+
+    /***/ inquirer:
+      /*!***************************!*\
+  !*** external "inquirer" ***!
+  \***************************/
+      /***/ (module) => {
+        module.exports = require('inquirer');
+
+        /***/
+      },
+
+    /***/ 'inquirer-autocomplete-prompt':
+      /*!***********************************************!*\
+  !*** external "inquirer-autocomplete-prompt" ***!
+  \***********************************************/
+      /***/ (module) => {
+        module.exports = require('inquirer-autocomplete-prompt');
+
+        /***/
+      },
+
+    /***/ 'isomorphic-git':
+      /*!*********************************!*\
+  !*** external "isomorphic-git" ***!
+  \*********************************/
+      /***/ (module) => {
+        module.exports = require('isomorphic-git');
+
+        /***/
+      },
+
+    /***/ 'isomorphic-git/http/node':
+      /*!*******************************************!*\
+  !*** external "isomorphic-git/http/node" ***!
+  \*******************************************/
+      /***/ (module) => {
+        module.exports = require('isomorphic-git/http/node');
+
+        /***/
+      },
+
+    /***/ 'js-yaml':
+      /*!**************************!*\
+  !*** external "js-yaml" ***!
+  \**************************/
+      /***/ (module) => {
+        module.exports = require('js-yaml');
+
+        /***/
+      },
+
+    /***/ lodash:
+      /*!*************************!*\
+  !*** external "lodash" ***!
+  \*************************/
+      /***/ (module) => {
+        module.exports = require('lodash');
+
+        /***/
+      },
+
+    /***/ 'on-exit-leak-free':
+      /*!************************************!*\
+  !*** external "on-exit-leak-free" ***!
+  \************************************/
+      /***/ (module) => {
+        module.exports = require('on-exit-leak-free');
+
+        /***/
+      },
+
+    /***/ pino:
+      /*!***********************!*\
+  !*** external "pino" ***!
+  \***********************/
+      /***/ (module) => {
+        module.exports = require('pino');
+
+        /***/
+      },
+
+    /***/ 'pino-abstract-transport':
+      /*!******************************************!*\
+  !*** external "pino-abstract-transport" ***!
+  \******************************************/
+      /***/ (module) => {
+        module.exports = require('pino-abstract-transport');
+
+        /***/
+      },
+
+    /***/ pump:
+      /*!***********************!*\
+  !*** external "pump" ***!
+  \***********************/
+      /***/ (module) => {
+        module.exports = require('pump');
+
+        /***/
+      },
+
+    /***/ 'readable-stream':
+      /*!**********************************!*\
+  !*** external "readable-stream" ***!
+  \**********************************/
+      /***/ (module) => {
+        module.exports = require('readable-stream');
+
+        /***/
+      },
+
+    /***/ 'secure-json-parse':
+      /*!************************************!*\
+  !*** external "secure-json-parse" ***!
+  \************************************/
+      /***/ (module) => {
+        module.exports = require('secure-json-parse');
+
+        /***/
+      },
+
+    /***/ 'sonic-boom':
+      /*!*****************************!*\
+  !*** external "sonic-boom" ***!
+  \*****************************/
+      /***/ (module) => {
+        module.exports = require('sonic-boom');
+
+        /***/
+      },
+
+    /***/ 'yaml-cfn':
+      /*!***************************!*\
+  !*** external "yaml-cfn" ***!
+  \***************************/
+      /***/ (module) => {
+        module.exports = require('yaml-cfn');
+
+        /***/
+      },
+
+    /***/ yargonaut:
+      /*!****************************!*\
+  !*** external "yargonaut" ***!
+  \****************************/
+      /***/ (module) => {
+        module.exports = require('yargonaut');
+
+        /***/
+      },
+
+    /***/ 'yargs/yargs':
+      /*!******************************!*\
+  !*** external "yargs/yargs" ***!
+  \******************************/
+      /***/ (module) => {
+        module.exports = require('yargs/yargs');
+
+        /***/
+      },
+
+    /***/ fs:
+      /*!*********************!*\
+  !*** external "fs" ***!
+  \*********************/
+      /***/ (module) => {
+        module.exports = require('fs');
+
+        /***/
+      },
+
+    /***/ path:
+      /*!***********************!*\
+  !*** external "path" ***!
+  \***********************/
+      /***/ (module) => {
+        module.exports = require('path');
+
+        /***/
+      },
+
+    /***/ worker_threads:
+      /*!*********************************!*\
+  !*** external "worker_threads" ***!
+  \*********************************/
+      /***/ (module) => {
+        module.exports = require('worker_threads');
+
+        /***/
+      },
+
+    /***/ './node_modules/pino-pretty/index.js':
+      /*!*******************************************!*\
+  !*** ./node_modules/pino-pretty/index.js ***!
+  \*******************************************/
+      /***/ (module, __unused_webpack_exports, __webpack_require__) => {
+        eval(
+          "\n\nconst { isColorSupported } = __webpack_require__(/*! colorette */ \"colorette\")\nconst pump = __webpack_require__(/*! pump */ \"pump\")\nconst { Transform } = __webpack_require__(/*! readable-stream */ \"readable-stream\")\nconst abstractTransport = __webpack_require__(/*! pino-abstract-transport */ \"pino-abstract-transport\")\nconst sjs = __webpack_require__(/*! secure-json-parse */ \"secure-json-parse\")\nconst colors = __webpack_require__(/*! ./lib/colors */ \"./node_modules/pino-pretty/lib/colors.js\")\nconst { ERROR_LIKE_KEYS, MESSAGE_KEY, TIMESTAMP_KEY, LEVEL_KEY, LEVEL_NAMES } = __webpack_require__(/*! ./lib/constants */ \"./node_modules/pino-pretty/lib/constants.js\")\nconst {\n  isObject,\n  prettifyErrorLog,\n  prettifyLevel,\n  prettifyMessage,\n  prettifyMetadata,\n  prettifyObject,\n  prettifyTime,\n  buildSafeSonicBoom,\n  filterLog,\n  handleCustomlevelsOpts,\n  handleCustomlevelNamesOpts\n} = __webpack_require__(/*! ./lib/utils */ \"./node_modules/pino-pretty/lib/utils.js\")\n\nconst jsonParser = input => {\n  try {\n    return { value: sjs.parse(input, { protoAction: 'remove' }) }\n  } catch (err) {\n    return { err }\n  }\n}\n\nconst defaultOptions = {\n  colorize: isColorSupported,\n  colorizeObjects: true,\n  crlf: false,\n  errorLikeObjectKeys: ERROR_LIKE_KEYS,\n  errorProps: '',\n  customLevels: null,\n  customColors: null,\n  useOnlyCustomProps: true,\n  levelFirst: false,\n  messageKey: MESSAGE_KEY,\n  messageFormat: false,\n  timestampKey: TIMESTAMP_KEY,\n  translateTime: true,\n  useMetadata: false,\n  outputStream: process.stdout,\n  customPrettifiers: {},\n  hideObject: false,\n  ignore: 'hostname',\n  include: undefined,\n  singleLine: false\n}\n\nfunction prettyFactory (options) {\n  const opts = Object.assign({}, defaultOptions, options)\n  const EOL = opts.crlf ? '\\r\\n' : '\\n'\n  const IDENT = '    '\n  const messageKey = opts.messageKey\n  const levelKey = opts.levelKey\n  const levelLabel = opts.levelLabel\n  const minimumLevel = opts.minimumLevel\n  const messageFormat = opts.messageFormat\n  const timestampKey = opts.timestampKey\n  const errorLikeObjectKeys = opts.errorLikeObjectKeys\n  const errorProps = opts.errorProps.split(',')\n  const useOnlyCustomProps = typeof opts.useOnlyCustomProps === 'boolean' ? opts.useOnlyCustomProps : opts.useOnlyCustomProps === 'true'\n  const customLevels = handleCustomlevelsOpts(opts.customLevels)\n  const customLevelNames = handleCustomlevelNamesOpts(opts.customLevels)\n\n  const customColors = opts.customColors\n    ? opts.customColors\n      .split(',')\n      .reduce((agg, value) => {\n        const [level, color] = value.split(':')\n\n        const condition = useOnlyCustomProps ? opts.customLevels : customLevelNames[level] !== undefined\n        const levelNum = condition ? customLevelNames[level] : LEVEL_NAMES[level]\n        const colorIdx = levelNum !== undefined ? levelNum : level\n\n        agg.push([colorIdx, color])\n\n        return agg\n      }, [])\n    : undefined\n  const customProps = {\n    customLevels,\n    customLevelNames\n  }\n  if (useOnlyCustomProps && !opts.customLevels) {\n    customProps.customLevels = undefined\n    customProps.customLevelNames = undefined\n  }\n  const customPrettifiers = opts.customPrettifiers\n  const includeKeys = opts.include !== undefined ? new Set(opts.include.split(',')) : undefined\n  const ignoreKeys = (!includeKeys && opts.ignore) ? new Set(opts.ignore.split(',')) : undefined\n  const hideObject = opts.hideObject\n  const singleLine = opts.singleLine\n  const colorizer = colors(opts.colorize, customColors, useOnlyCustomProps)\n  const objectColorizer = opts.colorizeObjects ? colorizer : colors(false, [], false)\n\n  return pretty\n\n  function pretty (inputData) {\n    let log\n    if (!isObject(inputData)) {\n      const parsed = jsonParser(inputData)\n      if (parsed.err || !isObject(parsed.value)) {\n        // pass through\n        return inputData + EOL\n      }\n      log = parsed.value\n    } else {\n      log = inputData\n    }\n\n    if (minimumLevel) {\n      const condition = useOnlyCustomProps ? opts.customLevels : customLevelNames[minimumLevel] !== undefined\n      const minimum = (condition ? customLevelNames[minimumLevel] : LEVEL_NAMES[minimumLevel]) || Number(minimumLevel)\n      const level = log[levelKey === undefined ? LEVEL_KEY : levelKey]\n      if (level < minimum) return\n    }\n\n    const prettifiedMessage = prettifyMessage({ log, messageKey, colorizer, messageFormat, levelLabel, ...customProps, useOnlyCustomProps })\n\n    if (ignoreKeys || includeKeys) {\n      log = filterLog({ log, ignoreKeys, includeKeys })\n    }\n\n    const prettifiedLevel = prettifyLevel({ log, colorizer, levelKey, prettifier: customPrettifiers.level, ...customProps })\n    const prettifiedMetadata = prettifyMetadata({ log, prettifiers: customPrettifiers })\n    const prettifiedTime = prettifyTime({ log, translateFormat: opts.translateTime, timestampKey, prettifier: customPrettifiers.time })\n\n    let line = ''\n    if (opts.levelFirst && prettifiedLevel) {\n      line = `${prettifiedLevel}`\n    }\n\n    if (prettifiedTime && line === '') {\n      line = `${prettifiedTime}`\n    } else if (prettifiedTime) {\n      line = `${line} ${prettifiedTime}`\n    }\n\n    if (!opts.levelFirst && prettifiedLevel) {\n      if (line.length > 0) {\n        line = `${line} ${prettifiedLevel}`\n      } else {\n        line = prettifiedLevel\n      }\n    }\n\n    if (prettifiedMetadata) {\n      if (line.length > 0) {\n        line = `${line} ${prettifiedMetadata}:`\n      } else {\n        line = prettifiedMetadata\n      }\n    }\n\n    if (line.endsWith(':') === false && line !== '') {\n      line += ':'\n    }\n\n    if (prettifiedMessage) {\n      if (line.length > 0) {\n        line = `${line} ${prettifiedMessage}`\n      } else {\n        line = prettifiedMessage\n      }\n    }\n\n    if (line.length > 0 && !singleLine) {\n      line += EOL\n    }\n\n    // pino@7+ does not log this anymore\n    if (log.type === 'Error' && log.stack) {\n      const prettifiedErrorLog = prettifyErrorLog({\n        log,\n        errorLikeKeys: errorLikeObjectKeys,\n        errorProperties: errorProps,\n        ident: IDENT,\n        eol: EOL\n      })\n      if (singleLine) line += EOL\n      line += prettifiedErrorLog\n    } else if (!hideObject) {\n      const skipKeys = [messageKey, levelKey, timestampKey].filter(key => typeof log[key] === 'string' || typeof log[key] === 'number')\n      const prettifiedObject = prettifyObject({\n        input: log,\n        skipKeys,\n        customPrettifiers,\n        errorLikeKeys: errorLikeObjectKeys,\n        eol: EOL,\n        ident: IDENT,\n        singleLine,\n        colorizer: objectColorizer\n      })\n\n      // In single line mode, include a space only if prettified version isn't empty\n      if (singleLine && !/^\\s$/.test(prettifiedObject)) {\n        line += ' '\n      }\n      line += prettifiedObject\n    }\n\n    return line\n  }\n}\n\nfunction build (opts = {}) {\n  const pretty = prettyFactory(opts)\n  return abstractTransport(function (source) {\n    const stream = new Transform({\n      objectMode: true,\n      autoDestroy: true,\n      transform (chunk, enc, cb) {\n        const line = pretty(chunk)\n        cb(null, line)\n      }\n    })\n\n    let destination\n\n    if (typeof opts.destination === 'object' && typeof opts.destination.write === 'function') {\n      destination = opts.destination\n    } else {\n      destination = buildSafeSonicBoom({\n        dest: opts.destination || 1,\n        append: opts.append,\n        mkdir: opts.mkdir,\n        sync: opts.sync // by default sonic will be async\n      })\n    }\n\n    source.on('unknown', function (line) {\n      destination.write(line + '\\n')\n    })\n\n    pump(source, stream, destination)\n    return stream\n  }, { parse: 'lines' })\n}\n\nmodule.exports = build\nmodule.exports.prettyFactory = prettyFactory\nmodule.exports.colorizerFactory = colors\nmodule.exports[\"default\"] = build\n\n\n//# sourceURL=webpack://ragate-cli/./node_modules/pino-pretty/index.js?"
+        );
+
+        /***/
+      },
+
+    /***/ './node_modules/pino-pretty/lib/colors.js':
+      /*!************************************************!*\
+  !*** ./node_modules/pino-pretty/lib/colors.js ***!
+  \************************************************/
+      /***/ (module, __unused_webpack_exports, __webpack_require__) => {
+        eval(
+          '\n\nconst { LEVELS, LEVEL_NAMES } = __webpack_require__(/*! ./constants */ "./node_modules/pino-pretty/lib/constants.js")\n\nconst nocolor = input => input\nconst plain = {\n  default: nocolor,\n  60: nocolor,\n  50: nocolor,\n  40: nocolor,\n  30: nocolor,\n  20: nocolor,\n  10: nocolor,\n  message: nocolor,\n  greyMessage: nocolor\n}\n\nconst { createColors } = __webpack_require__(/*! colorette */ "colorette")\nconst availableColors = createColors({ useColor: true })\nconst { white, bgRed, red, yellow, green, blue, gray, cyan } = availableColors\n\nconst colored = {\n  default: white,\n  60: bgRed,\n  50: red,\n  40: yellow,\n  30: green,\n  20: blue,\n  10: gray,\n  message: cyan,\n  greyMessage: gray\n}\n\nfunction resolveCustomColoredColorizer (customColors) {\n  return customColors.reduce(\n    function (agg, [level, color]) {\n      agg[level] = typeof availableColors[color] === \'function\' ? availableColors[color] : white\n\n      return agg\n    },\n    { default: white, message: cyan, greyMessage: gray }\n  )\n}\n\nfunction colorizeLevel (useOnlyCustomProps) {\n  return function (level, colorizer, { customLevels, customLevelNames } = {}) {\n    const levels = useOnlyCustomProps ? customLevels || LEVELS : Object.assign({}, LEVELS, customLevels)\n    const levelNames = useOnlyCustomProps ? customLevelNames || LEVEL_NAMES : Object.assign({}, LEVEL_NAMES, customLevelNames)\n\n    let levelNum = \'default\'\n    if (Number.isInteger(+level)) {\n      levelNum = Object.prototype.hasOwnProperty.call(levels, level) ? level : levelNum\n    } else {\n      levelNum = Object.prototype.hasOwnProperty.call(levelNames, level.toLowerCase()) ? levelNames[level.toLowerCase()] : levelNum\n    }\n\n    const levelStr = levels[levelNum]\n\n    return Object.prototype.hasOwnProperty.call(colorizer, levelNum) ? colorizer[levelNum](levelStr) : colorizer.default(levelStr)\n  }\n}\n\nfunction plainColorizer (useOnlyCustomProps) {\n  const newPlainColorizer = colorizeLevel(useOnlyCustomProps)\n  const customColoredColorizer = function (level, opts) {\n    return newPlainColorizer(level, plain, opts)\n  }\n  customColoredColorizer.message = plain.message\n  customColoredColorizer.greyMessage = plain.greyMessage\n  return customColoredColorizer\n}\n\nfunction coloredColorizer (useOnlyCustomProps) {\n  const newColoredColorizer = colorizeLevel(useOnlyCustomProps)\n  const customColoredColorizer = function (level, opts) {\n    return newColoredColorizer(level, colored, opts)\n  }\n  customColoredColorizer.message = colored.message\n  customColoredColorizer.greyMessage = colored.greyMessage\n  return customColoredColorizer\n}\n\nfunction customColoredColorizerFactory (customColors, useOnlyCustomProps) {\n  const onlyCustomColored = resolveCustomColoredColorizer(customColors)\n  const customColored = useOnlyCustomProps ? onlyCustomColored : Object.assign({}, colored, onlyCustomColored)\n  const colorizeLevelCustom = colorizeLevel(useOnlyCustomProps)\n\n  const customColoredColorizer = function (level, opts) {\n    return colorizeLevelCustom(level, customColored, opts)\n  }\n  customColoredColorizer.message = customColoredColorizer.message || customColored.message\n  customColoredColorizer.greyMessage = customColoredColorizer.greyMessage || customColored.greyMessage\n\n  return customColoredColorizer\n}\n\n/**\n * Factory function get a function to colorized levels. The returned function\n * also includes a `.message(str)` method to colorize strings.\n *\n * @param {boolean} [useColors=false] When `true` a function that applies standard\n * terminal colors is returned.\n * @param {array[]} [customColors] Touple where first item of each array is the level index and the second item is the color\n * @param {boolean} [useOnlyCustomProps] When `true`, only use the provided custom colors provided and not fallback to default\n *\n * @returns {function} `function (level) {}` has a `.message(str)` method to\n * apply colorization to a string. The core function accepts either an integer\n * `level` or a `string` level. The integer level will map to a known level\n * string or to `USERLVL` if not known.  The string `level` will map to the same\n * colors as the integer `level` and will also default to `USERLVL` if the given\n * string is not a recognized level name.\n */\nmodule.exports = function getColorizer (useColors = false, customColors, useOnlyCustomProps) {\n  if (useColors && customColors !== undefined) {\n    return customColoredColorizerFactory(customColors, useOnlyCustomProps)\n  } else if (useColors) {\n    return coloredColorizer(useOnlyCustomProps)\n  }\n\n  return plainColorizer(useOnlyCustomProps)\n}\n\n\n//# sourceURL=webpack://ragate-cli/./node_modules/pino-pretty/lib/colors.js?'
+        );
+
+        /***/
+      },
+
+    /***/ './node_modules/pino-pretty/lib/constants.js':
+      /*!***************************************************!*\
+  !*** ./node_modules/pino-pretty/lib/constants.js ***!
+  \***************************************************/
+      /***/ (module) => {
+        eval(
+          "\n\nmodule.exports = {\n  DATE_FORMAT: 'yyyy-mm-dd HH:MM:ss.l o',\n  DATE_FORMAT_SIMPLE: 'HH:MM:ss.l',\n\n  ERROR_LIKE_KEYS: ['err', 'error'],\n\n  MESSAGE_KEY: 'msg',\n\n  LEVEL_KEY: 'level',\n\n  LEVEL_LABEL: 'levelLabel',\n\n  TIMESTAMP_KEY: 'time',\n\n  LEVELS: {\n    default: 'USERLVL',\n    60: 'FATAL',\n    50: 'ERROR',\n    40: 'WARN',\n    30: 'INFO',\n    20: 'DEBUG',\n    10: 'TRACE'\n  },\n\n  LEVEL_NAMES: {\n    fatal: 60,\n    error: 50,\n    warn: 40,\n    info: 30,\n    debug: 20,\n    trace: 10\n  },\n\n  // Object keys that probably came from a logger like Pino or Bunyan.\n  LOGGER_KEYS: [\n    'pid',\n    'hostname',\n    'name',\n    'level',\n    'time',\n    'timestamp',\n    'caller'\n  ]\n}\n\n\n//# sourceURL=webpack://ragate-cli/./node_modules/pino-pretty/lib/constants.js?"
+        );
+
+        /***/
+      },
+
+    /***/ './node_modules/pino-pretty/lib/utils.js':
+      /*!***********************************************!*\
+  !*** ./node_modules/pino-pretty/lib/utils.js ***!
+  \***********************************************/
+      /***/ (module, __unused_webpack_exports, __webpack_require__) => {
+        eval(
+          "\n\nconst { createCopier } = __webpack_require__(/*! fast-copy */ \"fast-copy\")\nconst dateformat = __webpack_require__(/*! dateformat */ \"dateformat\")\nconst SonicBoom = __webpack_require__(/*! sonic-boom */ \"sonic-boom\")\nconst stringifySafe = __webpack_require__(/*! fast-safe-stringify */ \"fast-safe-stringify\")\nconst { isMainThread } = __webpack_require__(/*! worker_threads */ \"worker_threads\")\nconst defaultColorizer = __webpack_require__(/*! ./colors */ \"./node_modules/pino-pretty/lib/colors.js\")()\nconst {\n  DATE_FORMAT,\n  ERROR_LIKE_KEYS,\n  MESSAGE_KEY,\n  LEVEL_KEY,\n  LEVEL_LABEL,\n  TIMESTAMP_KEY,\n  LOGGER_KEYS,\n  LEVELS,\n  DATE_FORMAT_SIMPLE\n} = __webpack_require__(/*! ./constants */ \"./node_modules/pino-pretty/lib/constants.js\")\n\nconst fastCopy = createCopier({})\n\nmodule.exports = {\n  isObject,\n  prettifyErrorLog,\n  prettifyLevel,\n  prettifyMessage,\n  prettifyMetadata,\n  prettifyObject,\n  prettifyTime,\n  buildSafeSonicBoom,\n  filterLog,\n  handleCustomlevelsOpts,\n  handleCustomlevelNamesOpts\n}\n\nmodule.exports.internals = {\n  formatTime,\n  joinLinesWithIndentation,\n  prettifyError,\n  getPropertyValue,\n  deleteLogProperty,\n  splitPropertyKey,\n  createDate,\n  isValidDate\n}\n\n/**\n * Converts a given `epoch` to a desired display format.\n *\n * @param {number|string} epoch The time to convert. May be any value that is\n * valid for `new Date()`.\n * @param {boolean|string} [translateTime=false] When `false`, the given `epoch`\n * will simply be returned. When `true`, the given `epoch` will be converted\n * to a string at UTC using the `DATE_FORMAT` constant. If `translateTime` is\n * a string, the following rules are available:\n *\n * - `<format string>`: The string is a literal format string. This format\n * string will be used to interpret the `epoch` and return a display string\n * at UTC.\n * - `SYS:STANDARD`: The returned display string will follow the `DATE_FORMAT`\n * constant at the system's local timezone.\n * - `SYS:<format string>`: The returned display string will follow the given\n * `<format string>` at the system's local timezone.\n * - `UTC:<format string>`: The returned display string will follow the given\n * `<format string>` at UTC.\n *\n * @returns {number|string} The formatted time.\n */\nfunction formatTime (epoch, translateTime = false) {\n  if (translateTime === false) {\n    return epoch\n  }\n\n  const instant = createDate(epoch)\n\n  // If the Date is invalid, do not attempt to format\n  if (!isValidDate(instant)) {\n    return epoch\n  }\n\n  if (translateTime === true) {\n    return dateformat(instant, DATE_FORMAT_SIMPLE)\n  }\n\n  const upperFormat = translateTime.toUpperCase()\n  if (upperFormat === 'SYS:STANDARD') {\n    return dateformat(instant, DATE_FORMAT)\n  }\n\n  const prefix = upperFormat.substr(0, 4)\n  if (prefix === 'SYS:' || prefix === 'UTC:') {\n    if (prefix === 'UTC:') {\n      return dateformat(instant, translateTime)\n    }\n    return dateformat(instant, translateTime.slice(4))\n  }\n\n  return dateformat(instant, `UTC:${translateTime}`)\n}\n\n/**\n * Constructs a JS Date from a number or string. Accepts any single number\n * or single string argument that is valid for the Date() constructor,\n * or an epoch as a string.\n *\n * @param {string|number} epoch The representation of the Date.\n *\n * @returns {Date} The constructed Date.\n */\nfunction createDate (epoch) {\n  // If epoch is already a valid argument, return the valid Date\n  let date = new Date(epoch)\n  if (isValidDate(date)) {\n    return date\n  }\n\n  // Convert to a number to permit epoch as a string\n  date = new Date(+epoch)\n  return date\n}\n\n/**\n * Checks if the argument is a JS Date and not 'Invalid Date'.\n *\n * @param {Date} date The date to check.\n *\n * @returns {boolean} true if the argument is a JS Date and not 'Invalid Date'.\n */\nfunction isValidDate (date) {\n  return date instanceof Date && !Number.isNaN(date.getTime())\n}\n\nfunction isObject (input) {\n  return Object.prototype.toString.apply(input) === '[object Object]'\n}\n\n/**\n * Given a string with line separators, either `\\r\\n` or `\\n`, add indentation\n * to all lines subsequent to the first line and rejoin the lines using an\n * end of line sequence.\n *\n * @param {object} input\n * @param {string} input.input The string to split and reformat.\n * @param {string} [input.ident] The indentation string. Default: `    ` (4 spaces).\n * @param {string} [input.eol] The end of line sequence to use when rejoining\n * the lines. Default: `'\\n'`.\n *\n * @returns {string} A string with lines subsequent to the first indented\n * with the given indentation sequence.\n */\nfunction joinLinesWithIndentation ({ input, ident = '    ', eol = '\\n' }) {\n  const lines = input.split(/\\r?\\n/)\n  for (let i = 1; i < lines.length; i += 1) {\n    lines[i] = ident + lines[i]\n  }\n  return lines.join(eol)\n}\n\n/**\n * Given a log object that has a `type: 'Error'` key, prettify the object and\n * return the result. In other\n *\n * @param {object} input\n * @param {object} input.log The error log to prettify.\n * @param {string} [input.messageKey] The name of the key that contains a\n * general log message. This is not the error's message property but the logger\n * messsage property. Default: `MESSAGE_KEY` constant.\n * @param {string} [input.ident] The sequence to use for indentation. Default: `'    '`.\n * @param {string} [input.eol] The sequence to use for EOL. Default: `'\\n'`.\n * @param {string[]} [input.errorLikeKeys] A set of keys that should be considered\n * to have error objects as values. Default: `ERROR_LIKE_KEYS` constant.\n * @param {string[]} [input.errorProperties] A set of specific error object\n * properties, that are not the value of `messageKey`, `type`, or `stack`, to\n * include in the prettified result. The first entry in the list may be `'*'`\n * to indicate that all sibiling properties should be prettified. Default: `[]`.\n *\n * @returns {string} A sring that represents the prettified error log.\n */\nfunction prettifyErrorLog ({\n  log,\n  messageKey = MESSAGE_KEY,\n  ident = '    ',\n  eol = '\\n',\n  errorLikeKeys = ERROR_LIKE_KEYS,\n  errorProperties = []\n}) {\n  const stack = log.stack\n  const joinedLines = joinLinesWithIndentation({ input: stack, ident, eol })\n  let result = `${ident}${joinedLines}${eol}`\n\n  if (errorProperties.length > 0) {\n    const excludeProperties = LOGGER_KEYS.concat(messageKey, 'type', 'stack')\n    let propertiesToPrint\n    if (errorProperties[0] === '*') {\n      // Print all sibling properties except for the standard exclusions.\n      propertiesToPrint = Object.keys(log).filter(k => excludeProperties.includes(k) === false)\n    } else {\n      // Print only specified properties unless the property is a standard exclusion.\n      propertiesToPrint = errorProperties.filter(k => excludeProperties.includes(k) === false)\n    }\n\n    for (let i = 0; i < propertiesToPrint.length; i += 1) {\n      const key = propertiesToPrint[i]\n      if (key in log === false) continue\n      if (isObject(log[key])) {\n        // The nested object may have \"logger\" type keys but since they are not\n        // at the root level of the object being processed, we want to print them.\n        // Thus, we invoke with `excludeLoggerKeys: false`.\n        const prettifiedObject = prettifyObject({ input: log[key], errorLikeKeys, excludeLoggerKeys: false, eol, ident: ident + ident })\n        result = `${result}${ident}${key}: {${eol}${prettifiedObject}${ident}}${eol}`\n        continue\n      }\n      result = `${result}${ident}${key}: ${log[key]}${eol}`\n    }\n  }\n\n  return result\n}\n\n/**\n * Checks if the passed in log has a `level` value and returns a prettified\n * string for that level if so.\n *\n * @param {object} input\n * @param {object} input.log The log object.\n * @param {function} [input.colorizer] A colorizer function that accepts a level\n * value and returns a colorized string. Default: a no-op colorizer.\n * @param {string} [input.levelKey='level'] The key to find the level under.\n * @param {function} [input.prettifier] A user-supplied formatter to be called instead of colorizer.\n * @param {object} [input.customLevels] The custom levels where key as the level index and value as the level name.\n * @param {object} [input.customLevelNames] The custom level names where key is the level name and value is the level index.\n *\n * @returns {undefined|string} If `log` does not have a `level` property then\n * `undefined` will be returned. Otherwise, a string from the specified\n * `colorizer` is returned.\n */\nfunction prettifyLevel ({ log, colorizer = defaultColorizer, levelKey = LEVEL_KEY, prettifier, customLevels, customLevelNames }) {\n  const output = getPropertyValue(log, levelKey)\n  if (output === undefined) return undefined\n  return prettifier ? prettifier(output) : colorizer(output, { customLevels, customLevelNames })\n}\n\n/**\n * Prettifies a message string if the given `log` has a message property.\n *\n * @param {object} input\n * @param {object} input.log The log object with the message to colorize.\n * @param {string} [input.messageKey='msg'] The property of the `log` that is the\n * message to be prettified.\n * @param {string|function} [input.messageFormat=undefined] A format string or function that defines how the\n *  logged message should be formatted, e.g. `'{level} - {pid}'`.\n * @param {function} [input.colorizer] A colorizer function that has a\n * `.message(str)` method attached to it. This function should return a colorized\n * string which will be the \"prettified\" message. Default: a no-op colorizer.\n * @param {string} [input.levelLabel='levelLabel'] The label used to output the log level\n * @param {string} [input.levelKey='level'] The key to find the level under.\n * @param {object} [input.customLevels] The custom levels where key as the level index and value as the level name.\n *\n * @returns {undefined|string} If the message key is not found, or the message\n * key is not a string, then `undefined` will be returned. Otherwise, a string\n * that is the prettified message.\n */\nfunction prettifyMessage ({ log, messageFormat, messageKey = MESSAGE_KEY, colorizer = defaultColorizer, levelLabel = LEVEL_LABEL, levelKey = LEVEL_KEY, customLevels, useOnlyCustomProps }) {\n  if (messageFormat && typeof messageFormat === 'string') {\n    const message = String(messageFormat).replace(/{([^{}]+)}/g, function (match, p1) {\n      // return log level as string instead of int\n      let level\n      if (p1 === levelLabel && (level = getPropertyValue(log, levelKey)) !== undefined) {\n        const condition = useOnlyCustomProps ? customLevels === undefined : customLevels[level] === undefined\n        return condition ? LEVELS[level] : customLevels[level]\n      }\n      // Parse nested key access, e.g. `{keyA.subKeyB}`.\n      return getPropertyValue(log, p1) || ''\n    })\n    return colorizer.message(message)\n  }\n  if (messageFormat && typeof messageFormat === 'function') {\n    const msg = messageFormat(log, messageKey, levelLabel)\n    return colorizer.message(msg)\n  }\n  if (messageKey in log === false) return undefined\n  if (typeof log[messageKey] !== 'string') return undefined\n  return colorizer.message(log[messageKey])\n}\n\n/**\n * Prettifies metadata that is usually present in a Pino log line. It looks for\n * fields `name`, `pid`, `hostname`, and `caller` and returns a formatted string using\n * the fields it finds.\n *\n * @param {object} input\n * @param {object} input.log The log that may or may not contain metadata to\n * be prettified.\n * @param {object} input.prettifiers A set of functions used to prettify each\n * key of the input log's metadata. The keys are the keys of the metadata (like\n * `hostname`, `pid`, `name`, etc), and the values are functions which take the\n * metadata value and return a string. Each key is optional.\n *\n * @returns {undefined|string} If no metadata is found then `undefined` is\n * returned. Otherwise, a string of prettified metadata is returned.\n */\nfunction prettifyMetadata ({ log, prettifiers = {} }) {\n  let line = ''\n\n  if (log.name || log.pid || log.hostname) {\n    line += '('\n\n    if (log.name) {\n      line += prettifiers.name ? prettifiers.name(log.name) : log.name\n    }\n\n    if (log.pid) {\n      const prettyPid = prettifiers.pid ? prettifiers.pid(log.pid) : log.pid\n      if (log.name && log.pid) {\n        line += '/' + prettyPid\n      } else {\n        line += prettyPid\n      }\n    }\n\n    if (log.hostname) {\n      // If `pid` and `name` were in the ignore keys list then we don't need\n      // the leading space.\n      line += `${line === '(' ? 'on' : ' on'} ${prettifiers.hostname ? prettifiers.hostname(log.hostname) : log.hostname}`\n    }\n\n    line += ')'\n  }\n\n  if (log.caller) {\n    line += `${line === '' ? '' : ' '}<${prettifiers.caller ? prettifiers.caller(log.caller) : log.caller}>`\n  }\n\n  if (line === '') {\n    return undefined\n  } else {\n    return line\n  }\n}\n\n/**\n * Prettifies a standard object. Special care is taken when processing the object\n * to handle child objects that are attached to keys known to contain error\n * objects.\n *\n * @param {object} input\n * @param {object} input.input The object to prettify.\n * @param {string} [input.ident] The identation sequence to use. Default: `'    '`.\n * @param {string} [input.eol] The EOL sequence to use. Default: `'\\n'`.\n * @param {string[]} [input.skipKeys] A set of object keys to exclude from the\n * prettified result. Default: `[]`.\n * @param {Object<string, function>} [input.customPrettifiers] Dictionary of\n * custom prettifiers. Default: `{}`.\n * @param {string[]} [input.errorLikeKeys] A set of object keys that contain\n * error objects. Default: `ERROR_LIKE_KEYS` constant.\n * @param {boolean} [input.excludeLoggerKeys] Indicates if known logger specific\n * keys should be excluded from prettification. Default: `true`.\n * @param {boolean} [input.singleLine] Should non-error keys all be formatted\n * on a single line? This does NOT apply to errors, which will still be\n * multi-line. Default: `false`\n *\n * @returns {string} The prettified string. This can be as little as `''` if\n * there was nothing to prettify.\n */\nfunction prettifyObject ({\n  input,\n  ident = '    ',\n  eol = '\\n',\n  skipKeys = [],\n  customPrettifiers = {},\n  errorLikeKeys = ERROR_LIKE_KEYS,\n  excludeLoggerKeys = true,\n  singleLine = false,\n  colorizer = defaultColorizer\n}) {\n  const keysToIgnore = [].concat(skipKeys)\n\n  if (excludeLoggerKeys === true) Array.prototype.push.apply(keysToIgnore, LOGGER_KEYS)\n\n  let result = ''\n\n  // Split object keys into two categories: error and non-error\n  const { plain, errors } = Object.entries(input).reduce(({ plain, errors }, [k, v]) => {\n    if (keysToIgnore.includes(k) === false) {\n      // Pre-apply custom prettifiers, because all 3 cases below will need this\n      const pretty = typeof customPrettifiers[k] === 'function'\n        ? customPrettifiers[k](v, k, input)\n        : v\n      if (errorLikeKeys.includes(k)) {\n        errors[k] = pretty\n      } else {\n        plain[k] = pretty\n      }\n    }\n    return { plain, errors }\n  }, { plain: {}, errors: {} })\n\n  if (singleLine) {\n    // Stringify the entire object as a single JSON line\n    if (Object.keys(plain).length > 0) {\n      result += colorizer.greyMessage(stringifySafe(plain))\n    }\n    result += eol\n    // Avoid printing the escape character on escaped backslashes.\n    result = result.replace(/\\\\\\\\/gi, '\\\\')\n  } else {\n    // Put each object entry on its own line\n    Object.entries(plain).forEach(([keyName, keyValue]) => {\n      // custom prettifiers are already applied above, so we can skip it now\n      let lines = typeof customPrettifiers[keyName] === 'function'\n        ? keyValue\n        : stringifySafe(keyValue, null, 2)\n\n      if (lines === undefined) return\n\n      // Avoid printing the escape character on escaped backslashes.\n      lines = lines.replace(/\\\\\\\\/gi, '\\\\')\n\n      const joinedLines = joinLinesWithIndentation({ input: lines, ident, eol })\n      result += `${ident}${keyName}:${joinedLines.startsWith(eol) ? '' : ' '}${joinedLines}${eol}`\n    })\n  }\n\n  // Errors\n  Object.entries(errors).forEach(([keyName, keyValue]) => {\n    // custom prettifiers are already applied above, so we can skip it now\n    const lines = typeof customPrettifiers[keyName] === 'function'\n      ? keyValue\n      : stringifySafe(keyValue, null, 2)\n\n    if (lines === undefined) return\n\n    result += prettifyError({ keyName, lines, eol, ident })\n  })\n\n  return result\n}\n\n/**\n * Prettifies a timestamp if the given `log` has either `time`, `timestamp` or custom specified timestamp\n * property.\n *\n * @param {object} input\n * @param {object} input.log The log object with the timestamp to be prettified.\n * @param {string} [input.timestampKey='time'] The log property that should be used to resolve timestamp value\n * @param {boolean|string} [input.translateFormat=undefined] When `true` the\n * timestamp will be prettified into a string at UTC using the default\n * `DATE_FORMAT`. If a string, then `translateFormat` will be used as the format\n * string to determine the output; see the `formatTime` function for details.\n * @param {function} [input.prettifier] A user-supplied formatter for altering output.\n *\n * @returns {undefined|string} If a timestamp property cannot be found then\n * `undefined` is returned. Otherwise, the prettified time is returned as a\n * string.\n */\nfunction prettifyTime ({ log, timestampKey = TIMESTAMP_KEY, translateFormat = undefined, prettifier }) {\n  let time = null\n\n  if (timestampKey in log) {\n    time = log[timestampKey]\n  } else if ('timestamp' in log) {\n    time = log.timestamp\n  }\n\n  if (time === null) return undefined\n  const output = translateFormat ? formatTime(time, translateFormat) : time\n\n  return prettifier ? prettifier(output) : `[${output}]`\n}\n\n/**\n * Prettifies an error string into a multi-line format.\n * @param {object} input\n * @param {string} input.keyName The key assigned to this error in the log object\n * @param {string} input.lines The STRINGIFIED error. If the error field has a\n *  custom prettifier, that should be pre-applied as well\n * @param {string} input.ident The indentation sequence to use\n * @param {string} input.eol The EOL sequence to use\n */\nfunction prettifyError ({ keyName, lines, eol, ident }) {\n  let result = ''\n  const joinedLines = joinLinesWithIndentation({ input: lines, ident, eol })\n  const splitLines = `${ident}${keyName}: ${joinedLines}${eol}`.split(eol)\n\n  for (let j = 0; j < splitLines.length; j += 1) {\n    if (j !== 0) result += eol\n\n    const line = splitLines[j]\n    if (/^\\s*\"stack\"/.test(line)) {\n      const matches = /^(\\s*\"stack\":)\\s*(\".*\"),?$/.exec(line)\n      /* istanbul ignore else */\n      if (matches && matches.length === 3) {\n        const indentSize = /^\\s*/.exec(line)[0].length + 4\n        const indentation = ' '.repeat(indentSize)\n        const stackMessage = matches[2]\n        result += matches[1] + eol + indentation + JSON.parse(stackMessage).replace(/\\n/g, eol + indentation)\n      } else {\n        result += line\n      }\n    } else {\n      result += line\n    }\n  }\n\n  return result\n}\n\n/**\n * Splits the property key delimited by a dot character but not when it is preceded\n * by a backslash.\n *\n * @param {string} key A string identifying the property.\n *\n * @returns {string[]} Returns a list of string containing each delimited property.\n * e.g. `'prop2\\.domain\\.corp.prop2'` should return [ 'prop2.domain.com', 'prop2' ]\n */\nfunction splitPropertyKey (key) {\n  const result = []\n  let backslash = false\n  let segment = ''\n\n  for (let i = 0; i < key.length; i++) {\n    const c = key.charAt(i)\n\n    if (c === '\\\\') {\n      backslash = true\n      continue\n    }\n\n    if (backslash) {\n      backslash = false\n      segment += c\n      continue\n    }\n\n    /* Non-escaped dot, push to result */\n    if (c === '.') {\n      result.push(segment)\n      segment = ''\n      continue\n    }\n\n    segment += c\n  }\n\n  /* Push last entry to result */\n  if (segment.length) {\n    result.push(segment)\n  }\n\n  return result\n}\n\n/**\n * Gets a specified property from an object if it exists.\n *\n * @param {object} obj The object to be searched.\n * @param {string|string[]} property A string, or an array of strings, identifying\n  * the property to be retrieved from the object.\n * Accepts nested properties delimited by a `.`.\n * Delimiter can be escaped to preserve property names that contain the delimiter.\n * e.g. `'prop1.prop2'` or `'prop2\\.domain\\.corp.prop2'`.\n *\n * @returns {*}\n */\nfunction getPropertyValue (obj, property) {\n  const props = Array.isArray(property) ? property : splitPropertyKey(property)\n\n  for (const prop of props) {\n    if (!Object.prototype.hasOwnProperty.call(obj, prop)) {\n      return\n    }\n    obj = obj[prop]\n  }\n\n  return obj\n}\n\n/**\n * Deletes a specified property from a log object if it exists.\n * This function mutates the passed in `log` object.\n *\n * @param {object} log The log object to be modified.\n * @param {string} property A string identifying the property to be deleted from\n * the log object. Accepts nested properties delimited by a `.`\n * Delimiter can be escaped to preserve property names that contain the delimiter.\n * e.g. `'prop1.prop2'` or `'prop2\\.domain\\.corp.prop2'`\n */\nfunction deleteLogProperty (log, property) {\n  const props = splitPropertyKey(property)\n  const propToDelete = props.pop()\n\n  log = getPropertyValue(log, props)\n\n  if (log !== null && typeof log === 'object' && Object.prototype.hasOwnProperty.call(log, propToDelete)) {\n    delete log[propToDelete]\n  }\n}\n\n/**\n * Filter a log object by removing or including keys accordingly.\n * When `includeKeys` is passed, `ignoredKeys` will be ignored.\n * One of ignoreKeys or includeKeys must be pass in.\n *\n * @param {object} input\n * @param {object} input.log The log object to be modified.\n * @param {Set<string> | Array<string> | undefined} input.ignoreKeys\n *  An array of strings identifying the properties to be removed.\n * @param {Set<string> | Array<string> | undefined} input.includeKeys\n *  An array of strings identifying the properties to be included.\n *\n * @returns {object} A new `log` object instance that\n *  either only includes the keys in ignoreKeys\n *  or does not include those in ignoredKeys.\n */\nfunction filterLog ({ log, ignoreKeys, includeKeys }) {\n  const logCopy = fastCopy(log)\n\n  if (includeKeys) {\n    const logIncluded = {}\n\n    includeKeys.forEach((key) => {\n      logIncluded[key] = logCopy[key]\n    })\n    return logIncluded\n  }\n\n  ignoreKeys.forEach((ignoreKey) => {\n    deleteLogProperty(logCopy, ignoreKey)\n  })\n  return logCopy\n}\n\nfunction noop () {}\n\n/**\n * Creates a safe SonicBoom instance\n *\n * @param {object} opts Options for SonicBoom\n *\n * @returns {object} A new SonicBoom stream\n */\nfunction buildSafeSonicBoom (opts) {\n  const stream = new SonicBoom(opts)\n  stream.on('error', filterBrokenPipe)\n  // if we are sync: false, we must flush on exit\n  if (!opts.sync && isMainThread) {\n    setupOnExit(stream)\n  }\n  return stream\n\n  function filterBrokenPipe (err) {\n    if (err.code === 'EPIPE') {\n      stream.write = noop\n      stream.end = noop\n      stream.flushSync = noop\n      stream.destroy = noop\n      return\n    }\n    stream.removeListener('error', filterBrokenPipe)\n  }\n}\n\nfunction setupOnExit (stream) {\n  /* istanbul ignore next */\n  if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {\n    // This is leak free, it does not leave event handlers\n    const onExit = __webpack_require__(/*! on-exit-leak-free */ \"on-exit-leak-free\")\n\n    onExit.register(stream, autoEnd)\n\n    stream.on('close', function () {\n      onExit.unregister(stream)\n    })\n  }\n}\n\n/* istanbul ignore next */\nfunction autoEnd (stream, eventName) {\n  // This check is needed only on some platforms\n\n  if (stream.destroyed) {\n    return\n  }\n\n  if (eventName === 'beforeExit') {\n    // We still have an event loop, let's use it\n    stream.flush()\n    stream.on('drain', function () {\n      stream.end()\n    })\n  } else {\n    // We do not have an event loop, so flush synchronously\n    stream.flushSync()\n  }\n}\n\n/**\n * Parse a CSV string or options object that specifies\n * configuration for custom levels.\n *\n * @param {string|object} cLevels An object mapping level\n * names to values, e.g. `{ info: 30, debug: 65 }`, or a\n * CSV string in the format `level_name:level_value`, e.g.\n * `info:30,debug:65`.\n *\n * @returns {object} An object mapping levels to labels that\n * appear in logs, e.g. `{ '30': 'INFO', '65': 'DEBUG' }`.\n */\nfunction handleCustomlevelsOpts (cLevels) {\n  if (!cLevels) return {}\n\n  if (typeof cLevels === 'string') {\n    return cLevels\n      .split(',')\n      .reduce((agg, value, idx) => {\n        const [levelName, levelIdx = idx] = value.split(':')\n        agg[levelIdx] = levelName.toUpperCase()\n        return agg\n      },\n      { default: 'USERLVL' })\n  } else if (Object.prototype.toString.call(cLevels) === '[object Object]') {\n    return Object\n      .keys(cLevels)\n      .reduce((agg, levelName, idx) => {\n        agg[cLevels[levelName]] = levelName.toUpperCase()\n        return agg\n      }, { default: 'USERLVL' })\n  } else {\n    return {}\n  }\n}\n\n/**\n * Parse a CSV string or options object that maps level\n * labels to level values.\n *\n * @param {string|object} cLevels An object mapping level\n * names to level values, e.g. `{ info: 30, debug: 65 }`, or a\n * CSV string in the format `level_name:level_value`, e.g.\n * `info:30,debug:65`.\n *\n * @returns {object} An object mapping levels names to level values\n * e.g. `{ info: 30, debug: 65 }`.\n */\nfunction handleCustomlevelNamesOpts (cLevels) {\n  if (!cLevels) return {}\n\n  if (typeof cLevels === 'string') {\n    return cLevels\n      .split(',')\n      .reduce((agg, value, idx) => {\n        const [levelName, levelIdx = idx] = value.split(':')\n        agg[levelName.toLowerCase()] = levelIdx\n        return agg\n      }, {})\n  } else if (Object.prototype.toString.call(cLevels) === '[object Object]') {\n    return Object\n      .keys(cLevels)\n      .reduce((agg, levelName, idx) => {\n        agg[levelName.toLowerCase()] = cLevels[levelName]\n        return agg\n      }, {})\n  } else {\n    return {}\n  }\n}\n\n\n//# sourceURL=webpack://ragate-cli/./node_modules/pino-pretty/lib/utils.js?"
+        );
+
+        /***/
+      },
+
+    /***/ './package.json':
+      /*!**********************!*\
+  !*** ./package.json ***!
+  \**********************/
+      /***/ (module) => {
+        eval(
+          'module.exports = JSON.parse(\'{"name":"ragate-cli","version":"0.2.0","description":"Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.","engines":{"node":">=18.x"},"scripts":{"test":"echo \\\'Sorry, test code is in preparation.\\\\n\\\'","build:dev":"ENV=development webpack","build:prd":"ENV=production webpack","lint":"eslint . --fix","format":"prettier . --write","prepare":"husky install"},"eslintIgnore":["!/.github",".serverless","bin","tmp","webpack.config.js"],"main":"./lib/app.ts","bin":{"ragate":"./bin/app.js"},"repository":{"type":"git","url":"git+https://github.com/ragate-inc/ragate-cli.git"},"lint-staged":{"*.{ts,js}":["eslint"],"*.{css,html,js,json,md,yaml,yml,ts,js}":["prettier . --write"]},"keywords":["aws","serverless","ragate","cli","amplify","serverless","lambda","amazon"],"author":"Ragate inc.","license":"MIT","bugs":{"url":"https://github.com/ragate-inc/ragate-cli/issues"},"homepage":"https://github.com/ragate-inc/ragate-cli#readme","devDependencies":{"@tsconfig/node-lts":"^18.12.1","@types/figlet":"^1.5.6","@types/fs-extra":"^11.0.1","@types/inquirer":"^9.0.3","@types/inquirer-autocomplete-prompt":"^3.0.0","@types/js-yaml":"^4.0.5","@types/lodash":"^4.14.194","@types/node":"^18.16.3","@types/webpack":"^5.28.1","@types/webpack-node-externals":"^3.0.0","@types/yargs":"^17.0.24","@typescript-eslint/eslint-plugin":"^5.59.2","@typescript-eslint/parser":"^5.59.2","eslint":"^8.39.0","eslint-config-prettier":"^8.8.0","eslint-config-standard-with-typescript":"^34.0.1","husky":"^6.0.0","lint-staged":"^13.2.2","prettier":"2.8.8","ts-loader":"^9.4.2","ts-node":"^10.9.1","tsconfig-paths-webpack-plugin":"^4.0.1","typescript":"^5.0.4","webpack":"^5.81.0","webpack-cli":"^5.0.2","webpack-node-externals":"^3.0.0"},"dependencies":{"@aws-cdk/assert":"^2.68.0","@aws-cdk/aws-iam":"^1.201.0","@aws-cdk/aws-sns":"^1.201.0","@aws-cdk/aws-sns-subscriptions":"^1.201.0","@aws-cdk/aws-sqs":"^1.201.0","aws-cdk-lib":"^2.79.1","figlet":"^1.6.0","fs-extra":"^11.1.1","graphql":"^16.6.0","graphql-compose":"^9.0.10","graphql-tools":"^8.3.20","inquirer":"^8.0.0","inquirer-autocomplete-prompt":"^2.0.0","isomorphic-git":"^1.23.0","js-yaml":"^4.1.0","lodash":"^4.17.21","parent-require":"^1.0.0","pino":"^8.12.1","pino-pretty":"^10.0.0","yaml-cfn":"^0.3.2","yargonaut":"^1.1.4","yargs":"^17.1.1-candidate.0"}}\');\n\n//# sourceURL=webpack://ragate-cli/./package.json?'
+        );
+
+        /***/
+      },
+
+    /******/
+  };
+  /************************************************************************/
+  /******/ // The module cache
+  /******/ var __webpack_module_cache__ = {};
+  /******/
+  /******/ // The require function
+  /******/ function __webpack_require__(moduleId) {
+    /******/ // Check if module is in cache
+    /******/ var cachedModule = __webpack_module_cache__[moduleId];
+    /******/ if (cachedModule !== undefined) {
+      /******/ return cachedModule.exports;
+      /******/
+    }
+    /******/ // Create a new module (and put it into the cache)
+    /******/ var module = (__webpack_module_cache__[moduleId] = {
+      /******/ // no module.id needed
+      /******/ // no module.loaded needed
+      /******/ exports: {},
+      /******/
+    });
+    /******/
+    /******/ // Execute the module function
+    /******/ __webpack_modules__[moduleId].call(module.exports, module, module.exports, __webpack_require__);
+    /******/
+    /******/ // Return the exports of the module
+    /******/ return module.exports;
+    /******/
+  }
+  /******/
+  /************************************************************************/
+  /******/
+  /******/ // startup
+  /******/ // Load entry module and return exports
+  /******/ // This entry module is referenced by other modules so it can't be inlined
+  /******/ var __webpack_exports__ = __webpack_require__('./lib/app.ts');
+  /******/
+  /******/
 })();
