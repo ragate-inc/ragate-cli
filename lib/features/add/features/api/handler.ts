@@ -13,6 +13,7 @@ import generateMutationService from 'features/add/features/api/services/generate
 import generateQueryService from 'features/add/features/api/services/generateQueryService';
 import generateGetItemService from 'features/add/features/api/services/generateGetItemService';
 import AppSyncStackService from 'services/appSyncStackService';
+import { getLocaleLang } from 'features/add/features/api/utils/getLocale';
 
 export default class extends FeatureHandlerAbstract {
   constructor(argv: yargs.ArgumentsCamelCase<{ region: AWS_REGION }>) {
@@ -29,12 +30,13 @@ export default class extends FeatureHandlerAbstract {
 
   public async run(): Promise<void> {
     const logger = Logger.getLogger();
+    const locale = getLocaleLang(this.lang);
 
     const info = (await inquirer.prompt([
       {
         type: 'input',
         name: 'apiName',
-        message: 'API名を入力',
+        message: locale.inquirer.apiName,
         filter: (input: string) => input.replace(/\s+/g, ''),
         transformer: (input: string) => input.replace(/\s+/g, ''),
         validate: (value: string) => new Validator(value, this.lang).required().mustNoIncludeZenkaku().value(),
@@ -43,20 +45,20 @@ export default class extends FeatureHandlerAbstract {
         type: 'list',
         name: 'apiType',
         choices: ['Mutation', 'Query'],
-        message: 'APIタイプを選択',
+        message: locale.inquirer.apiType,
         validate: (value: string) => new Validator(value, this.lang).required().value(),
       },
       {
         type: 'list',
         name: 'resolverType',
         choices: ['UNIT', 'PIPELINE'],
-        message: 'リゾルバータイプを選択',
+        message: locale.inquirer.resolverType,
         validate: (value: string) => new Validator(value, this.lang).required().value(),
       },
       {
         type: 'input',
         name: 'serverlessConfigPath',
-        message: 'input a serverless config file path',
+        message: locale.inquirer.serverlessConfigPath,
         default: () => this.defaultServerlessConfigPath,
         validate: (value: string) => new Validator(value, this.lang).required().mustBeYamlFilePath().value(),
         transformer: (input: string) => new Transformer(input).removeAllSpace().value(),
@@ -69,50 +71,50 @@ export default class extends FeatureHandlerAbstract {
     const sls = new ServerlessConfigService({ region: this.argv.region as AWS_REGION, serverlessConfigPath: info.serverlessConfigPath, lang: this.lang });
 
     if (!sls.isExistsServelessConfig) {
-      throw new Error('serverless.ymlが存在しません');
+      throw new Error(locale.error.notFoundServerlessConfig);
     }
 
     const slsConfig = sls.serverlessConfig as ServerlessConfig;
 
     if (!(slsConfig.plugins ?? []).includes('serverless-appsync-plugin')) {
-      throw new Error('serverless-appsync-pluginがインストールされていません');
+      throw new Error(locale.error.notInstalledAppSyncPlugin);
     }
 
     const appSyncStackPath: string = Parser.parseSlsRecursivelyReference(slsConfig.custom?.appSync as string) as string;
 
     if (_.isEmpty(appSyncStackPath)) {
-      throw new Error('serverless.ymlのcustom.appsyncが不正です、custom.appsyncには、以下のような文字列が設定されている必要があります。\n${file(./appsync/stack.yml)}');
+      throw new Error(`${locale.error.invalidServerlessCustomAppSync} : \${file(./appsync/stack.yml)}`);
     }
 
     const appSyncStackService = new AppSyncStackService({ stackFilePath: appSyncStackPath, lang: this.lang, region: this.argv.region as AWS_REGION });
     const appSyncStack = appSyncStackService.appSyncStack;
 
     if (appSyncStack?.mappingTemplates.some((m) => m.type === info.apiType && m.field === info.apiName)) {
-      throw new Error('既にマッピングテンプレートに定義が存在します');
+      throw new Error(locale.error.alreadyExistsMappingTemplate);
     }
 
     if (info.resolverType === 'PIPELINE' && appSyncStack?.functionConfigurations.some((m) => m.name === `Mutation${info.apiName}`)) {
-      throw new Error('既にリゾルバー関数がAPIが存在します');
+      throw new Error(locale.error.alreadyExistsResolver);
     }
 
     if (info.apiType === 'Mutation') {
-      if (appSyncStack?.schema.isExistsMutationApi(info.apiName)) throw new Error('既にschemaにAPI定義が存在します');
+      if (appSyncStack?.schema.isExistsMutationApi(info.apiName)) throw new Error(locale.error.alreadyExistsAPI);
       return generateMutationService({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });
     }
 
     if (info.apiType === 'Query') {
-      if (appSyncStack?.schema.isExistsQueryApi(info.apiName)) throw new Error('既にschemaにAPI定義が存在します');
-      const { operation } = (await inquirer.prompt([
+      if (appSyncStack?.schema.isExistsQueryApi(info.apiName)) throw new Error(locale.error.alreadyExistsAPI);
+      const { queryOperation } = (await inquirer.prompt([
         {
           type: 'list',
-          name: 'operation',
+          name: 'queryOperation',
           choices: ['Query', 'GetItem'],
-          message: 'Queryのタイプを選択',
+          message: locale.inquirer.queryOperation,
           validate: (value: string) => new Validator(value, this.lang).required().value(),
         },
-      ])) as { operation: 'Query' | 'GetItem' };
-      if (operation === 'Query') return generateQueryService({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });
-      if (operation === 'GetItem') return generateGetItemService({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });
+      ])) as { queryOperation: 'Query' | 'GetItem' };
+      if (queryOperation === 'Query') return generateQueryService({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });
+      if (queryOperation === 'GetItem') return generateGetItemService({ appSyncStackService: appSyncStackService, lang: this.lang, slsConfig: sls, info });
     }
   }
 }

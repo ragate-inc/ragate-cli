@@ -12,18 +12,20 @@ import AppSyncStackService from 'services/appSyncStackService';
 import { AppSyncFunctionConfiguration } from 'types/index';
 import path from 'path';
 import _ from 'lodash';
+import { getLocaleLang } from 'features/add/features/api/utils/getLocale';
 
 export default async (args: { appSyncStackService: AppSyncStackService; lang: string; slsConfig: ServerlessConfigService; info: Type.PromptApiInfo }): Promise<void> => {
   const { appSyncStackService, lang, slsConfig, info } = args;
   const logger = Logger.getLogger();
   logger.debug(`appsyncStack : ${JSON.stringify(appSyncStackService.appSyncStack)}`);
+  const locale = getLocaleLang(lang);
 
   const isCreateDataSource = async (): Promise<boolean> => {
     const { createDataSource } = (await inquirer.prompt([
       {
         type: 'expand',
         name: 'createDataSource',
-        message: 'データソースを新しく作成しますか？',
+        message: locale.services.common.inquirer.createDataSource,
         choices: [
           {
             key: 'y',
@@ -42,7 +44,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
     if (createDataSource) {
       return createDataSource;
     } else if (appSyncStackService.appSyncStack?.dataSources.length === 0) {
-      console.log(chalk.red('データソースが存在しません、データソースを作成する必要があります'));
+      console.log(chalk.red(locale.services.common.error.notFoundDataSource));
       return isCreateDataSource();
     } else {
       return false;
@@ -57,7 +59,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
         {
           type: 'input',
           name: 'lambdaFunctionName',
-          message: 'Lambda関数名を入力',
+          message: locale.services.common.inquirer.lambdaFunctionName,
           default: () => info.apiName,
           filter: (input: string) => input.replace(/\s+/g, ''),
           transformer: (input: string) => input.replace(/\s+/g, ''),
@@ -66,7 +68,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
         {
           type: 'input',
           name: 'lambdaHandler',
-          message: 'input a lambda handler path',
+          message: locale.services.common.inquirer.lambdaHandler,
           default: () => `src/functions/appsync/${info.apiName}.handler`,
           validate: (value: string) => new Validator(value, lang).required().mustBeExtension().value(),
           transformer: (input: string) => new Transformer(input).removeAllSpace().value(),
@@ -100,7 +102,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
         type: 'list',
         name: 'dataSource',
         choices: appSyncStackService.appSyncStack?.dataSources.map((d) => d.name),
-        message: 'データソースを選択',
+        message: locale.services.common.inquirer.dataSource,
         validate: (value: string) => new Validator(value, lang).required().value(),
       },
     ])) as { dataSource: string };

@@ -300,8 +300,9 @@
           m = r(a(6849)),
           f = r(a(8391)),
           g = r(a(245)),
-          h = r(a(7116));
-        class y extends n.FeatureHandlerAbstract {
+          h = r(a(7116)),
+          y = a(8854);
+        class v extends n.FeatureHandlerAbstract {
           constructor(e) {
             super(e);
           }
@@ -313,60 +314,66 @@
           }
           async run() {
             const e = s.default.getLogger(),
-              t = await l.default.prompt([
+              t = (0, y.getLocaleLang)(this.lang),
+              a = await l.default.prompt([
                 {
                   type: 'input',
                   name: 'apiName',
-                  message: 'API名を入力',
+                  message: t.inquirer.apiName,
                   filter: (e) => e.replace(/\s+/g, ''),
                   transformer: (e) => e.replace(/\s+/g, ''),
                   validate: (e) => new u.default(e, this.lang).required().mustNoIncludeZenkaku().value(),
                 },
-                { type: 'list', name: 'apiType', choices: ['Mutation', 'Query'], message: 'APIタイプを選択', validate: (e) => new u.default(e, this.lang).required().value() },
+                { type: 'list', name: 'apiType', choices: ['Mutation', 'Query'], message: t.inquirer.apiType, validate: (e) => new u.default(e, this.lang).required().value() },
                 {
                   type: 'list',
                   name: 'resolverType',
                   choices: ['UNIT', 'PIPELINE'],
-                  message: 'リゾルバータイプを選択',
+                  message: t.inquirer.resolverType,
                   validate: (e) => new u.default(e, this.lang).required().value(),
                 },
                 {
                   type: 'input',
                   name: 'serverlessConfigPath',
-                  message: 'input a serverless config file path',
+                  message: t.inquirer.serverlessConfigPath,
                   default: () => this.defaultServerlessConfigPath,
                   validate: (e) => new u.default(e, this.lang).required().mustBeYamlFilePath().value(),
                   transformer: (e) => new d.default(e).removeAllSpace().value(),
                   filter: (e) => new c.default(e).removeAllSpace().value(),
                 },
               ]);
-            e.debug(`input info values : ${JSON.stringify(t)}}`);
-            const a = new o.default({ region: this.argv.region, serverlessConfigPath: t.serverlessConfigPath, lang: this.lang });
-            if (!a.isExistsServelessConfig) throw new Error('serverless.ymlが存在しません');
-            const r = a.serverlessConfig;
-            if (!(r.plugins ?? []).includes('serverless-appsync-plugin')) throw new Error('serverless-appsync-pluginがインストールされていません');
-            const n = p.default.parseSlsRecursivelyReference(r.custom?.appSync);
-            if (i.default.isEmpty(n))
-              throw new Error('serverless.ymlのcustom.appsyncが不正です、custom.appsyncには、以下のような文字列が設定されている必要があります。\n${file(./appsync/stack.yml)}');
-            const y = new h.default({ stackFilePath: n, lang: this.lang, region: this.argv.region }),
-              v = y.appSyncStack;
-            if (v?.mappingTemplates.some((e) => e.type === t.apiType && e.field === t.apiName)) throw new Error('既にマッピングテンプレートに定義が存在します');
-            if ('PIPELINE' === t.resolverType && v?.functionConfigurations.some((e) => e.name === `Mutation${t.apiName}`)) throw new Error('既にリゾルバー関数がAPIが存在します');
-            if ('Mutation' === t.apiType) {
-              if (v?.schema.isExistsMutationApi(t.apiName)) throw new Error('既にschemaにAPI定義が存在します');
-              return (0, m.default)({ appSyncStackService: y, lang: this.lang, slsConfig: a, info: t });
+            e.debug(`input info values : ${JSON.stringify(a)}}`);
+            const r = new o.default({ region: this.argv.region, serverlessConfigPath: a.serverlessConfigPath, lang: this.lang });
+            if (!r.isExistsServelessConfig) throw new Error(t.error.notFoundServerlessConfig);
+            const n = r.serverlessConfig;
+            if (!(n.plugins ?? []).includes('serverless-appsync-plugin')) throw new Error(t.error.notInstalledAppSyncPlugin);
+            const v = p.default.parseSlsRecursivelyReference(n.custom?.appSync);
+            if (i.default.isEmpty(v)) throw new Error(`${t.error.invalidServerlessCustomAppSync} : \${file(./appsync/stack.yml)}`);
+            const S = new h.default({ stackFilePath: v, lang: this.lang, region: this.argv.region }),
+              _ = S.appSyncStack;
+            if (_?.mappingTemplates.some((e) => e.type === a.apiType && e.field === a.apiName)) throw new Error(t.error.alreadyExistsMappingTemplate);
+            if ('PIPELINE' === a.resolverType && _?.functionConfigurations.some((e) => e.name === `Mutation${a.apiName}`)) throw new Error(t.error.alreadyExistsResolver);
+            if ('Mutation' === a.apiType) {
+              if (_?.schema.isExistsMutationApi(a.apiName)) throw new Error(t.error.alreadyExistsAPI);
+              return (0, m.default)({ appSyncStackService: S, lang: this.lang, slsConfig: r, info: a });
             }
-            if ('Query' === t.apiType) {
-              if (v?.schema.isExistsQueryApi(t.apiName)) throw new Error('既にschemaにAPI定義が存在します');
-              const { operation: e } = await l.default.prompt([
-                { type: 'list', name: 'operation', choices: ['Query', 'GetItem'], message: 'Queryのタイプを選択', validate: (e) => new u.default(e, this.lang).required().value() },
+            if ('Query' === a.apiType) {
+              if (_?.schema.isExistsQueryApi(a.apiName)) throw new Error(t.error.alreadyExistsAPI);
+              const { queryOperation: e } = await l.default.prompt([
+                {
+                  type: 'list',
+                  name: 'queryOperation',
+                  choices: ['Query', 'GetItem'],
+                  message: t.inquirer.queryOperation,
+                  validate: (e) => new u.default(e, this.lang).required().value(),
+                },
               ]);
-              if ('Query' === e) return (0, f.default)({ appSyncStackService: y, lang: this.lang, slsConfig: a, info: t });
-              if ('GetItem' === e) return (0, g.default)({ appSyncStackService: y, lang: this.lang, slsConfig: a, info: t });
+              if ('Query' === e) return (0, f.default)({ appSyncStackService: S, lang: this.lang, slsConfig: r, info: a });
+              if ('GetItem' === e) return (0, g.default)({ appSyncStackService: S, lang: this.lang, slsConfig: r, info: a });
             }
           }
         }
-        t.default = y;
+        t.default = v;
       },
       8806: function (e, t, a) {
         var r =
@@ -378,6 +385,78 @@
         const s = r(a(7352)),
           n = r(a(1723));
         t.default = { builder: s.default, handler: n.default };
+      },
+      4538: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            error: {
+              notFoundServerlessConfig: 'Serverless.yml does not exist',
+              notInstalledAppSyncPlugin: 'serverless-appsync-plugin is not installed',
+              invalidServerlessCustomAppSync: 'The custom.appsync in serverless.yml is incorrect, custom.appsync must have the following string set',
+              alreadyExistsMappingTemplate: 'A definition already exists in the mapping template',
+              alreadyExistsResolver: 'A definition already exists in the resolver',
+              alreadyExistsAPI: 'A definition already exists in the API',
+            },
+            inquirer: {
+              apiName: 'Enter API name',
+              apiType: 'Select API Type',
+              resolverType: 'Select Resolver Type',
+              serverlessConfigPath: 'Enter the path to serverless.yml',
+              queryOperation: 'Select Query Type',
+            },
+            services: {
+              common: {
+                inquirer: {
+                  createDataSource: 'Do you want to create a new data source?',
+                  lambdaFunctionName: 'Enter Lambda function name',
+                  lambdaHandler: 'Enter the path to the Lambda handler',
+                  dataSource: 'Select Data Source',
+                  template: 'Select a template',
+                  primaryKeyName: 'Enter primary key name',
+                  sortKeyName: 'Enter sort key name',
+                  indexName: 'Enter index name',
+                },
+                error: { notFoundDataSource: 'Data source does not exist, data source must be created' },
+              },
+              generateQueryService: { inquirer: { gsiName: 'Enter GSI name' } },
+            },
+          });
+      },
+      3957: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            error: {
+              notFoundServerlessConfig: 'serverless.ymlが存在しません',
+              notInstalledAppSyncPlugin: 'serverless-appsync-pluginがインストールされていません',
+              invalidServerlessCustomAppSync: 'serverless.ymlのcustom.appsyncが不正です、custom.appsyncには、以下のような文字列が設定されている必要があります',
+              alreadyExistsMappingTemplate: '既にマッピングテンプレートに定義が存在します',
+              alreadyExistsResolver: '既にリゾルバーに定義が存在します',
+              alreadyExistsAPI: '既にAPIに定義が存在します',
+            },
+            inquirer: {
+              apiName: 'API名を入力',
+              apiType: 'APIタイプを選択',
+              resolverType: 'リゾルバータイプを選択',
+              serverlessConfigPath: 'serverless.ymlのパスを入力',
+              queryOperation: 'Queryのタイプを選択',
+            },
+            services: {
+              common: {
+                inquirer: {
+                  createDataSource: 'データソースを新しく作成しますか？',
+                  lambdaFunctionName: 'Lambda関数名を入力',
+                  lambdaHandler: 'Lambdaハンドラーのパスを入力',
+                  dataSource: 'データソースを選択',
+                  template: 'テンプレートを選択',
+                  primaryKeyName: 'プライマリーキー名を入力',
+                  sortKeyName: 'ソートキー名を入力',
+                  indexName: 'インデックス名を入力',
+                },
+                error: { notFoundDataSource: 'データソースが存在しません、データソースを作成する必要があります' },
+              },
+              generateQueryService: { inquirer: { gsiName: 'GSI名を入力' } },
+            },
+          });
       },
       245: function (e, t, a) {
         var r =
@@ -395,17 +474,19 @@
           c = a(6870),
           d = r(a(1017)),
           p = r(a(6517)),
-          m = a(7343);
+          m = a(7343),
+          f = a(8854);
         t.default = async (e) => {
-          const { appSyncStackService: t, lang: a, slsConfig: r, info: f } = e,
-            g = s.default.getLogger();
-          g.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const h = async () => {
+          const { appSyncStackService: t, lang: a, slsConfig: r, info: g } = e,
+            h = s.default.getLogger(),
+            y = (0, f.getLocaleLang)(a);
+          h.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
+          const v = async () => {
               const { createDataSource: e } = await n.default.prompt([
                 {
                   type: 'expand',
                   name: 'createDataSource',
-                  message: 'データソースを新しく作成しますか？',
+                  message: y.services.common.inquirer.createDataSource,
                   choices: [
                     { key: 'y', name: 'yes', value: !0 },
                     { key: 'n', name: 'no', value: !1 },
@@ -413,10 +494,10 @@
                   validate: (e) => new i.default(e, a).required().value(),
                 },
               ]);
-              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), h()));
+              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red(y.services.common.error.notFoundDataSource)), v()));
             },
-            y = await h(),
-            v = async (e) => {
+            S = await v(),
+            _ = async (e) => {
               if ('AMAZON_DYNAMODB' === e.type) {
                 const {
                   template: e,
@@ -427,13 +508,13 @@
                     type: 'list',
                     name: 'template',
                     choices: ['getItem', 'getItemConsistentRead', 'localResolver'],
-                    message: 'テンプレートを選択',
+                    message: y.services.common.inquirer.template,
                     validate: (e) => new i.default(e, a).required().value(),
                   },
                   {
                     type: 'input',
                     name: 'primaryKeyName',
-                    message: 'プライマリーキー名を入力',
+                    message: y.services.common.inquirer.primaryKeyName,
                     default: () => 'Id',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
@@ -442,7 +523,7 @@
                   {
                     type: 'input',
                     name: 'sortKeyName',
-                    message: 'ソートキー名を入力',
+                    message: y.services.common.inquirer.sortKeyName,
                     default: () => 'Sk',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
@@ -466,8 +547,8 @@
                     {
                       type: 'input',
                       name: 'indexName',
-                      message: 'インデックス名を入力',
-                      default: () => f.apiName,
+                      message: y.services.common.inquirer.indexName,
+                      default: () => g.apiName,
                       filter: (e) => e.replace(/\s+/g, ''),
                       transformer: (e) => e.replace(/\s+/g, ''),
                       validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
@@ -480,13 +561,164 @@
               }
               return { before: '{}', after: '{}' };
             },
-            S = await (async () => {
-              if (y) {
+            $ = await (async () => {
+              if (S) {
                 const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
                   {
                     type: 'input',
                     name: 'lambdaFunctionName',
-                    message: 'Lambda関数名を入力',
+                    message: y.services.common.inquirer.lambdaFunctionName,
+                    default: () => g.apiName,
+                    filter: (e) => e.replace(/\s+/g, ''),
+                    transformer: (e) => e.replace(/\s+/g, ''),
+                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
+                  },
+                  {
+                    type: 'input',
+                    name: 'lambdaHandler',
+                    message: y.services.common.inquirer.lambdaHandler,
+                    default: () => `src/functions/appsync/${g.apiName}.handler`,
+                    validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
+                    transformer: (e) => new o.default(e).removeAllSpace().value(),
+                    filter: (e) => new l.default(e).removeAllSpace().value(),
+                  },
+                ]);
+                r.addFunction({ lambdaFunctionName: e, lambdaHandler: s, code: u.default.templates.typescript.skeleton });
+                const c = {
+                  type: 'AWS_LAMBDA',
+                  name: e,
+                  description: `It is for ${g.apiType}.${g.apiName}`,
+                  config: {
+                    functionName: { Ref: `${e}LambdaFunction` },
+                    lambdaFunctionArn: { 'Fn::GetAtt': [`${e}LambdaFunction`, 'Arn'] },
+                    serviceRoleArn: { 'Fn::GetAtt': [t.appSyncLambdaRoleName, 'Arn'] },
+                  },
+                };
+                return t.addIamRoleByDataSource({ dataSource: 'AWS_LAMBDA', sls: r }), t.addDataSource(c), c;
+              }
+              const { dataSource: e } = await n.default.prompt([
+                  {
+                    type: 'list',
+                    name: 'dataSource',
+                    choices: t.appSyncStack?.dataSources.map((e) => e.name),
+                    message: y.services.common.inquirer.dataSource,
+                    validate: (e) => new i.default(e, a).required().value(),
+                  },
+                ]),
+                s = t.appSyncStack?.dataSources.find((t) => t.name === e);
+              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), h.debug('finished dataSourceProcess'), s;
+            })(),
+            b = await (async (e) => {
+              const { dataSource: a } = e;
+              if ('UNIT' === g.resolverType) return Promise.resolve(void 0);
+              const r = t.appSyncStack?.functionConfigurationsLocation ?? './',
+                s = {
+                  dataSource: a.name,
+                  name: `${g.apiType}${p.default.upperFirst(g.apiName)}`,
+                  request: 'AWS_LAMBDA' !== a.type && `functions/${g.apiType}.${g.apiName}.request.vtl`,
+                  response: 'AWS_LAMBDA' !== a.type && `functions/${g.apiType}.${g.apiName}.response.vtl`,
+                };
+              if ('AWS_LAMBDA' !== a.type) {
+                const { before: e, after: t } = await _(a);
+                p.default.isString(s.request) && new u.default({ filePath: d.default.join(r, s.request), code: e, type: 'vtl' }).write(),
+                  p.default.isString(s.response) && new u.default({ filePath: d.default.join(r, s.response), code: t, type: 'vtl' }).write();
+              }
+              return t.addFunctionConfiguration({ functionConfiguration: s }), h.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
+            })({ dataSource: $ }),
+            w = await (async (e) => {
+              const { dataSource: a, functionConfigurations: r } = e,
+                s = await (async () => {
+                  if ('PIPELINE' === g.resolverType) {
+                    const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
+                      a = {
+                        type: g.apiType,
+                        request: `queries/${g.apiType}.${g.apiName}.request.vtl`,
+                        response: `queries/${g.apiType}.${g.apiName}.response.vtl`,
+                        field: g.apiName,
+                        kind: g.resolverType,
+                        functions: [r?.name],
+                      };
+                    return (
+                      new u.default({ filePath: d.default.join(e, a.request), code: u.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
+                      new u.default({ filePath: d.default.join(e, a.response), code: u.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
+                      a
+                    );
+                  }
+                  const e = {
+                    dataSource: a.name,
+                    type: g.apiType,
+                    field: g.apiName,
+                    kind: g.resolverType,
+                    request: 'AWS_LAMBDA' !== a.type && `queries/${g.apiType}.${g.apiName}.request.vtl`,
+                    response: 'AWS_LAMBDA' !== a.type && `queries/${g.apiType}.${g.apiName}.response.vtl`,
+                  };
+                  if ('AWS_LAMBDA' !== a.type) {
+                    const r = t.appSyncStack?.mappingTemplatesLocation ?? './',
+                      { before: s, after: n } = await _(a);
+                    p.default.isString(e.request) && new u.default({ filePath: d.default.join(r, e.request), code: s, type: 'vtl' }).write(),
+                      p.default.isString(e.response) && new u.default({ filePath: d.default.join(r, e.response), code: n, type: 'vtl' }).write();
+                  }
+                  return e;
+                })();
+              return t.addMappingTemplate({ mappingTemplate: s }), h.debug('finished mappingTemplateProcess'), s;
+            })({ dataSource: $, functionConfigurations: b }),
+            P = await (async () => {
+              const e = t.graphqlEditor,
+                a = t.graphqlEditor.addExampleType(g.apiName);
+              return (
+                t.updateCustomSchemaGraphl({ query: { apiName: g.apiName, type: a.getType(), args: { example: { type: m.GraphQLString } } } }),
+                h.debug('finished scheneGraphqlProcess'),
+                Promise.resolve(e.customSchema)
+              );
+            })();
+          h.debug({ dataSource: $, functionConfigurations: b, mappingTemplate: w, schemaGraphql: P });
+        };
+      },
+      6849: function (e, t, a) {
+        var r =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const s = r(a(6444)),
+          n = r(a(3290)),
+          i = r(a(7973)),
+          o = r(a(1092)),
+          l = r(a(5837)),
+          u = r(a(2056)),
+          c = a(6870),
+          d = r(a(1017)),
+          p = r(a(6517)),
+          m = a(8854);
+        t.default = async (e) => {
+          const { appSyncStackService: t, lang: a, slsConfig: r, info: f } = e,
+            g = s.default.getLogger();
+          g.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
+          const h = (0, m.getLocaleLang)(a),
+            y = async () => {
+              const { createDataSource: e } = await n.default.prompt([
+                {
+                  type: 'expand',
+                  name: 'createDataSource',
+                  message: h.services.common.inquirer.createDataSource,
+                  choices: [
+                    { key: 'y', name: 'yes', value: !0 },
+                    { key: 'n', name: 'no', value: !1 },
+                  ],
+                  validate: (e) => new i.default(e, a).required().value(),
+                },
+              ]);
+              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red(h.services.common.error.notFoundDataSource)), y()));
+            },
+            v = await y(),
+            S = await (async () => {
+              if (v) {
+                const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
+                  {
+                    type: 'input',
+                    name: 'lambdaFunctionName',
+                    message: h.services.common.inquirer.lambdaFunctionName,
                     default: () => f.apiName,
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
@@ -495,7 +727,7 @@
                   {
                     type: 'input',
                     name: 'lambdaHandler',
-                    message: 'input a lambda handler path',
+                    message: h.services.common.inquirer.lambdaHandler,
                     default: () => `src/functions/appsync/${f.apiName}.handler`,
                     validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
                     transformer: (e) => new o.default(e).removeAllSpace().value(),
@@ -520,39 +752,28 @@
                     type: 'list',
                     name: 'dataSource',
                     choices: t.appSyncStack?.dataSources.map((e) => e.name),
-                    message: 'データソースを選択',
+                    message: h.services.common.inquirer.dataSource,
                     validate: (e) => new i.default(e, a).required().value(),
                   },
                 ]),
                 s = t.appSyncStack?.dataSources.find((t) => t.name === e);
               return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), g.debug('finished dataSourceProcess'), s;
             })(),
-            $ = await (async (e) => {
+            _ = await ((e) => {
               const { dataSource: a } = e;
               if ('UNIT' === f.resolverType) return Promise.resolve(void 0);
-              const r = t.appSyncStack?.functionConfigurationsLocation ?? './',
-                s = {
-                  dataSource: a.name,
-                  name: `${f.apiType}${p.default.upperFirst(f.apiName)}`,
-                  request: 'AWS_LAMBDA' !== a.type && `functions/${f.apiType}.${f.apiName}.request.vtl`,
-                  response: 'AWS_LAMBDA' !== a.type && `functions/${f.apiType}.${f.apiName}.response.vtl`,
-                };
-              if ('AWS_LAMBDA' !== a.type) {
-                const { before: e, after: t } = await v(a);
-                p.default.isString(s.request) && new u.default({ filePath: d.default.join(r, s.request), code: e, type: 'vtl' }).write(),
-                  p.default.isString(s.response) && new u.default({ filePath: d.default.join(r, s.response), code: t, type: 'vtl' }).write();
-              }
-              return t.addFunctionConfiguration({ functionConfiguration: s }), g.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
+              const r = { dataSource: a.name, name: `${f.apiType}${p.default.upperFirst(f.apiName)}`, request: !1, response: !1 };
+              return t.addFunctionConfiguration({ functionConfiguration: r }), g.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
             })({ dataSource: S }),
-            _ = await (async (e) => {
+            $ = await (async (e) => {
               const { dataSource: a, functionConfigurations: r } = e,
-                s = await (async () => {
+                s = (() => {
                   if ('PIPELINE' === f.resolverType) {
                     const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
                       a = {
                         type: f.apiType,
-                        request: `queries/${f.apiType}.${f.apiName}.request.vtl`,
-                        response: `queries/${f.apiType}.${f.apiName}.response.vtl`,
+                        request: `mutations/${f.apiType}.${f.apiName}.request.vtl`,
+                        response: `mutations/${f.apiType}.${f.apiName}.response.vtl`,
                         field: f.apiName,
                         kind: f.resolverType,
                         functions: [r?.name],
@@ -563,159 +784,21 @@
                       a
                     );
                   }
-                  const e = {
-                    dataSource: a.name,
-                    type: f.apiType,
-                    field: f.apiName,
-                    kind: f.resolverType,
-                    request: 'AWS_LAMBDA' !== a.type && `queries/${f.apiType}.${f.apiName}.request.vtl`,
-                    response: 'AWS_LAMBDA' !== a.type && `queries/${f.apiType}.${f.apiName}.response.vtl`,
-                  };
-                  if ('AWS_LAMBDA' !== a.type) {
-                    const r = t.appSyncStack?.mappingTemplatesLocation ?? './',
-                      { before: s, after: n } = await v(a);
-                    p.default.isString(e.request) && new u.default({ filePath: d.default.join(r, e.request), code: s, type: 'vtl' }).write(),
-                      p.default.isString(e.response) && new u.default({ filePath: d.default.join(r, e.response), code: n, type: 'vtl' }).write();
-                  }
-                  return e;
+                  return { dataSource: a.name, type: f.apiType, field: f.apiName, kind: f.resolverType, request: !1, response: !1 };
                 })();
               return t.addMappingTemplate({ mappingTemplate: s }), g.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: S, functionConfigurations: $ }),
+            })({ dataSource: S, functionConfigurations: _ }),
             b = await (async () => {
               const e = t.graphqlEditor,
-                a = t.graphqlEditor.addExampleType(f.apiName);
+                a = t.graphqlEditor.addExampleType(f.apiName),
+                r = t.graphqlEditor.addExampleInput(f.apiName);
               return (
-                t.updateCustomSchemaGraphl({ query: { apiName: f.apiName, type: a.getType(), args: { example: { type: m.GraphQLString } } } }),
+                t.updateCustomSchemaGraphl({ mutation: { apiName: f.apiName, type: a.getType(), input: r.getType() } }),
                 g.debug('finished scheneGraphqlProcess'),
                 Promise.resolve(e.customSchema)
               );
             })();
-          g.debug({ dataSource: S, functionConfigurations: $, mappingTemplate: _, schemaGraphql: b });
-        };
-      },
-      6849: function (e, t, a) {
-        var r =
-          (this && this.__importDefault) ||
-          function (e) {
-            return e && e.__esModule ? e : { default: e };
-          };
-        Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6444)),
-          n = r(a(3290)),
-          i = r(a(7973)),
-          o = r(a(1092)),
-          l = r(a(5837)),
-          u = r(a(2056)),
-          c = a(6870),
-          d = r(a(1017)),
-          p = r(a(6517));
-        t.default = async (e) => {
-          const { appSyncStackService: t, lang: a, slsConfig: r, info: m } = e,
-            f = s.default.getLogger();
-          f.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const g = async () => {
-              const { createDataSource: e } = await n.default.prompt([
-                {
-                  type: 'expand',
-                  name: 'createDataSource',
-                  message: 'データソースを新しく作成しますか？',
-                  choices: [
-                    { key: 'y', name: 'yes', value: !0 },
-                    { key: 'n', name: 'no', value: !1 },
-                  ],
-                  validate: (e) => new i.default(e, a).required().value(),
-                },
-              ]);
-              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), g()));
-            },
-            h = await g(),
-            y = await (async () => {
-              if (h) {
-                const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
-                  {
-                    type: 'input',
-                    name: 'lambdaFunctionName',
-                    message: 'Lambda関数名を入力',
-                    default: () => m.apiName,
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                  },
-                  {
-                    type: 'input',
-                    name: 'lambdaHandler',
-                    message: 'input a lambda handler path',
-                    default: () => `src/functions/appsync/${m.apiName}.handler`,
-                    validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
-                    transformer: (e) => new o.default(e).removeAllSpace().value(),
-                    filter: (e) => new l.default(e).removeAllSpace().value(),
-                  },
-                ]);
-                r.addFunction({ lambdaFunctionName: e, lambdaHandler: s, code: u.default.templates.typescript.skeleton });
-                const c = {
-                  type: 'AWS_LAMBDA',
-                  name: e,
-                  description: `It is for ${m.apiType}.${m.apiName}`,
-                  config: {
-                    functionName: { Ref: `${e}LambdaFunction` },
-                    lambdaFunctionArn: { 'Fn::GetAtt': [`${e}LambdaFunction`, 'Arn'] },
-                    serviceRoleArn: { 'Fn::GetAtt': [t.appSyncLambdaRoleName, 'Arn'] },
-                  },
-                };
-                return t.addIamRoleByDataSource({ dataSource: 'AWS_LAMBDA', sls: r }), t.addDataSource(c), c;
-              }
-              const { dataSource: e } = await n.default.prompt([
-                  {
-                    type: 'list',
-                    name: 'dataSource',
-                    choices: t.appSyncStack?.dataSources.map((e) => e.name),
-                    message: 'データソースを選択',
-                    validate: (e) => new i.default(e, a).required().value(),
-                  },
-                ]),
-                s = t.appSyncStack?.dataSources.find((t) => t.name === e);
-              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), f.debug('finished dataSourceProcess'), s;
-            })(),
-            v = await ((e) => {
-              const { dataSource: a } = e;
-              if ('UNIT' === m.resolverType) return Promise.resolve(void 0);
-              const r = { dataSource: a.name, name: `${m.apiType}${p.default.upperFirst(m.apiName)}`, request: !1, response: !1 };
-              return t.addFunctionConfiguration({ functionConfiguration: r }), f.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
-            })({ dataSource: y }),
-            S = await (async (e) => {
-              const { dataSource: a, functionConfigurations: r } = e,
-                s = (() => {
-                  if ('PIPELINE' === m.resolverType) {
-                    const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
-                      a = {
-                        type: m.apiType,
-                        request: `mutations/${m.apiType}.${m.apiName}.request.vtl`,
-                        response: `mutations/${m.apiType}.${m.apiName}.response.vtl`,
-                        field: m.apiName,
-                        kind: m.resolverType,
-                        functions: [r?.name],
-                      };
-                    return (
-                      new u.default({ filePath: d.default.join(e, a.request), code: u.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
-                      new u.default({ filePath: d.default.join(e, a.response), code: u.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
-                      a
-                    );
-                  }
-                  return { dataSource: a.name, type: m.apiType, field: m.apiName, kind: m.resolverType, request: !1, response: !1 };
-                })();
-              return t.addMappingTemplate({ mappingTemplate: s }), f.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: y, functionConfigurations: v }),
-            $ = await (async () => {
-              const e = t.graphqlEditor,
-                a = t.graphqlEditor.addExampleType(m.apiName),
-                r = t.graphqlEditor.addExampleInput(m.apiName);
-              return (
-                t.updateCustomSchemaGraphl({ mutation: { apiName: m.apiName, type: a.getType(), input: r.getType() } }),
-                f.debug('finished scheneGraphqlProcess'),
-                Promise.resolve(e.customSchema)
-              );
-            })();
-          f.debug({ dataSource: y, functionConfigurations: v, mappingTemplate: S, schemaGraphql: $ });
+          g.debug({ dataSource: S, functionConfigurations: _, mappingTemplate: $, schemaGraphql: b });
         };
       },
       8391: function (e, t, a) {
@@ -734,17 +817,19 @@
           c = a(6870),
           d = r(a(1017)),
           p = r(a(6517)),
-          m = a(7343);
+          m = a(7343),
+          f = a(8854);
         t.default = async (e) => {
-          const { appSyncStackService: t, lang: a, slsConfig: r, info: f } = e,
-            g = s.default.getLogger();
-          g.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const h = async () => {
+          const { appSyncStackService: t, lang: a, slsConfig: r, info: g } = e,
+            h = s.default.getLogger();
+          h.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
+          const y = (0, f.getLocaleLang)(a),
+            v = async () => {
               const { createDataSource: e } = await n.default.prompt([
                 {
                   type: 'expand',
                   name: 'createDataSource',
-                  message: 'データソースを新しく作成しますか？',
+                  message: y.services.common.inquirer.createDataSource,
                   choices: [
                     { key: 'y', name: 'yes', value: !0 },
                     { key: 'n', name: 'no', value: !1 },
@@ -752,10 +837,10 @@
                   validate: (e) => new i.default(e, a).required().value(),
                 },
               ]);
-              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red('データソースが存在しません、データソースを作成する必要があります')), h()));
+              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red(y.services.common.error.notFoundDataSource)), v()));
             },
-            y = await h(),
-            v = async (e) => {
+            S = await v(),
+            _ = async (e) => {
               if ('AMAZON_DYNAMODB' === e.type) {
                 const {
                   template: e,
@@ -766,13 +851,13 @@
                     type: 'list',
                     name: 'template',
                     choices: ['query', 'queryWithGsi', 'scan'],
-                    message: 'テンプレートを選択',
+                    message: y.services.common.inquirer.template,
                     validate: (e) => new i.default(e, a).required().value(),
                   },
                   {
                     type: 'input',
                     name: 'primaryKeyName',
-                    message: 'プライマリーキー名を入力',
+                    message: y.services.common.inquirer.primaryKeyName,
                     default: () => 'Id',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
@@ -781,7 +866,7 @@
                   {
                     type: 'input',
                     name: 'sortKeyName',
-                    message: 'ソートキー名を入力',
+                    message: y.services.common.inquirer.sortKeyName,
                     default: () => 'Sk',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
@@ -795,7 +880,7 @@
                     {
                       type: 'input',
                       name: 'gsiName',
-                      message: 'GSI名を入力',
+                      message: y.services.generateQueryService.inquirer.gsiName,
                       default: () => 'ExampleIndex',
                       filter: (e) => e.replace(/\s+/g, ''),
                       transformer: (e) => e.replace(/\s+/g, ''),
@@ -814,8 +899,8 @@
                     {
                       type: 'input',
                       name: 'indexName',
-                      message: 'インデックス名を入力',
-                      default: () => f.apiName,
+                      message: y.services.common.inquirer.indexName,
+                      default: () => g.apiName,
                       filter: (e) => e.replace(/\s+/g, ''),
                       transformer: (e) => e.replace(/\s+/g, ''),
                       validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
@@ -828,14 +913,14 @@
               }
               return { before: '{}', after: '{}' };
             },
-            S = await (async () => {
-              if (y) {
+            $ = await (async () => {
+              if (S) {
                 const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
                   {
                     type: 'input',
                     name: 'lambdaFunctionName',
-                    message: 'Lambda関数名を入力',
-                    default: () => f.apiName,
+                    message: y.services.common.inquirer.lambdaFunctionName,
+                    default: () => g.apiName,
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
                     validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
@@ -843,8 +928,8 @@
                   {
                     type: 'input',
                     name: 'lambdaHandler',
-                    message: 'input a lambda handler path',
-                    default: () => `src/functions/appsync/${f.apiName}.handler`,
+                    message: y.services.common.inquirer.lambdaHandler,
+                    default: () => `src/functions/appsync/${g.apiName}.handler`,
                     validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
                     transformer: (e) => new o.default(e).removeAllSpace().value(),
                     filter: (e) => new l.default(e).removeAllSpace().value(),
@@ -854,7 +939,7 @@
                 const c = {
                   type: 'AWS_LAMBDA',
                   name: e,
-                  description: `It is for ${f.apiType}.${f.apiName}`,
+                  description: `It is for ${g.apiType}.${g.apiName}`,
                   config: {
                     functionName: { Ref: `${e}LambdaFunction` },
                     lambdaFunctionArn: { 'Fn::GetAtt': [`${e}LambdaFunction`, 'Arn'] },
@@ -868,41 +953,41 @@
                     type: 'list',
                     name: 'dataSource',
                     choices: t.appSyncStack?.dataSources.map((e) => e.name),
-                    message: 'データソースを選択',
+                    message: y.services.common.inquirer.dataSource,
                     validate: (e) => new i.default(e, a).required().value(),
                   },
                 ]),
                 s = t.appSyncStack?.dataSources.find((t) => t.name === e);
-              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), g.debug('finished dataSourceProcess'), s;
+              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), h.debug('finished dataSourceProcess'), s;
             })(),
-            $ = await (async (e) => {
+            b = await (async (e) => {
               const { dataSource: a } = e;
-              if ('UNIT' === f.resolverType) return Promise.resolve(void 0);
+              if ('UNIT' === g.resolverType) return Promise.resolve(void 0);
               const r = t.appSyncStack?.functionConfigurationsLocation ?? './',
                 s = {
                   dataSource: a.name,
-                  name: `${f.apiType}${p.default.upperFirst(f.apiName)}`,
-                  request: 'AWS_LAMBDA' !== a.type && `functions/${f.apiType}.${f.apiName}.request.vtl`,
-                  response: 'AWS_LAMBDA' !== a.type && `functions/${f.apiType}.${f.apiName}.response.vtl`,
+                  name: `${g.apiType}${p.default.upperFirst(g.apiName)}`,
+                  request: 'AWS_LAMBDA' !== a.type && `functions/${g.apiType}.${g.apiName}.request.vtl`,
+                  response: 'AWS_LAMBDA' !== a.type && `functions/${g.apiType}.${g.apiName}.response.vtl`,
                 };
               if ('AWS_LAMBDA' !== a.type) {
-                const { before: e, after: t } = await v(a);
+                const { before: e, after: t } = await _(a);
                 p.default.isString(s.request) && new u.default({ filePath: d.default.join(r, s.request), code: e, type: 'vtl' }).write(),
                   p.default.isString(s.response) && new u.default({ filePath: d.default.join(r, s.response), code: t, type: 'vtl' }).write();
               }
-              return t.addFunctionConfiguration({ functionConfiguration: s }), g.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
-            })({ dataSource: S }),
-            _ = await (async (e) => {
+              return t.addFunctionConfiguration({ functionConfiguration: s }), h.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
+            })({ dataSource: $ }),
+            w = await (async (e) => {
               const { dataSource: a, functionConfigurations: r } = e,
                 s = await (async () => {
-                  if ('PIPELINE' === f.resolverType) {
+                  if ('PIPELINE' === g.resolverType) {
                     const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
                       a = {
-                        type: f.apiType,
-                        request: `queries/${f.apiType}.${f.apiName}.request.vtl`,
-                        response: `queries/${f.apiType}.${f.apiName}.response.vtl`,
-                        field: f.apiName,
-                        kind: f.resolverType,
+                        type: g.apiType,
+                        request: `queries/${g.apiType}.${g.apiName}.request.vtl`,
+                        response: `queries/${g.apiType}.${g.apiName}.response.vtl`,
+                        field: g.apiName,
+                        kind: g.resolverType,
                         functions: [r?.name],
                       };
                     return (
@@ -913,33 +998,44 @@
                   }
                   const e = {
                     dataSource: a.name,
-                    type: f.apiType,
-                    field: f.apiName,
-                    kind: f.resolverType,
-                    request: 'AWS_LAMBDA' !== a.type && `queries/${f.apiType}.${f.apiName}.request.vtl`,
-                    response: 'AWS_LAMBDA' !== a.type && `queries/${f.apiType}.${f.apiName}.response.vtl`,
+                    type: g.apiType,
+                    field: g.apiName,
+                    kind: g.resolverType,
+                    request: 'AWS_LAMBDA' !== a.type && `queries/${g.apiType}.${g.apiName}.request.vtl`,
+                    response: 'AWS_LAMBDA' !== a.type && `queries/${g.apiType}.${g.apiName}.response.vtl`,
                   };
                   if ('AWS_LAMBDA' !== a.type) {
                     const r = t.appSyncStack?.mappingTemplatesLocation ?? './',
-                      { before: s, after: n } = await v(a);
+                      { before: s, after: n } = await _(a);
                     p.default.isString(e.request) && new u.default({ filePath: d.default.join(r, e.request), code: s, type: 'vtl' }).write(),
                       p.default.isString(e.response) && new u.default({ filePath: d.default.join(r, e.response), code: n, type: 'vtl' }).write();
                   }
                   return e;
                 })();
-              return t.addMappingTemplate({ mappingTemplate: s }), g.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: S, functionConfigurations: $ }),
-            b = await (async () => {
+              return t.addMappingTemplate({ mappingTemplate: s }), h.debug('finished mappingTemplateProcess'), s;
+            })({ dataSource: $, functionConfigurations: b }),
+            P = await (async () => {
               const e = t.graphqlEditor,
-                a = t.graphqlEditor.addExampleType(f.apiName);
+                a = t.graphqlEditor.addExampleType(g.apiName);
               return (
-                t.updateCustomSchemaGraphl({ query: { apiName: f.apiName, type: a.getType(), args: { example: { type: m.GraphQLString } } } }),
-                g.debug('finished scheneGraphqlProcess'),
+                t.updateCustomSchemaGraphl({ query: { apiName: g.apiName, type: a.getType(), args: { example: { type: m.GraphQLString } } } }),
+                h.debug('finished scheneGraphqlProcess'),
                 Promise.resolve(e.customSchema)
               );
             })();
-          g.debug({ dataSource: S, functionConfigurations: $, mappingTemplate: _, schemaGraphql: b });
+          h.debug({ dataSource: $, functionConfigurations: b, mappingTemplate: w, schemaGraphql: P });
         };
+      },
+      8854: function (e, t, a) {
+        var r =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
+        const s = r(a(3957)),
+          n = r(a(4538));
+        t.getLocaleLang = (e) => ('ja' === e ? s.default : n.default);
       },
       3582: (e, t, a) => {
         Object.defineProperty(t, '__esModule', { value: !0 });
@@ -1199,8 +1295,8 @@
           y = n(a(9087)),
           v = n(a(6324)),
           S = n(a(5862)),
-          $ = n(a(2e3)),
-          _ = i(a(1325));
+          _ = n(a(2e3)),
+          $ = i(a(1325));
         class b extends l.FeatureHandlerAbstract {
           constructor(e) {
             super(e);
@@ -1220,7 +1316,7 @@
                     ? r.addSubscription(new v.EmailSubscription('****@****.com'))
                     : 'lambda' === t
                     ? r.addSubscription(
-                        new v.LambdaSubscription(S.Function.fromFunctionArn(a, `${e}Lambda`, `arn:aws:lambda:${this.argv.region}:${$.Fn.ref('AWS::AccountId')}:function:*****`))
+                        new v.LambdaSubscription(S.Function.fromFunctionArn(a, `${e}Lambda`, `arn:aws:lambda:${this.argv.region}:${_.Fn.ref('AWS::AccountId')}:function:*****`))
                       )
                     : 'sms' === t
                     ? r.addSubscription(new v.SmsSubscription('0000000000'))
@@ -1278,7 +1374,7 @@
                 }));
             e.debug(`input values : ${JSON.stringify(a)}}`);
             const { resourceName: r, filePath: s, subscriptions: n, serverlessConfigPath: i } = a,
-              l = new _.default({ region: this.argv.region, serverlessConfigPath: i, lang: this.lang }),
+              l = new $.default({ region: this.argv.region, serverlessConfigPath: i, lang: this.lang }),
               g = this.generateSnsCf(r, n);
             l.addResource({ filePath: s, resourceName: r, cf: g });
           }
@@ -3133,8 +3229,8 @@
             prettifyMessage: y,
             prettifyMetadata: v,
             prettifyObject: S,
-            prettifyTime: $,
-            buildSafeSonicBoom: _,
+            prettifyTime: _,
+            buildSafeSonicBoom: $,
             filterLog: b,
             handleCustomlevelsOpts: w,
             handleCustomlevelNamesOpts: P,
@@ -3168,7 +3264,7 @@
             include: void 0,
             singleLine: !1,
           };
-        function A(e) {
+        function N(e) {
           const t = Object.assign({}, x, e),
             a = t.crlf ? '\r\n' : '\n',
             r = '    ',
@@ -3179,27 +3275,27 @@
             u = t.messageFormat,
             c = t.timestampKey,
             d = t.errorLikeObjectKeys,
-            _ = t.errorProps.split(','),
-            A = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
-            N = w(t.customLevels),
-            L = P(t.customLevels),
-            k = t.customColors
+            $ = t.errorProps.split(','),
+            N = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
+            A = w(t.customLevels),
+            q = P(t.customLevels),
+            L = t.customColors
               ? t.customColors.split(',').reduce((e, a) => {
                   const [r, s] = a.split(':'),
-                    n = (A ? t.customLevels : void 0 !== L[r]) ? L[r] : m[r],
+                    n = (N ? t.customLevels : void 0 !== q[r]) ? q[r] : m[r],
                     i = void 0 !== n ? n : r;
                   return e.push([i, s]), e;
                 }, [])
               : void 0,
-            q = { customLevels: N, customLevelNames: L };
-          A && !t.customLevels && ((q.customLevels = void 0), (q.customLevelNames = void 0));
+            k = { customLevels: A, customLevelNames: q };
+          N && !t.customLevels && ((k.customLevels = void 0), (k.customLevelNames = void 0));
           const C = t.customPrettifiers,
             R = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
             O = !R && t.ignore ? new Set(t.ignore.split(',')) : void 0,
             M = t.hideObject,
-            j = t.singleLine,
-            D = l(t.colorize, k, A),
-            F = t.colorizeObjects ? D : l(!1, [], !1);
+            D = t.singleLine,
+            j = l(t.colorize, L, N),
+            F = t.colorizeObjects ? j : l(!1, [], !1);
           return function (e) {
             let l;
             if (f(e)) l = e;
@@ -3209,37 +3305,37 @@
               l = t.value;
             }
             if (o) {
-              const e = ((A ? t.customLevels : void 0 !== L[o]) ? L[o] : m[o]) || Number(o);
+              const e = ((N ? t.customLevels : void 0 !== q[o]) ? q[o] : m[o]) || Number(o);
               if (l[void 0 === n ? p : n] < e) return;
             }
-            const w = y({ log: l, messageKey: s, colorizer: D, messageFormat: u, levelLabel: i, ...q, useOnlyCustomProps: A });
+            const w = y({ log: l, messageKey: s, colorizer: j, messageFormat: u, levelLabel: i, ...k, useOnlyCustomProps: N });
             (O || R) && (l = b({ log: l, ignoreKeys: O, includeKeys: R }));
-            const P = h({ log: l, colorizer: D, levelKey: n, prettifier: C.level, ...q }),
+            const P = h({ log: l, colorizer: j, levelKey: n, prettifier: C.level, ...k }),
               x = v({ log: l, prettifiers: C }),
-              N = $({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: C.time });
-            let k = '';
+              A = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: C.time });
+            let L = '';
             if (
-              (t.levelFirst && P && (k = `${P}`),
-              N && '' === k ? (k = `${N}`) : N && (k = `${k} ${N}`),
-              !t.levelFirst && P && (k = k.length > 0 ? `${k} ${P}` : P),
-              x && (k = k.length > 0 ? `${k} ${x}:` : x),
-              !1 === k.endsWith(':') && '' !== k && (k += ':'),
-              w && (k = k.length > 0 ? `${k} ${w}` : w),
-              k.length > 0 && !j && (k += a),
+              (t.levelFirst && P && (L = `${P}`),
+              A && '' === L ? (L = `${A}`) : A && (L = `${L} ${A}`),
+              !t.levelFirst && P && (L = L.length > 0 ? `${L} ${P}` : P),
+              x && (L = L.length > 0 ? `${L} ${x}:` : x),
+              !1 === L.endsWith(':') && '' !== L && (L += ':'),
+              w && (L = L.length > 0 ? `${L} ${w}` : w),
+              L.length > 0 && !D && (L += a),
               'Error' === l.type && l.stack)
             ) {
-              const e = g({ log: l, errorLikeKeys: d, errorProperties: _, ident: r, eol: a });
-              j && (k += a), (k += e);
+              const e = g({ log: l, errorLikeKeys: d, errorProperties: $, ident: r, eol: a });
+              D && (L += a), (L += e);
             } else if (!M) {
               const e = [s, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = S({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: d, eol: a, ident: r, singleLine: j, colorizer: F });
-              j && !/^\s$/.test(t) && (k += ' '), (k += t);
+                t = S({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: d, eol: a, ident: r, singleLine: D, colorizer: F });
+              D && !/^\s$/.test(t) && (L += ' '), (L += t);
             }
-            return k;
+            return L;
           };
         }
-        function N(e = {}) {
-          const t = A(e);
+        function A(e = {}) {
+          const t = N(e);
           return i(
             function (a) {
               const r = new n({
@@ -3254,7 +3350,7 @@
                 (i =
                   'object' == typeof e.destination && 'function' == typeof e.destination.write
                     ? e.destination
-                    : _({ dest: e.destination || 1, append: e.append, mkdir: e.mkdir, sync: e.sync })),
+                    : $({ dest: e.destination || 1, append: e.append, mkdir: e.mkdir, sync: e.sync })),
                 a.on('unknown', function (e) {
                   i.write(e + '\n');
                 }),
@@ -3265,7 +3361,7 @@
             { parse: 'lines' }
           );
         }
-        (e.exports = N), (e.exports.prettyFactory = A), (e.exports.colorizerFactory = l), (e.exports.default = N);
+        (e.exports = A), (e.exports.prettyFactory = N), (e.exports.colorizerFactory = l), (e.exports.default = A);
       },
       903: (e, t, a) => {
         const { LEVELS: r, LEVEL_NAMES: s } = a(7318),
@@ -3345,19 +3441,19 @@
           v = r({});
         function S(e, t = !1) {
           if (!1 === t) return e;
-          const a = $(e);
-          if (!_(a)) return e;
+          const a = _(e);
+          if (!$(a)) return e;
           if (!0 === t) return s(a, y);
           const r = t.toUpperCase();
           if ('SYS:STANDARD' === r) return s(a, u);
           const n = r.substr(0, 4);
           return s(a, 'SYS:' === n || 'UTC:' === n ? ('UTC:' === n ? t : t.slice(4)) : `UTC:${t}`);
         }
-        function $(e) {
-          let t = new Date(e);
-          return _(t) || (t = new Date(+e)), t;
-        }
         function _(e) {
+          let t = new Date(e);
+          return $(t) || (t = new Date(+e)), t;
+        }
+        function $(e) {
           return e instanceof Date && !Number.isNaN(e.getTime());
         }
         function b(e) {
@@ -3437,7 +3533,7 @@
           }
           return r.length && t.push(r), t;
         }
-        function A(e, t) {
+        function N(e, t) {
           const a = Array.isArray(t) ? t : x(t);
           for (const t of a) {
             if (!Object.prototype.hasOwnProperty.call(e, t)) return;
@@ -3445,13 +3541,13 @@
           }
           return e;
         }
-        function N(e, t) {
+        function A(e, t) {
           const a = x(t),
             r = a.pop();
-          null !== (e = A(e, a)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, r) && delete e[r];
+          null !== (e = N(e, a)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, r) && delete e[r];
         }
-        function L() {}
-        function k(e, t) {
+        function q() {}
+        function L(e, t) {
           e.destroyed ||
             ('beforeExit' === t
               ? (e.flush(),
@@ -3477,7 +3573,7 @@
             return i;
           },
           prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: a = p, prettifier: r, customLevels: s, customLevelNames: n }) {
-            const i = A(e, a);
+            const i = N(e, a);
             return void 0 === i ? void 0 : r ? r(i) : t(i, { customLevels: s, customLevelNames: n });
           },
           prettifyMessage: function ({
@@ -3493,7 +3589,7 @@
             if (t && 'string' == typeof t) {
               const a = String(t).replace(/{([^{}]+)}/g, function (t, a) {
                 let r;
-                return a === s && void 0 !== (r = A(e, n)) ? ((o ? void 0 === i : void 0 === i[r]) ? h[r] : i[r]) : A(e, a) || '';
+                return a === s && void 0 !== (r = N(e, n)) ? ((o ? void 0 === i : void 0 === i[r]) ? h[r] : i[r]) : N(e, a) || '';
               });
               return r.message(a);
             }
@@ -3525,7 +3621,7 @@
             const t = new n(e);
             return (
               t.on('error', function e(a) {
-                if ('EPIPE' === a.code) return (t.write = L), (t.end = L), (t.flushSync = L), void (t.destroy = L);
+                if ('EPIPE' === a.code) return (t.write = q), (t.end = q), (t.flushSync = q), void (t.destroy = q);
                 t.removeListener('error', e);
               }),
               !e.sync &&
@@ -3533,7 +3629,7 @@
                 (function (e) {
                   if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
                     const t = a(2067);
-                    t.register(e, k),
+                    t.register(e, L),
                       e.on('close', function () {
                         t.unregister(e);
                       });
@@ -3555,7 +3651,7 @@
             }
             return (
               t.forEach((e) => {
-                N(r, e);
+                A(r, e);
               }),
               r
             );
@@ -3592,16 +3688,16 @@
             formatTime: S,
             joinLinesWithIndentation: w,
             prettifyError: E,
-            getPropertyValue: A,
-            deleteLogProperty: N,
+            getPropertyValue: N,
+            deleteLogProperty: A,
             splitPropertyKey: x,
-            createDate: $,
-            isValidDate: _,
+            createDate: _,
+            isValidDate: $,
           });
       },
       4147: (e) => {
         e.exports = JSON.parse(
-          '{"name":"ragate-cli","version":"0.1.3","description":"Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.","engines":{"node":">=18.x"},"scripts":{"test":"echo \'Sorry, test code is in preparation.\\n\'","build:dev":"ENV=development webpack","build:prd":"ENV=production webpack","lint":"eslint . --fix","format":"prettier . --write","prepare":"husky install"},"eslintIgnore":["!/.github",".serverless","bin","tmp","webpack.config.js"],"main":"./lib/app.ts","bin":{"ragate":"./bin/app.js"},"repository":{"type":"git","url":"git+https://github.com/ragate-inc/ragate-cli.git"},"lint-staged":{"*.{ts,js}":["eslint"],"*.{css,html,js,json,md,yaml,yml,ts,js}":["prettier . --write"]},"keywords":["aws","serverless","ragate","cli","amplify","serverless","lambda","amazon"],"author":"Ragate inc.","license":"MIT","bugs":{"url":"https://github.com/ragate-inc/ragate-cli/issues"},"homepage":"https://github.com/ragate-inc/ragate-cli#readme","devDependencies":{"@tsconfig/node-lts":"^18.12.1","@types/figlet":"^1.5.6","@types/fs-extra":"^11.0.1","@types/inquirer":"^9.0.3","@types/inquirer-autocomplete-prompt":"^3.0.0","@types/js-yaml":"^4.0.5","@types/lodash":"^4.14.194","@types/node":"^18.16.3","@types/webpack":"^5.28.1","@types/webpack-node-externals":"^3.0.0","@types/yargs":"^17.0.24","@typescript-eslint/eslint-plugin":"^5.59.2","@typescript-eslint/parser":"^5.59.2","eslint":"^8.39.0","eslint-config-prettier":"^8.8.0","eslint-config-standard-with-typescript":"^34.0.1","husky":"^6.0.0","lint-staged":"^13.2.2","prettier":"2.8.8","ts-loader":"^9.4.2","ts-node":"^10.9.1","tsconfig-paths-webpack-plugin":"^4.0.1","typescript":"^5.0.4","webpack":"^5.81.0","webpack-cli":"^5.0.2","webpack-node-externals":"^3.0.0"},"dependencies":{"@aws-cdk/assert":"^2.68.0","@aws-cdk/aws-iam":"^1.201.0","@aws-cdk/aws-sns":"^1.201.0","@aws-cdk/aws-sns-subscriptions":"^1.201.0","@aws-cdk/aws-sqs":"^1.201.0","aws-cdk-lib":"^2.79.1","figlet":"^1.6.0","fs-extra":"^11.1.1","graphql":"^16.6.0","graphql-compose":"^9.0.10","graphql-tools":"^8.3.20","inquirer":"^8.0.0","inquirer-autocomplete-prompt":"^2.0.0","isomorphic-git":"^1.23.0","js-yaml":"^4.1.0","lodash":"^4.17.21","parent-require":"^1.0.0","pino":"^8.12.1","pino-pretty":"^10.0.0","yaml-cfn":"^0.3.2","yargonaut":"^1.1.4","yargs":"^17.1.1-candidate.0"}}'
+          '{"name":"ragate-cli","version":"0.2.0","description":"Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.","engines":{"node":">=18.x"},"scripts":{"test":"echo \'Sorry, test code is in preparation.\\n\'","build:dev":"ENV=development webpack","build:prd":"ENV=production webpack","lint":"eslint . --fix","format":"prettier . --write","prepare":"husky install"},"eslintIgnore":["!/.github",".serverless","bin","tmp","webpack.config.js"],"main":"./lib/app.ts","bin":{"ragate":"./bin/app.js"},"repository":{"type":"git","url":"git+https://github.com/ragate-inc/ragate-cli.git"},"lint-staged":{"*.{ts,js}":["eslint"],"*.{css,html,js,json,md,yaml,yml,ts,js}":["prettier . --write"]},"keywords":["aws","serverless","ragate","cli","amplify","serverless","lambda","amazon"],"author":"Ragate inc.","license":"MIT","bugs":{"url":"https://github.com/ragate-inc/ragate-cli/issues"},"homepage":"https://github.com/ragate-inc/ragate-cli#readme","devDependencies":{"@tsconfig/node-lts":"^18.12.1","@types/figlet":"^1.5.6","@types/fs-extra":"^11.0.1","@types/inquirer":"^9.0.3","@types/inquirer-autocomplete-prompt":"^3.0.0","@types/js-yaml":"^4.0.5","@types/lodash":"^4.14.194","@types/node":"^18.16.3","@types/webpack":"^5.28.1","@types/webpack-node-externals":"^3.0.0","@types/yargs":"^17.0.24","@typescript-eslint/eslint-plugin":"^5.59.2","@typescript-eslint/parser":"^5.59.2","eslint":"^8.39.0","eslint-config-prettier":"^8.8.0","eslint-config-standard-with-typescript":"^34.0.1","husky":"^6.0.0","lint-staged":"^13.2.2","prettier":"2.8.8","ts-loader":"^9.4.2","ts-node":"^10.9.1","tsconfig-paths-webpack-plugin":"^4.0.1","typescript":"^5.0.4","webpack":"^5.81.0","webpack-cli":"^5.0.2","webpack-node-externals":"^3.0.0"},"dependencies":{"@aws-cdk/assert":"^2.68.0","@aws-cdk/aws-iam":"^1.201.0","@aws-cdk/aws-sns":"^1.201.0","@aws-cdk/aws-sns-subscriptions":"^1.201.0","@aws-cdk/aws-sqs":"^1.201.0","aws-cdk-lib":"^2.79.1","figlet":"^1.6.0","fs-extra":"^11.1.1","graphql":"^16.6.0","graphql-compose":"^9.0.10","graphql-tools":"^8.3.20","inquirer":"^8.0.0","inquirer-autocomplete-prompt":"^2.0.0","isomorphic-git":"^1.23.0","js-yaml":"^4.1.0","lodash":"^4.17.21","parent-require":"^1.0.0","pino":"^8.12.1","pino-pretty":"^10.0.0","yaml-cfn":"^0.3.2","yargonaut":"^1.1.4","yargs":"^17.1.1-candidate.0"}}'
         );
       },
     },

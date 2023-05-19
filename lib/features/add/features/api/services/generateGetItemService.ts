@@ -13,10 +13,12 @@ import { AppSyncFunctionConfiguration } from 'types/index';
 import path from 'path';
 import _ from 'lodash';
 import { GraphQLString } from 'graphql';
+import { getLocaleLang } from 'features/add/features/api/utils/getLocale';
 
 export default async (args: { appSyncStackService: AppSyncStackService; lang: string; slsConfig: ServerlessConfigService; info: Type.PromptApiInfo }): Promise<void> => {
   const { appSyncStackService, lang, slsConfig, info } = args;
   const logger = Logger.getLogger();
+  const locale = getLocaleLang(lang);
   logger.debug(`appsyncStack : ${JSON.stringify(appSyncStackService.appSyncStack)}`);
 
   const isCreateDataSource = async (): Promise<boolean> => {
@@ -24,7 +26,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
       {
         type: 'expand',
         name: 'createDataSource',
-        message: 'データソースを新しく作成しますか？',
+        message: locale.services.common.inquirer.createDataSource,
         choices: [
           {
             key: 'y',
@@ -43,7 +45,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
     if (createDataSource) {
       return createDataSource;
     } else if (appSyncStackService.appSyncStack?.dataSources.length === 0) {
-      console.log(chalk.red('データソースが存在しません、データソースを作成する必要があります'));
+      console.log(chalk.red(locale.services.common.error.notFoundDataSource));
       return isCreateDataSource();
     } else {
       return false;
@@ -58,7 +60,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
         {
           type: 'input',
           name: 'lambdaFunctionName',
-          message: 'Lambda関数名を入力',
+          message: locale.services.common.inquirer.lambdaFunctionName,
           default: () => info.apiName,
           filter: (input: string) => input.replace(/\s+/g, ''),
           transformer: (input: string) => input.replace(/\s+/g, ''),
@@ -67,7 +69,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
         {
           type: 'input',
           name: 'lambdaHandler',
-          message: 'input a lambda handler path',
+          message: locale.services.common.inquirer.lambdaHandler,
           default: () => `src/functions/appsync/${info.apiName}.handler`,
           validate: (value: string) => new Validator(value, lang).required().mustBeExtension().value(),
           transformer: (input: string) => new Transformer(input).removeAllSpace().value(),
@@ -101,7 +103,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
         type: 'list',
         name: 'dataSource',
         choices: appSyncStackService.appSyncStack?.dataSources.map((d) => d.name),
-        message: 'データソースを選択',
+        message: locale.services.common.inquirer.dataSource,
         validate: (value: string) => new Validator(value, lang).required().value(),
       },
     ])) as { dataSource: string };
@@ -121,13 +123,13 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
           type: 'list',
           name: 'template',
           choices: ['getItem', 'getItemConsistentRead', 'localResolver'],
-          message: 'テンプレートを選択',
+          message: locale.services.common.inquirer.template,
           validate: (value: string) => new Validator(value, lang).required().value(),
         },
         {
           type: 'input',
           name: 'primaryKeyName',
-          message: 'プライマリーキー名を入力',
+          message: locale.services.common.inquirer.primaryKeyName,
           default: () => 'Id',
           filter: (input: string) => input.replace(/\s+/g, ''),
           transformer: (input: string) => input.replace(/\s+/g, ''),
@@ -136,7 +138,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
         {
           type: 'input',
           name: 'sortKeyName',
-          message: 'ソートキー名を入力',
+          message: locale.services.common.inquirer.sortKeyName,
           default: () => 'Sk',
           filter: (input: string) => input.replace(/\s+/g, ''),
           transformer: (input: string) => input.replace(/\s+/g, ''),
@@ -166,7 +168,7 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
         {
           type: 'input',
           name: 'indexName',
-          message: 'インデックス名を入力',
+          message: locale.services.common.inquirer.indexName,
           default: () => info.apiName,
           filter: (input: string) => input.replace(/\s+/g, ''),
           transformer: (input: string) => input.replace(/\s+/g, ''),
