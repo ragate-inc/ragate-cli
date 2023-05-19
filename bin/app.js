@@ -468,36 +468,19 @@
         const s = r(a(6444)),
           n = r(a(3290)),
           i = r(a(7973)),
-          o = r(a(1092)),
-          l = r(a(5837)),
-          u = r(a(2056)),
-          c = a(6870),
-          d = r(a(1017)),
-          p = r(a(6517)),
-          m = a(7343),
-          f = a(8854);
+          o = r(a(2056)),
+          l = r(a(1017)),
+          u = r(a(6517)),
+          c = a(7343),
+          d = a(8854),
+          p = a(6134);
         t.default = async (e) => {
-          const { appSyncStackService: t, lang: a, slsConfig: r, info: g } = e,
-            h = s.default.getLogger(),
-            y = (0, f.getLocaleLang)(a);
-          h.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const v = async () => {
-              const { createDataSource: e } = await n.default.prompt([
-                {
-                  type: 'expand',
-                  name: 'createDataSource',
-                  message: y.services.common.inquirer.createDataSource,
-                  choices: [
-                    { key: 'y', name: 'yes', value: !0 },
-                    { key: 'n', name: 'no', value: !1 },
-                  ],
-                  validate: (e) => new i.default(e, a).required().value(),
-                },
-              ]);
-              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red(y.services.common.error.notFoundDataSource)), v()));
-            },
-            S = await v(),
-            _ = async (e) => {
+          const { appSyncStackService: t, lang: a, slsConfig: r, info: m } = e,
+            f = s.default.getLogger(),
+            g = (0, d.getLocaleLang)(a);
+          f.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
+          const h = await (0, p.isCreateDataSource)({ lang: a, dataSource: t.appSyncStack?.dataSources ?? [] }),
+            y = async (e) => {
               if ('AMAZON_DYNAMODB' === e.type) {
                 const {
                   template: e,
@@ -508,13 +491,13 @@
                     type: 'list',
                     name: 'template',
                     choices: ['getItem', 'getItemConsistentRead', 'localResolver'],
-                    message: y.services.common.inquirer.template,
+                    message: g.services.common.inquirer.template,
                     validate: (e) => new i.default(e, a).required().value(),
                   },
                   {
                     type: 'input',
                     name: 'primaryKeyName',
-                    message: y.services.common.inquirer.primaryKeyName,
+                    message: g.services.common.inquirer.primaryKeyName,
                     default: () => 'Id',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
@@ -523,7 +506,7 @@
                   {
                     type: 'input',
                     name: 'sortKeyName',
-                    message: y.services.common.inquirer.sortKeyName,
+                    message: g.services.common.inquirer.sortKeyName,
                     default: () => 'Sk',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
@@ -532,146 +515,103 @@
                 ]);
                 if ('getItem' === e)
                   return {
-                    before: u.default.templates.vtl.dynamoGetItemRequest({ consistentRead: !1, primaryKeyName: t, sortKeyName: r }),
-                    after: u.default.templates.vtl.dynamoGetItemResponse,
+                    before: o.default.templates.vtl.dynamoGetItemRequest({ consistentRead: !1, primaryKeyName: t, sortKeyName: r }),
+                    after: o.default.templates.vtl.dynamoGetItemResponse,
                   };
                 if ('getItemConsistentRead' === e)
                   return {
-                    before: u.default.templates.vtl.dynamoGetItemRequest({ consistentRead: !0, primaryKeyName: t, sortKeyName: r }),
-                    after: u.default.templates.vtl.dynamoGetItemResponse,
+                    before: o.default.templates.vtl.dynamoGetItemRequest({ consistentRead: !0, primaryKeyName: t, sortKeyName: r }),
+                    after: o.default.templates.vtl.dynamoGetItemResponse,
                   };
-                if ('localResolver' === e) return { before: u.default.templates.vtl.localResolverRequest, after: u.default.templates.vtl.localResolverResponse };
+                if ('localResolver' === e) return { before: o.default.templates.vtl.localResolverRequest, after: o.default.templates.vtl.localResolverResponse };
               } else {
                 if ('AMAZON_ELASTICSEARCH' === e.type) {
                   const { indexName: e } = await n.default.prompt([
                     {
                       type: 'input',
                       name: 'indexName',
-                      message: y.services.common.inquirer.indexName,
-                      default: () => g.apiName,
+                      message: g.services.common.inquirer.indexName,
+                      default: () => m.apiName,
                       filter: (e) => e.replace(/\s+/g, ''),
                       transformer: (e) => e.replace(/\s+/g, ''),
                       validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
                     },
                   ]);
-                  return { before: u.default.templates.vtl.openSearchQueryRequest({ indexName: e }), after: u.default.templates.vtl.openSearchQueryResponse };
+                  return { before: o.default.templates.vtl.openSearchQueryRequest({ indexName: e }), after: o.default.templates.vtl.openSearchQueryResponse };
                 }
-                if ('RELATIONAL_DATABASE' === e.type) return { before: u.default.templates.vtl.rdbQueryRequest, after: u.default.templates.vtl.rdbQueryResponse };
-                if ('HTTP' === e.type) return { before: u.default.templates.vtl.httpQueryRequest, after: u.default.templates.vtl.httpQueryResponse };
+                if ('RELATIONAL_DATABASE' === e.type) return { before: o.default.templates.vtl.rdbQueryRequest, after: o.default.templates.vtl.rdbQueryResponse };
+                if ('HTTP' === e.type) return { before: o.default.templates.vtl.httpQueryRequest, after: o.default.templates.vtl.httpQueryResponse };
               }
               return { before: '{}', after: '{}' };
             },
-            $ = await (async () => {
-              if (S) {
-                const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
-                  {
-                    type: 'input',
-                    name: 'lambdaFunctionName',
-                    message: y.services.common.inquirer.lambdaFunctionName,
-                    default: () => g.apiName,
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                  },
-                  {
-                    type: 'input',
-                    name: 'lambdaHandler',
-                    message: y.services.common.inquirer.lambdaHandler,
-                    default: () => `src/functions/appsync/${g.apiName}.handler`,
-                    validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
-                    transformer: (e) => new o.default(e).removeAllSpace().value(),
-                    filter: (e) => new l.default(e).removeAllSpace().value(),
-                  },
-                ]);
-                r.addFunction({ lambdaFunctionName: e, lambdaHandler: s, code: u.default.templates.typescript.skeleton });
-                const c = {
-                  type: 'AWS_LAMBDA',
-                  name: e,
-                  description: `It is for ${g.apiType}.${g.apiName}`,
-                  config: {
-                    functionName: { Ref: `${e}LambdaFunction` },
-                    lambdaFunctionArn: { 'Fn::GetAtt': [`${e}LambdaFunction`, 'Arn'] },
-                    serviceRoleArn: { 'Fn::GetAtt': [t.appSyncLambdaRoleName, 'Arn'] },
-                  },
-                };
-                return t.addIamRoleByDataSource({ dataSource: 'AWS_LAMBDA', sls: r }), t.addDataSource(c), c;
-              }
-              const { dataSource: e } = await n.default.prompt([
-                  {
-                    type: 'list',
-                    name: 'dataSource',
-                    choices: t.appSyncStack?.dataSources.map((e) => e.name),
-                    message: y.services.common.inquirer.dataSource,
-                    validate: (e) => new i.default(e, a).required().value(),
-                  },
-                ]),
-                s = t.appSyncStack?.dataSources.find((t) => t.name === e);
-              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), h.debug('finished dataSourceProcess'), s;
-            })(),
-            b = await (async (e) => {
+            v = await (async () =>
+              h
+                ? await (0, p.addLambda)({ appSyncStackService: t, lang: a, slsConfig: r, info: m })
+                : await (0, p.selectDataSource)({ lang: a, appSyncStackService: t, slsConfig: r }))(),
+            S = await (async (e) => {
               const { dataSource: a } = e;
-              if ('UNIT' === g.resolverType) return Promise.resolve(void 0);
+              if ('UNIT' === m.resolverType) return Promise.resolve(void 0);
               const r = t.appSyncStack?.functionConfigurationsLocation ?? './',
                 s = {
                   dataSource: a.name,
-                  name: `${g.apiType}${p.default.upperFirst(g.apiName)}`,
-                  request: 'AWS_LAMBDA' !== a.type && `functions/${g.apiType}.${g.apiName}.request.vtl`,
-                  response: 'AWS_LAMBDA' !== a.type && `functions/${g.apiType}.${g.apiName}.response.vtl`,
+                  name: `${m.apiType}${u.default.upperFirst(m.apiName)}`,
+                  request: 'AWS_LAMBDA' !== a.type && `functions/${m.apiType}.${m.apiName}.request.vtl`,
+                  response: 'AWS_LAMBDA' !== a.type && `functions/${m.apiType}.${m.apiName}.response.vtl`,
                 };
               if ('AWS_LAMBDA' !== a.type) {
-                const { before: e, after: t } = await _(a);
-                p.default.isString(s.request) && new u.default({ filePath: d.default.join(r, s.request), code: e, type: 'vtl' }).write(),
-                  p.default.isString(s.response) && new u.default({ filePath: d.default.join(r, s.response), code: t, type: 'vtl' }).write();
+                const { before: e, after: t } = await y(a);
+                u.default.isString(s.request) && new o.default({ filePath: l.default.join(r, s.request), code: e, type: 'vtl' }).write(),
+                  u.default.isString(s.response) && new o.default({ filePath: l.default.join(r, s.response), code: t, type: 'vtl' }).write();
               }
-              return t.addFunctionConfiguration({ functionConfiguration: s }), h.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
-            })({ dataSource: $ }),
-            w = await (async (e) => {
+              return t.addFunctionConfiguration({ functionConfiguration: s }), f.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
+            })({ dataSource: v }),
+            _ = await (async (e) => {
               const { dataSource: a, functionConfigurations: r } = e,
                 s = await (async () => {
-                  if ('PIPELINE' === g.resolverType) {
+                  if ('PIPELINE' === m.resolverType) {
                     const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
                       a = {
-                        type: g.apiType,
-                        request: `queries/${g.apiType}.${g.apiName}.request.vtl`,
-                        response: `queries/${g.apiType}.${g.apiName}.response.vtl`,
-                        field: g.apiName,
-                        kind: g.resolverType,
+                        type: m.apiType,
+                        request: `queries/${m.apiType}.${m.apiName}.request.vtl`,
+                        response: `queries/${m.apiType}.${m.apiName}.response.vtl`,
+                        field: m.apiName,
+                        kind: m.resolverType,
                         functions: [r?.name],
                       };
                     return (
-                      new u.default({ filePath: d.default.join(e, a.request), code: u.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
-                      new u.default({ filePath: d.default.join(e, a.response), code: u.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
+                      new o.default({ filePath: l.default.join(e, a.request), code: o.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
+                      new o.default({ filePath: l.default.join(e, a.response), code: o.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
                       a
                     );
                   }
                   const e = {
                     dataSource: a.name,
-                    type: g.apiType,
-                    field: g.apiName,
-                    kind: g.resolverType,
-                    request: 'AWS_LAMBDA' !== a.type && `queries/${g.apiType}.${g.apiName}.request.vtl`,
-                    response: 'AWS_LAMBDA' !== a.type && `queries/${g.apiType}.${g.apiName}.response.vtl`,
+                    type: m.apiType,
+                    field: m.apiName,
+                    kind: m.resolverType,
+                    request: 'AWS_LAMBDA' !== a.type && `queries/${m.apiType}.${m.apiName}.request.vtl`,
+                    response: 'AWS_LAMBDA' !== a.type && `queries/${m.apiType}.${m.apiName}.response.vtl`,
                   };
                   if ('AWS_LAMBDA' !== a.type) {
                     const r = t.appSyncStack?.mappingTemplatesLocation ?? './',
-                      { before: s, after: n } = await _(a);
-                    p.default.isString(e.request) && new u.default({ filePath: d.default.join(r, e.request), code: s, type: 'vtl' }).write(),
-                      p.default.isString(e.response) && new u.default({ filePath: d.default.join(r, e.response), code: n, type: 'vtl' }).write();
+                      { before: s, after: n } = await y(a);
+                    u.default.isString(e.request) && new o.default({ filePath: l.default.join(r, e.request), code: s, type: 'vtl' }).write(),
+                      u.default.isString(e.response) && new o.default({ filePath: l.default.join(r, e.response), code: n, type: 'vtl' }).write();
                   }
                   return e;
                 })();
-              return t.addMappingTemplate({ mappingTemplate: s }), h.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: $, functionConfigurations: b }),
-            P = await (async () => {
+              return t.addMappingTemplate({ mappingTemplate: s }), f.debug('finished mappingTemplateProcess'), s;
+            })({ dataSource: v, functionConfigurations: S }),
+            $ = await (async () => {
               const e = t.graphqlEditor,
-                a = t.graphqlEditor.addExampleType(g.apiName);
+                a = t.graphqlEditor.addExampleType(m.apiName);
               return (
-                t.updateCustomSchemaGraphl({ query: { apiName: g.apiName, type: a.getType(), args: { example: { type: m.GraphQLString } } } }),
-                h.debug('finished scheneGraphqlProcess'),
+                t.updateCustomSchemaGraphl({ query: { apiName: m.apiName, type: a.getType(), args: { example: { type: c.GraphQLString } } } }),
+                f.debug('finished scheneGraphqlProcess'),
                 Promise.resolve(e.customSchema)
               );
             })();
-          h.debug({ dataSource: $, functionConfigurations: b, mappingTemplate: w, schemaGraphql: P });
+          f.debug({ dataSource: v, functionConfigurations: S, mappingTemplate: _, schemaGraphql: $ });
         };
       },
       6849: function (e, t, a) {
@@ -682,123 +622,59 @@
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(6444)),
-          n = r(a(3290)),
-          i = r(a(7973)),
-          o = r(a(1092)),
-          l = r(a(5837)),
-          u = r(a(2056)),
-          c = a(6870),
-          d = r(a(1017)),
-          p = r(a(6517)),
-          m = a(8854);
+          n = r(a(2056)),
+          i = r(a(1017)),
+          o = r(a(6517)),
+          l = a(6134);
         t.default = async (e) => {
-          const { appSyncStackService: t, lang: a, slsConfig: r, info: f } = e,
-            g = s.default.getLogger();
-          g.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const h = (0, m.getLocaleLang)(a),
-            y = async () => {
-              const { createDataSource: e } = await n.default.prompt([
-                {
-                  type: 'expand',
-                  name: 'createDataSource',
-                  message: h.services.common.inquirer.createDataSource,
-                  choices: [
-                    { key: 'y', name: 'yes', value: !0 },
-                    { key: 'n', name: 'no', value: !1 },
-                  ],
-                  validate: (e) => new i.default(e, a).required().value(),
-                },
-              ]);
-              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red(h.services.common.error.notFoundDataSource)), y()));
-            },
-            v = await y(),
-            S = await (async () => {
-              if (v) {
-                const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
-                  {
-                    type: 'input',
-                    name: 'lambdaFunctionName',
-                    message: h.services.common.inquirer.lambdaFunctionName,
-                    default: () => f.apiName,
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                  },
-                  {
-                    type: 'input',
-                    name: 'lambdaHandler',
-                    message: h.services.common.inquirer.lambdaHandler,
-                    default: () => `src/functions/appsync/${f.apiName}.handler`,
-                    validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
-                    transformer: (e) => new o.default(e).removeAllSpace().value(),
-                    filter: (e) => new l.default(e).removeAllSpace().value(),
-                  },
-                ]);
-                r.addFunction({ lambdaFunctionName: e, lambdaHandler: s, code: u.default.templates.typescript.skeleton });
-                const c = {
-                  type: 'AWS_LAMBDA',
-                  name: e,
-                  description: `It is for ${f.apiType}.${f.apiName}`,
-                  config: {
-                    functionName: { Ref: `${e}LambdaFunction` },
-                    lambdaFunctionArn: { 'Fn::GetAtt': [`${e}LambdaFunction`, 'Arn'] },
-                    serviceRoleArn: { 'Fn::GetAtt': [t.appSyncLambdaRoleName, 'Arn'] },
-                  },
-                };
-                return t.addIamRoleByDataSource({ dataSource: 'AWS_LAMBDA', sls: r }), t.addDataSource(c), c;
-              }
-              const { dataSource: e } = await n.default.prompt([
-                  {
-                    type: 'list',
-                    name: 'dataSource',
-                    choices: t.appSyncStack?.dataSources.map((e) => e.name),
-                    message: h.services.common.inquirer.dataSource,
-                    validate: (e) => new i.default(e, a).required().value(),
-                  },
-                ]),
-                s = t.appSyncStack?.dataSources.find((t) => t.name === e);
-              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), g.debug('finished dataSourceProcess'), s;
-            })(),
-            _ = await ((e) => {
+          const { appSyncStackService: t, lang: a, slsConfig: r, info: u } = e,
+            c = s.default.getLogger();
+          c.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
+          const d = await (0, l.isCreateDataSource)({ lang: a, dataSource: t.appSyncStack?.dataSources ?? [] }),
+            p = await (async () =>
+              d
+                ? await (0, l.addLambda)({ appSyncStackService: t, lang: a, slsConfig: r, info: u })
+                : await (0, l.selectDataSource)({ lang: a, appSyncStackService: t, slsConfig: r }))(),
+            m = await ((e) => {
               const { dataSource: a } = e;
-              if ('UNIT' === f.resolverType) return Promise.resolve(void 0);
-              const r = { dataSource: a.name, name: `${f.apiType}${p.default.upperFirst(f.apiName)}`, request: !1, response: !1 };
-              return t.addFunctionConfiguration({ functionConfiguration: r }), g.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
-            })({ dataSource: S }),
-            $ = await (async (e) => {
+              if ('UNIT' === u.resolverType) return Promise.resolve(void 0);
+              const r = { dataSource: a.name, name: `${u.apiType}${o.default.upperFirst(u.apiName)}`, request: !1, response: !1 };
+              return t.addFunctionConfiguration({ functionConfiguration: r }), c.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
+            })({ dataSource: p }),
+            f = await (async (e) => {
               const { dataSource: a, functionConfigurations: r } = e,
                 s = (() => {
-                  if ('PIPELINE' === f.resolverType) {
+                  if ('PIPELINE' === u.resolverType) {
                     const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
                       a = {
-                        type: f.apiType,
-                        request: `mutations/${f.apiType}.${f.apiName}.request.vtl`,
-                        response: `mutations/${f.apiType}.${f.apiName}.response.vtl`,
-                        field: f.apiName,
-                        kind: f.resolverType,
+                        type: u.apiType,
+                        request: `mutations/${u.apiType}.${u.apiName}.request.vtl`,
+                        response: `mutations/${u.apiType}.${u.apiName}.response.vtl`,
+                        field: u.apiName,
+                        kind: u.resolverType,
                         functions: [r?.name],
                       };
                     return (
-                      new u.default({ filePath: d.default.join(e, a.request), code: u.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
-                      new u.default({ filePath: d.default.join(e, a.response), code: u.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
+                      new n.default({ filePath: i.default.join(e, a.request), code: n.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
+                      new n.default({ filePath: i.default.join(e, a.response), code: n.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
                       a
                     );
                   }
-                  return { dataSource: a.name, type: f.apiType, field: f.apiName, kind: f.resolverType, request: !1, response: !1 };
+                  return { dataSource: a.name, type: u.apiType, field: u.apiName, kind: u.resolverType, request: !1, response: !1 };
                 })();
-              return t.addMappingTemplate({ mappingTemplate: s }), g.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: S, functionConfigurations: _ }),
-            b = await (async () => {
+              return t.addMappingTemplate({ mappingTemplate: s }), c.debug('finished mappingTemplateProcess'), s;
+            })({ dataSource: p, functionConfigurations: m }),
+            g = await (async () => {
               const e = t.graphqlEditor,
-                a = t.graphqlEditor.addExampleType(f.apiName),
-                r = t.graphqlEditor.addExampleInput(f.apiName);
+                a = t.graphqlEditor.addExampleType(u.apiName),
+                r = t.graphqlEditor.addExampleInput(u.apiName);
               return (
-                t.updateCustomSchemaGraphl({ mutation: { apiName: f.apiName, type: a.getType(), input: r.getType() } }),
-                g.debug('finished scheneGraphqlProcess'),
+                t.updateCustomSchemaGraphl({ mutation: { apiName: u.apiName, type: a.getType(), input: r.getType() } }),
+                c.debug('finished scheneGraphqlProcess'),
                 Promise.resolve(e.customSchema)
               );
             })();
-          g.debug({ dataSource: S, functionConfigurations: _, mappingTemplate: $, schemaGraphql: b });
+          c.debug({ dataSource: p, functionConfigurations: m, mappingTemplate: f, schemaGraphql: g });
         };
       },
       8391: function (e, t, a) {
@@ -811,36 +687,19 @@
         const s = r(a(6444)),
           n = r(a(3290)),
           i = r(a(7973)),
-          o = r(a(1092)),
-          l = r(a(5837)),
-          u = r(a(2056)),
-          c = a(6870),
-          d = r(a(1017)),
-          p = r(a(6517)),
-          m = a(7343),
-          f = a(8854);
+          o = r(a(2056)),
+          l = r(a(1017)),
+          u = r(a(6517)),
+          c = a(7343),
+          d = a(8854),
+          p = a(6134);
         t.default = async (e) => {
-          const { appSyncStackService: t, lang: a, slsConfig: r, info: g } = e,
-            h = s.default.getLogger();
-          h.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const y = (0, f.getLocaleLang)(a),
-            v = async () => {
-              const { createDataSource: e } = await n.default.prompt([
-                {
-                  type: 'expand',
-                  name: 'createDataSource',
-                  message: y.services.common.inquirer.createDataSource,
-                  choices: [
-                    { key: 'y', name: 'yes', value: !0 },
-                    { key: 'n', name: 'no', value: !1 },
-                  ],
-                  validate: (e) => new i.default(e, a).required().value(),
-                },
-              ]);
-              return e || (0 === t.appSyncStack?.dataSources.length && (console.log(c.chalk.red(y.services.common.error.notFoundDataSource)), v()));
-            },
-            S = await v(),
-            _ = async (e) => {
+          const { appSyncStackService: t, lang: a, slsConfig: r, info: m } = e,
+            f = s.default.getLogger();
+          f.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
+          const g = (0, d.getLocaleLang)(a),
+            h = await (0, p.isCreateDataSource)({ lang: a, dataSource: t.appSyncStack?.dataSources ?? [] }),
+            y = async (e) => {
               if ('AMAZON_DYNAMODB' === e.type) {
                 const {
                   template: e,
@@ -851,13 +710,13 @@
                     type: 'list',
                     name: 'template',
                     choices: ['query', 'queryWithGsi', 'scan'],
-                    message: y.services.common.inquirer.template,
+                    message: g.services.common.inquirer.template,
                     validate: (e) => new i.default(e, a).required().value(),
                   },
                   {
                     type: 'input',
                     name: 'primaryKeyName',
-                    message: y.services.common.inquirer.primaryKeyName,
+                    message: g.services.common.inquirer.primaryKeyName,
                     default: () => 'Id',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
@@ -866,7 +725,7 @@
                   {
                     type: 'input',
                     name: 'sortKeyName',
-                    message: y.services.common.inquirer.sortKeyName,
+                    message: g.services.common.inquirer.sortKeyName,
                     default: () => 'Sk',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
@@ -874,13 +733,13 @@
                   },
                 ]);
                 if ('query' === e)
-                  return { before: u.default.templates.vtl.dynamoQueryRequest({ primaryKeyName: t, sortKeyName: r }), after: u.default.templates.vtl.dynamoGetItemResponse };
+                  return { before: o.default.templates.vtl.dynamoQueryRequest({ primaryKeyName: t, sortKeyName: r }), after: o.default.templates.vtl.dynamoGetItemResponse };
                 if ('queryWithGsi' === e) {
                   const { gsiName: e } = await n.default.prompt([
                     {
                       type: 'input',
                       name: 'gsiName',
-                      message: y.services.generateQueryService.inquirer.gsiName,
+                      message: g.services.generateQueryService.inquirer.gsiName,
                       default: () => 'ExampleIndex',
                       filter: (e) => e.replace(/\s+/g, ''),
                       transformer: (e) => e.replace(/\s+/g, ''),
@@ -888,142 +747,99 @@
                     },
                   ]);
                   return {
-                    before: u.default.templates.vtl.dynamoQueryRequest({ gsiName: e, primaryKeyName: t, sortKeyName: r }),
-                    after: u.default.templates.vtl.dynamoGetItemResponse,
+                    before: o.default.templates.vtl.dynamoQueryRequest({ gsiName: e, primaryKeyName: t, sortKeyName: r }),
+                    after: o.default.templates.vtl.dynamoGetItemResponse,
                   };
                 }
-                if ('scan' === e) return { before: u.default.templates.vtl.dynamoScanRequest, after: u.default.templates.vtl.dynamoScanResponse };
+                if ('scan' === e) return { before: o.default.templates.vtl.dynamoScanRequest, after: o.default.templates.vtl.dynamoScanResponse };
               } else {
                 if ('AMAZON_ELASTICSEARCH' === e.type) {
                   const { indexName: e } = await n.default.prompt([
                     {
                       type: 'input',
                       name: 'indexName',
-                      message: y.services.common.inquirer.indexName,
-                      default: () => g.apiName,
+                      message: g.services.common.inquirer.indexName,
+                      default: () => m.apiName,
                       filter: (e) => e.replace(/\s+/g, ''),
                       transformer: (e) => e.replace(/\s+/g, ''),
                       validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
                     },
                   ]);
-                  return { before: u.default.templates.vtl.openSearchQueryRequest({ indexName: e }), after: u.default.templates.vtl.openSearchQueryResponse };
+                  return { before: o.default.templates.vtl.openSearchQueryRequest({ indexName: e }), after: o.default.templates.vtl.openSearchQueryResponse };
                 }
-                if ('RELATIONAL_DATABASE' === e.type) return { before: u.default.templates.vtl.rdbQueryRequest, after: u.default.templates.vtl.rdbQueryResponse };
-                if ('HTTP' === e.type) return { before: u.default.templates.vtl.httpQueryRequest, after: u.default.templates.vtl.httpQueryResponse };
+                if ('RELATIONAL_DATABASE' === e.type) return { before: o.default.templates.vtl.rdbQueryRequest, after: o.default.templates.vtl.rdbQueryResponse };
+                if ('HTTP' === e.type) return { before: o.default.templates.vtl.httpQueryRequest, after: o.default.templates.vtl.httpQueryResponse };
               }
               return { before: '{}', after: '{}' };
             },
-            $ = await (async () => {
-              if (S) {
-                const { lambdaFunctionName: e, lambdaHandler: s } = await n.default.prompt([
-                  {
-                    type: 'input',
-                    name: 'lambdaFunctionName',
-                    message: y.services.common.inquirer.lambdaFunctionName,
-                    default: () => g.apiName,
-                    filter: (e) => e.replace(/\s+/g, ''),
-                    transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
-                  },
-                  {
-                    type: 'input',
-                    name: 'lambdaHandler',
-                    message: y.services.common.inquirer.lambdaHandler,
-                    default: () => `src/functions/appsync/${g.apiName}.handler`,
-                    validate: (e) => new i.default(e, a).required().mustBeExtension().value(),
-                    transformer: (e) => new o.default(e).removeAllSpace().value(),
-                    filter: (e) => new l.default(e).removeAllSpace().value(),
-                  },
-                ]);
-                r.addFunction({ lambdaFunctionName: e, lambdaHandler: s, code: u.default.templates.typescript.skeleton });
-                const c = {
-                  type: 'AWS_LAMBDA',
-                  name: e,
-                  description: `It is for ${g.apiType}.${g.apiName}`,
-                  config: {
-                    functionName: { Ref: `${e}LambdaFunction` },
-                    lambdaFunctionArn: { 'Fn::GetAtt': [`${e}LambdaFunction`, 'Arn'] },
-                    serviceRoleArn: { 'Fn::GetAtt': [t.appSyncLambdaRoleName, 'Arn'] },
-                  },
-                };
-                return t.addIamRoleByDataSource({ dataSource: 'AWS_LAMBDA', sls: r }), t.addDataSource(c), c;
-              }
-              const { dataSource: e } = await n.default.prompt([
-                  {
-                    type: 'list',
-                    name: 'dataSource',
-                    choices: t.appSyncStack?.dataSources.map((e) => e.name),
-                    message: y.services.common.inquirer.dataSource,
-                    validate: (e) => new i.default(e, a).required().value(),
-                  },
-                ]),
-                s = t.appSyncStack?.dataSources.find((t) => t.name === e);
-              return t.addIamRoleByDataSource({ dataSource: s.type, sls: r }), h.debug('finished dataSourceProcess'), s;
-            })(),
-            b = await (async (e) => {
+            v = await (async () =>
+              h
+                ? await (0, p.addLambda)({ appSyncStackService: t, lang: a, slsConfig: r, info: m })
+                : await (0, p.selectDataSource)({ lang: a, appSyncStackService: t, slsConfig: r }))(),
+            S = await (async (e) => {
               const { dataSource: a } = e;
-              if ('UNIT' === g.resolverType) return Promise.resolve(void 0);
+              if ('UNIT' === m.resolverType) return Promise.resolve(void 0);
               const r = t.appSyncStack?.functionConfigurationsLocation ?? './',
                 s = {
                   dataSource: a.name,
-                  name: `${g.apiType}${p.default.upperFirst(g.apiName)}`,
-                  request: 'AWS_LAMBDA' !== a.type && `functions/${g.apiType}.${g.apiName}.request.vtl`,
-                  response: 'AWS_LAMBDA' !== a.type && `functions/${g.apiType}.${g.apiName}.response.vtl`,
+                  name: `${m.apiType}${u.default.upperFirst(m.apiName)}`,
+                  request: 'AWS_LAMBDA' !== a.type && `functions/${m.apiType}.${m.apiName}.request.vtl`,
+                  response: 'AWS_LAMBDA' !== a.type && `functions/${m.apiType}.${m.apiName}.response.vtl`,
                 };
               if ('AWS_LAMBDA' !== a.type) {
-                const { before: e, after: t } = await _(a);
-                p.default.isString(s.request) && new u.default({ filePath: d.default.join(r, s.request), code: e, type: 'vtl' }).write(),
-                  p.default.isString(s.response) && new u.default({ filePath: d.default.join(r, s.response), code: t, type: 'vtl' }).write();
+                const { before: e, after: t } = await y(a);
+                u.default.isString(s.request) && new o.default({ filePath: l.default.join(r, s.request), code: e, type: 'vtl' }).write(),
+                  u.default.isString(s.response) && new o.default({ filePath: l.default.join(r, s.response), code: t, type: 'vtl' }).write();
               }
-              return t.addFunctionConfiguration({ functionConfiguration: s }), h.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
-            })({ dataSource: $ }),
-            w = await (async (e) => {
+              return t.addFunctionConfiguration({ functionConfiguration: s }), f.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
+            })({ dataSource: v }),
+            _ = await (async (e) => {
               const { dataSource: a, functionConfigurations: r } = e,
                 s = await (async () => {
-                  if ('PIPELINE' === g.resolverType) {
+                  if ('PIPELINE' === m.resolverType) {
                     const e = t.appSyncStack?.mappingTemplatesLocation ?? './',
                       a = {
-                        type: g.apiType,
-                        request: `queries/${g.apiType}.${g.apiName}.request.vtl`,
-                        response: `queries/${g.apiType}.${g.apiName}.response.vtl`,
-                        field: g.apiName,
-                        kind: g.resolverType,
+                        type: m.apiType,
+                        request: `queries/${m.apiType}.${m.apiName}.request.vtl`,
+                        response: `queries/${m.apiType}.${m.apiName}.response.vtl`,
+                        field: m.apiName,
+                        kind: m.resolverType,
                         functions: [r?.name],
                       };
                     return (
-                      new u.default({ filePath: d.default.join(e, a.request), code: u.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
-                      new u.default({ filePath: d.default.join(e, a.response), code: u.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
+                      new o.default({ filePath: l.default.join(e, a.request), code: o.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
+                      new o.default({ filePath: l.default.join(e, a.response), code: o.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
                       a
                     );
                   }
                   const e = {
                     dataSource: a.name,
-                    type: g.apiType,
-                    field: g.apiName,
-                    kind: g.resolverType,
-                    request: 'AWS_LAMBDA' !== a.type && `queries/${g.apiType}.${g.apiName}.request.vtl`,
-                    response: 'AWS_LAMBDA' !== a.type && `queries/${g.apiType}.${g.apiName}.response.vtl`,
+                    type: m.apiType,
+                    field: m.apiName,
+                    kind: m.resolverType,
+                    request: 'AWS_LAMBDA' !== a.type && `queries/${m.apiType}.${m.apiName}.request.vtl`,
+                    response: 'AWS_LAMBDA' !== a.type && `queries/${m.apiType}.${m.apiName}.response.vtl`,
                   };
                   if ('AWS_LAMBDA' !== a.type) {
                     const r = t.appSyncStack?.mappingTemplatesLocation ?? './',
-                      { before: s, after: n } = await _(a);
-                    p.default.isString(e.request) && new u.default({ filePath: d.default.join(r, e.request), code: s, type: 'vtl' }).write(),
-                      p.default.isString(e.response) && new u.default({ filePath: d.default.join(r, e.response), code: n, type: 'vtl' }).write();
+                      { before: s, after: n } = await y(a);
+                    u.default.isString(e.request) && new o.default({ filePath: l.default.join(r, e.request), code: s, type: 'vtl' }).write(),
+                      u.default.isString(e.response) && new o.default({ filePath: l.default.join(r, e.response), code: n, type: 'vtl' }).write();
                   }
                   return e;
                 })();
-              return t.addMappingTemplate({ mappingTemplate: s }), h.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: $, functionConfigurations: b }),
-            P = await (async () => {
+              return t.addMappingTemplate({ mappingTemplate: s }), f.debug('finished mappingTemplateProcess'), s;
+            })({ dataSource: v, functionConfigurations: S }),
+            $ = await (async () => {
               const e = t.graphqlEditor,
-                a = t.graphqlEditor.addExampleType(g.apiName);
+                a = t.graphqlEditor.addExampleType(m.apiName);
               return (
-                t.updateCustomSchemaGraphl({ query: { apiName: g.apiName, type: a.getType(), args: { example: { type: m.GraphQLString } } } }),
-                h.debug('finished scheneGraphqlProcess'),
+                t.updateCustomSchemaGraphl({ query: { apiName: m.apiName, type: a.getType(), args: { example: { type: c.GraphQLString } } } }),
+                f.debug('finished scheneGraphqlProcess'),
                 Promise.resolve(e.customSchema)
               );
             })();
-          h.debug({ dataSource: $, functionConfigurations: b, mappingTemplate: w, schemaGraphql: P });
+          f.debug({ dataSource: v, functionConfigurations: S, mappingTemplate: _, schemaGraphql: $ });
         };
       },
       8854: function (e, t, a) {
@@ -1036,6 +852,90 @@
         const s = r(a(3957)),
           n = r(a(4538));
         t.getLocaleLang = (e) => ('ja' === e ? s.default : n.default);
+      },
+      6134: function (e, t, a) {
+        var r =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.selectDataSource = t.addLambda = t.isCreateDataSource = void 0);
+        const s = r(a(3290)),
+          n = r(a(7973)),
+          i = r(a(1092)),
+          o = r(a(5837)),
+          l = r(a(2056)),
+          u = a(6870),
+          c = a(8854);
+        (t.isCreateDataSource = async (e) => {
+          const { lang: a, dataSource: r } = e,
+            i = (0, c.getLocaleLang)(a),
+            { createDataSource: o } = await s.default.prompt([
+              {
+                type: 'expand',
+                name: 'createDataSource',
+                message: i.services.common.inquirer.createDataSource,
+                choices: [
+                  { key: 'y', name: 'yes', value: !0 },
+                  { key: 'n', name: 'no', value: !1 },
+                ],
+                validate: (e) => new n.default(e, a).required().value(),
+              },
+            ]);
+          return o || (0 === r.length && (console.log(u.chalk.red(i.services.common.error.notFoundDataSource)), (0, t.isCreateDataSource)(e)));
+        }),
+          (t.addLambda = async (e) => {
+            const { lang: t, slsConfig: a, info: r, appSyncStackService: u } = e,
+              { apiName: d, apiType: p } = r,
+              m = (0, c.getLocaleLang)(t),
+              { lambdaFunctionName: f, lambdaHandler: g } = await s.default.prompt([
+                {
+                  type: 'input',
+                  name: 'lambdaFunctionName',
+                  message: m.services.common.inquirer.lambdaFunctionName,
+                  default: () => d,
+                  filter: (e) => e.replace(/\s+/g, ''),
+                  transformer: (e) => e.replace(/\s+/g, ''),
+                  validate: (e) => new n.default(e, t).required().mustNoIncludeZenkaku().value(),
+                },
+                {
+                  type: 'input',
+                  name: 'lambdaHandler',
+                  message: m.services.common.inquirer.lambdaHandler,
+                  default: () => `src/functions/appsync/${d}.handler`,
+                  validate: (e) => new n.default(e, t).required().mustBeExtension().value(),
+                  transformer: (e) => new i.default(e).removeAllSpace().value(),
+                  filter: (e) => new o.default(e).removeAllSpace().value(),
+                },
+              ]);
+            a.addFunction({ lambdaFunctionName: f, lambdaHandler: g, code: l.default.templates.typescript.skeleton });
+            const h = {
+              type: 'AWS_LAMBDA',
+              name: f,
+              description: `It is for ${p}.${d}`,
+              config: {
+                functionName: { Ref: `${f}LambdaFunction` },
+                lambdaFunctionArn: { 'Fn::GetAtt': [`${f}LambdaFunction`, 'Arn'] },
+                serviceRoleArn: { 'Fn::GetAtt': [u.appSyncLambdaRoleName, 'Arn'] },
+              },
+            };
+            return u.addIamRoleByDataSource({ dataSource: 'AWS_LAMBDA', sls: a }), u.addDataSource(h), h;
+          }),
+          (t.selectDataSource = async (e) => {
+            const { appSyncStackService: t, lang: a, slsConfig: r } = e,
+              i = (0, c.getLocaleLang)(a),
+              { dataSource: o } = await s.default.prompt([
+                {
+                  type: 'list',
+                  name: 'dataSource',
+                  choices: t.appSyncStack?.dataSources.map((e) => e.name),
+                  message: i.services.common.inquirer.dataSource,
+                  validate: (e) => new n.default(e, a).required().value(),
+                },
+              ]),
+              l = t.appSyncStack?.dataSources.find((e) => e.name === o);
+            return t.addIamRoleByDataSource({ dataSource: l.type, sls: r }), l;
+          });
       },
       3582: (e, t, a) => {
         Object.defineProperty(t, '__esModule', { value: !0 });
@@ -3277,25 +3177,25 @@
             d = t.errorLikeObjectKeys,
             $ = t.errorProps.split(','),
             N = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
-            A = w(t.customLevels),
-            q = P(t.customLevels),
-            L = t.customColors
+            L = w(t.customLevels),
+            A = P(t.customLevels),
+            q = t.customColors
               ? t.customColors.split(',').reduce((e, a) => {
                   const [r, s] = a.split(':'),
-                    n = (N ? t.customLevels : void 0 !== q[r]) ? q[r] : m[r],
+                    n = (N ? t.customLevels : void 0 !== A[r]) ? A[r] : m[r],
                     i = void 0 !== n ? n : r;
                   return e.push([i, s]), e;
                 }, [])
               : void 0,
-            k = { customLevels: A, customLevelNames: q };
-          N && !t.customLevels && ((k.customLevels = void 0), (k.customLevelNames = void 0));
-          const C = t.customPrettifiers,
-            R = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
-            O = !R && t.ignore ? new Set(t.ignore.split(',')) : void 0,
+            C = { customLevels: L, customLevelNames: A };
+          N && !t.customLevels && ((C.customLevels = void 0), (C.customLevelNames = void 0));
+          const k = t.customPrettifiers,
+            O = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
+            R = !O && t.ignore ? new Set(t.ignore.split(',')) : void 0,
             M = t.hideObject,
             D = t.singleLine,
-            j = l(t.colorize, L, N),
-            F = t.colorizeObjects ? j : l(!1, [], !1);
+            j = l(t.colorize, q, N),
+            T = t.colorizeObjects ? j : l(!1, [], !1);
           return function (e) {
             let l;
             if (f(e)) l = e;
@@ -3305,36 +3205,36 @@
               l = t.value;
             }
             if (o) {
-              const e = ((N ? t.customLevels : void 0 !== q[o]) ? q[o] : m[o]) || Number(o);
+              const e = ((N ? t.customLevels : void 0 !== A[o]) ? A[o] : m[o]) || Number(o);
               if (l[void 0 === n ? p : n] < e) return;
             }
-            const w = y({ log: l, messageKey: s, colorizer: j, messageFormat: u, levelLabel: i, ...k, useOnlyCustomProps: N });
-            (O || R) && (l = b({ log: l, ignoreKeys: O, includeKeys: R }));
-            const P = h({ log: l, colorizer: j, levelKey: n, prettifier: C.level, ...k }),
-              x = v({ log: l, prettifiers: C }),
-              A = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: C.time });
-            let L = '';
+            const w = y({ log: l, messageKey: s, colorizer: j, messageFormat: u, levelLabel: i, ...C, useOnlyCustomProps: N });
+            (R || O) && (l = b({ log: l, ignoreKeys: R, includeKeys: O }));
+            const P = h({ log: l, colorizer: j, levelKey: n, prettifier: k.level, ...C }),
+              x = v({ log: l, prettifiers: k }),
+              L = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: k.time });
+            let q = '';
             if (
-              (t.levelFirst && P && (L = `${P}`),
-              A && '' === L ? (L = `${A}`) : A && (L = `${L} ${A}`),
-              !t.levelFirst && P && (L = L.length > 0 ? `${L} ${P}` : P),
-              x && (L = L.length > 0 ? `${L} ${x}:` : x),
-              !1 === L.endsWith(':') && '' !== L && (L += ':'),
-              w && (L = L.length > 0 ? `${L} ${w}` : w),
-              L.length > 0 && !D && (L += a),
+              (t.levelFirst && P && (q = `${P}`),
+              L && '' === q ? (q = `${L}`) : L && (q = `${q} ${L}`),
+              !t.levelFirst && P && (q = q.length > 0 ? `${q} ${P}` : P),
+              x && (q = q.length > 0 ? `${q} ${x}:` : x),
+              !1 === q.endsWith(':') && '' !== q && (q += ':'),
+              w && (q = q.length > 0 ? `${q} ${w}` : w),
+              q.length > 0 && !D && (q += a),
               'Error' === l.type && l.stack)
             ) {
               const e = g({ log: l, errorLikeKeys: d, errorProperties: $, ident: r, eol: a });
-              D && (L += a), (L += e);
+              D && (q += a), (q += e);
             } else if (!M) {
               const e = [s, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = S({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: d, eol: a, ident: r, singleLine: D, colorizer: F });
-              D && !/^\s$/.test(t) && (L += ' '), (L += t);
+                t = S({ input: l, skipKeys: e, customPrettifiers: k, errorLikeKeys: d, eol: a, ident: r, singleLine: D, colorizer: T });
+              D && !/^\s$/.test(t) && (q += ' '), (q += t);
             }
-            return L;
+            return q;
           };
         }
-        function A(e = {}) {
+        function L(e = {}) {
           const t = N(e);
           return i(
             function (a) {
@@ -3361,7 +3261,7 @@
             { parse: 'lines' }
           );
         }
-        (e.exports = A), (e.exports.prettyFactory = N), (e.exports.colorizerFactory = l), (e.exports.default = A);
+        (e.exports = L), (e.exports.prettyFactory = N), (e.exports.colorizerFactory = l), (e.exports.default = L);
       },
       903: (e, t, a) => {
         const { LEVELS: r, LEVEL_NAMES: s } = a(7318),
@@ -3541,13 +3441,13 @@
           }
           return e;
         }
-        function A(e, t) {
+        function L(e, t) {
           const a = x(t),
             r = a.pop();
           null !== (e = N(e, a)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, r) && delete e[r];
         }
-        function q() {}
-        function L(e, t) {
+        function A() {}
+        function q(e, t) {
           e.destroyed ||
             ('beforeExit' === t
               ? (e.flush(),
@@ -3621,7 +3521,7 @@
             const t = new n(e);
             return (
               t.on('error', function e(a) {
-                if ('EPIPE' === a.code) return (t.write = q), (t.end = q), (t.flushSync = q), void (t.destroy = q);
+                if ('EPIPE' === a.code) return (t.write = A), (t.end = A), (t.flushSync = A), void (t.destroy = A);
                 t.removeListener('error', e);
               }),
               !e.sync &&
@@ -3629,7 +3529,7 @@
                 (function (e) {
                   if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
                     const t = a(2067);
-                    t.register(e, L),
+                    t.register(e, q),
                       e.on('close', function () {
                         t.unregister(e);
                       });
@@ -3651,7 +3551,7 @@
             }
             return (
               t.forEach((e) => {
-                A(r, e);
+                L(r, e);
               }),
               r
             );
@@ -3689,7 +3589,7 @@
             joinLinesWithIndentation: w,
             prettifyError: E,
             getPropertyValue: N,
-            deleteLogProperty: A,
+            deleteLogProperty: L,
             splitPropertyKey: x,
             createDate: _,
             isValidDate: $,
