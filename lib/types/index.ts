@@ -137,6 +137,7 @@ export type ServerlessConfig = {
     modules?: Record<string, unknown>;
     appSync?: string;
   } & Record<string, unknown>;
+  appSync?: string;
 };
 
 export type ServerlessConfigInput = {

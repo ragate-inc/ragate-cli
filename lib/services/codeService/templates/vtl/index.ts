@@ -2,12 +2,16 @@ import pipelineAfter from 'services/codeService/templates/vtl/pipeline.after';
 import pipelineBefore from 'services/codeService/templates/vtl/pipeline.before';
 import localResolverRequest from 'services/codeService/templates/vtl/localResolver.request';
 import localResolverResponse from 'services/codeService/templates/vtl/localResolver.response';
-import dynamoQueryRequest from 'services/codeService/templates/vtl/dynamo.query.request';
-import dynamoQueryResponse from 'services/codeService/templates/vtl/dynamo.query.response';
+import addDynamoQueryRequest from 'services/codeService/templates/vtl/add.dynamo.query.request';
+import addDynamoQueryResponse from 'services/codeService/templates/vtl/add.dynamo.query.response';
+import codegenDynamoQueryRequest from 'services/codeService/templates/vtl/codegen.dynamo.query.request';
+import codegenDynamoQueryResponse from 'services/codeService/templates/vtl/codegen.dynamo.query.response';
 import dynamoScanRequest from 'services/codeService/templates/vtl/dynamo.scan.request';
 import dynamoScanResponse from 'services/codeService/templates/vtl/dynamo.scan.response';
-import dynamoGetItemRequest from 'services/codeService/templates/vtl/dynamo.getItem.request';
-import dynamoGetItemResponse from 'services/codeService/templates/vtl/dynamo.getItem.response';
+import addDynamoGetItemRequest from 'services/codeService/templates/vtl/add.dynamo.getItem.request';
+import addDynamoGetItemResponse from 'services/codeService/templates/vtl/add.dynamo.getItem.response';
+import codegenDynamoGetItemRequest from 'services/codeService/templates/vtl/codegen.dynamo.getItem.request';
+import codegenDynamoGetItemResponse from 'services/codeService/templates/vtl/codegen.dynamo.getItem.response';
 import openSearchQueryRequest from 'services/codeService/templates/vtl/opensearch.query.request';
 import openSearchQueryResponse from 'services/codeService/templates/vtl/opensearch.query.response';
 import httpQueryRequest from 'services/codeService/templates/vtl/http.query.request';
@@ -18,12 +22,16 @@ import rdbQueryResponse from 'services/codeService/templates/vtl/rdb.query.respo
 export type Template = {
   pipelineAfter: string;
   pipelineBefore: string;
-  dynamoGetItemRequest: (args: { consistentRead: boolean; primaryKeyName: string; sortKeyName: string }) => string;
-  dynamoGetItemResponse: string;
+  addDynamoGetItemRequest: (args: { consistentRead: boolean; primaryKeyName: string; sortKeyName: string }) => string;
+  addDynamoGetItemResponse: string;
+  codegenDynamoGetItemRequest: string;
+  codegenDynamoGetItemResponse: string;
   localResolverRequest: string;
   localResolverResponse: string;
-  dynamoQueryRequest: (args: { gsiName?: string; primaryKeyName: string; sortKeyName: string }) => string;
-  dynamoQueryResponse: string;
+  addDynamoQueryRequest: (args: { gsiName?: string; primaryKeyName: string; sortKeyName: string }) => string;
+  addDynamoQueryResponse: string;
+  codegenDynamoQueryRequest: string;
+  codegenDynamoQueryResponse: string;
   dynamoScanRequest: string;
   dynamoScanResponse: string;
   openSearchQueryRequest: (args: { indexName?: string }) => string;
@@ -37,10 +45,14 @@ export type Template = {
 export default {
   pipelineAfter,
   pipelineBefore,
-  dynamoGetItemRequest,
-  dynamoGetItemResponse,
-  dynamoQueryRequest,
-  dynamoQueryResponse,
+  addDynamoGetItemRequest,
+  addDynamoGetItemResponse,
+  addDynamoQueryRequest,
+  addDynamoQueryResponse,
+  codegenDynamoGetItemRequest,
+  codegenDynamoGetItemResponse,
+  codegenDynamoQueryRequest,
+  codegenDynamoQueryResponse,
   localResolverRequest,
   localResolverResponse,
   dynamoScanRequest,
