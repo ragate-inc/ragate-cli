@@ -79,7 +79,7 @@ export default class extends FeatureHandlerAbstract {
         const vtlGetters = _.filter(resolverMappings.vtl, (vtl) => vtl.type === 'get');
         // 一つずつ質問するのでfor文を使う
         for (let i = 0; i < vtlGetters.length; i++) {
-          const answer = (await inquirer.prompt([questions.selectResolverType(this.lang)])) as { selectResolverType: string };
+          const answer = (await inquirer.prompt([questions.selectResolverType(this.lang, vtlGetters[i].name)])) as { selectResolverType: string };
           vtlGetters[i].type = answer.selectResolverType;
         }
         return resolverMappings;
@@ -93,20 +93,22 @@ export default class extends FeatureHandlerAbstract {
         _.each(resolverMappings.lambda, (lambda) => {
           const functionName = _.upperFirst(lambda.name);
           const lambdaFunctionName = `${functionName}LambdaFunction`;
-          yml[lambdaFunctionName] = {
-            ...(yml[lambdaFunctionName] || {}),
-            type: 'AWS_LAMBDA',
-            description: lambdaFunctionName,
-            config: {
-              functionName: functionName,
-              lambdaFunctionArn: {
-                'Fn::GetAtt': ['UpdatePostLambdaFunction', 'Arn'],
-              },
-              serviceRoleArn: {
-                'Fn::GetAtt': ['AppSyncLambdaServiceRole', 'Arn'],
+          yml[lambdaFunctionName] = _.assign(
+            {
+              type: 'AWS_LAMBDA',
+              description: lambdaFunctionName,
+              config: {
+                functionName: functionName,
+                lambdaFunctionArn: {
+                  'Fn::GetAtt': ['UpdatePostLambdaFunction', 'Arn'],
+                },
+                serviceRoleArn: {
+                  'Fn::GetAtt': ['AppSyncLambdaServiceRole', 'Arn'],
+                },
               },
             },
-          };
+            yml[lambdaFunctionName]
+          );
         });
         writeYaml(filePath, yml);
       });
@@ -123,9 +125,9 @@ export default class extends FeatureHandlerAbstract {
           const filePath = `appsync/resolvers/functions/Query.${functionName}.request`;
           const code = (() => {
             switch (vtl.type) {
-              case 'get':
+              case 'GetItem':
                 return CodeService.templates.vtl.codegenDynamoGetItemRequest;
-              case 'none':
+              case 'LocalResolver':
                 return CodeService.templates.vtl.localResolverRequest;
               case 'query':
                 return CodeService.templates.vtl.codegenDynamoQueryRequest;
@@ -134,22 +136,26 @@ export default class extends FeatureHandlerAbstract {
             }
           })();
           new CodeService({ filePath, code, type: 'vtl' }).write();
-          yml[functionName] = {
-            ...(yml[functionName] || {}),
-            dataSource: dataSourceName,
-            request: `${filePath}.vtl`,
-            response: `appsync/resolvers/common/resolver.response.vtl`,
-          };
+          yml[functionName] = _.assign(
+            {
+              dataSource: dataSourceName,
+              request: `${filePath}.vtl`,
+              response: `appsync/resolvers/common/resolver.response.vtl`,
+            },
+            yml[functionName]
+          );
         });
         // lambda
         _.each(resolverMappings.lambda, (lambda) => {
           const functionName = _.upperFirst(lambda.name);
           const lambdaFunctionName = `${functionName}LambdaFunction`;
           console.log(`Add Lambda Function: ${lambdaFunctionName}`);
-          yml[functionName] = {
-            ...(yml[functionName] || {}),
-            dataSource: lambdaFunctionName,
-          };
+          yml[functionName] = _.assign(
+            {
+              dataSource: lambdaFunctionName,
+            },
+            yml[functionName]
+          );
         });
         writeYaml(filePath, yml);
       });
@@ -177,10 +183,12 @@ export default class extends FeatureHandlerAbstract {
         _.each(resolverMappings.lambda, (lambda) => {
           const keyName = `Mutation.${lambda.name}`;
           const functionName = _.upperFirst(lambda.name);
-          yml[keyName] = {
-            ...(yml[keyName] || {}),
-            functions: [functionName],
-          };
+          yml[keyName] = _.assign(
+            {
+              functions: [functionName],
+            },
+            yml[keyName]
+          );
         });
         writeYaml(filePath, yml);
       });
@@ -206,11 +214,13 @@ export default class extends FeatureHandlerAbstract {
         else return CodeService.templates.typescript[lambda.type as 'create' | 'update' | 'delete'](`${functionName}MutationVariables`, lambda.returnValue as string);
       })();
       new CodeService({ filePath, code, type: 'typescript' }).write();
-      functionsConfig[functionName] = {
-        ...(functionsConfig[functionName] || {}),
-        handler,
-        name,
-      };
+      functionsConfig[functionName] = _.assign(
+        {
+          handler,
+          name,
+        },
+        functionsConfig[functionName]
+      );
     });
     writeYaml(functionsPath, functionsConfig);
   }

@@ -1627,7 +1627,7 @@
                 .then(async (e) => {
                   const t = i.default.filter(e.vtl, (e) => 'get' === e.type);
                   for (let e = 0; e < t.length; e++) {
-                    const a = await n.default.prompt([m.default.selectResolverType(this.lang)]);
+                    const a = await n.default.prompt([m.default.selectResolverType(this.lang, t[e].name)]);
                     t[e].type = a.selectResolverType;
                   }
                   return e;
@@ -1641,16 +1641,18 @@
                   i.default.each(g.lambda, (e) => {
                     const t = i.default.upperFirst(e.name),
                       r = `${t}LambdaFunction`;
-                    a[r] = {
-                      ...(a[r] || {}),
-                      type: 'AWS_LAMBDA',
-                      description: r,
-                      config: {
-                        functionName: t,
-                        lambdaFunctionArn: { 'Fn::GetAtt': ['UpdatePostLambdaFunction', 'Arn'] },
-                        serviceRoleArn: { 'Fn::GetAtt': ['AppSyncLambdaServiceRole', 'Arn'] },
+                    a[r] = i.default.assign(
+                      {
+                        type: 'AWS_LAMBDA',
+                        description: r,
+                        config: {
+                          functionName: t,
+                          lambdaFunctionArn: { 'Fn::GetAtt': ['UpdatePostLambdaFunction', 'Arn'] },
+                          serviceRoleArn: { 'Fn::GetAtt': ['AppSyncLambdaServiceRole', 'Arn'] },
+                        },
                       },
-                    };
+                      a[r]
+                    );
                   }),
                     (0, c.writeYaml)(t, a);
                 }),
@@ -1665,9 +1667,9 @@
                       s = `appsync/resolvers/functions/Query.${t}.request`,
                       n = (() => {
                         switch (e.type) {
-                          case 'get':
+                          case 'GetItem':
                             return p.default.templates.vtl.codegenDynamoGetItemRequest;
-                          case 'none':
+                          case 'LocalResolver':
                             return p.default.templates.vtl.localResolverRequest;
                           case 'query':
                             return p.default.templates.vtl.codegenDynamoQueryRequest;
@@ -1676,12 +1678,12 @@
                         }
                       })();
                     new p.default({ filePath: s, code: n, type: 'vtl' }).write(),
-                      (a[t] = { ...(a[t] || {}), dataSource: r, request: `${s}.vtl`, response: 'appsync/resolvers/common/resolver.response.vtl' });
+                      (a[t] = i.default.assign({ dataSource: r, request: `${s}.vtl`, response: 'appsync/resolvers/common/resolver.response.vtl' }, a[t]));
                   }),
                     i.default.each(g.lambda, (e) => {
                       const t = i.default.upperFirst(e.name),
                         r = `${t}LambdaFunction`;
-                      console.log(`Add Lambda Function: ${r}`), (a[t] = { ...(a[t] || {}), dataSource: r });
+                      console.log(`Add Lambda Function: ${r}`), (a[t] = i.default.assign({ dataSource: r }, a[t]));
                     }),
                     (0, c.writeYaml)(t, a);
                 }),
@@ -1700,7 +1702,7 @@
                     i.default.each(g.lambda, (e) => {
                       const t = `Mutation.${e.name}`,
                         r = i.default.upperFirst(e.name);
-                      a[t] = { ...(a[t] || {}), functions: [r] };
+                      a[t] = i.default.assign({ functions: [r] }, a[t]);
                     }),
                     (0, c.writeYaml)(t, a);
                 }),
@@ -1718,7 +1720,7 @@
                 n = i.default.includes(['create', 'update', 'delete'], e.type)
                   ? p.default.templates.typescript[e.type](`${t}MutationVariables`, e.returnValue)
                   : p.default.templates.typescript.skeleton;
-              new p.default({ filePath: a, code: n, type: 'typescript' }).write(), (v[t] = { ...(v[t] || {}), handler: r, name: s });
+              new p.default({ filePath: a, code: n, type: 'typescript' }).write(), (v[t] = i.default.assign({ handler: r, name: s }, v[t]));
             }),
               (0, c.writeYaml)(h, v);
           }
@@ -1960,14 +1962,14 @@
       2297: (e, t, a) => {
         Object.defineProperty(t, '__esModule', { value: !0 });
         const r = a(7704);
-        t.default = (e) => ({
+        t.default = (e, t) => ({
           type: 'list',
           name: 'selectResolverType',
-          message: (0, r.getLocaleLang)(e).inquirer.selectResolverType,
-          default: () => 'get',
+          message: `${t}: ${(0, r.getLocaleLang)(e).inquirer.selectResolverType}`,
+          default: () => 'GetItem',
           choices: [
-            { title: 'LocalResolver', value: 'none' },
-            { title: 'GetItem', value: 'get' },
+            { title: 'LocalResolver', value: 'LocalResolver' },
+            { title: 'GetItem', value: 'GetItem' },
           ],
         });
       },
@@ -2603,7 +2605,7 @@
       9652: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = (e, t) =>
-            `import { AppSyncResolverEvent } from 'aws-lambda';\nimport moment from 'moment';\nimport DynamoService from 'services/dynamoService';\nimport { ${e}, ${t} } from 'types/API';\nimport { DYNAMO_TABLES } from 'types/index';\nimport middy from 'utils/middy';\n\nexport const handler = middy.handler(async (event: AppSyncResolverEvent<${e}>): Promise<${t}> => {\n  const input = event.arguments.input;\n  const now = moment.tz('Asia/Tokyo').format();\n  const dynamoService = new DynamoService();\n  const item = {\n    Id: input.Id,\n    Sk: \`${t}#\${input.ItemId}\`,\n    ...input,\n    UpdatedAt: now,\n  } as ${t};\n\n  await dynamoService.updateAttributes({\n    tableName: DYNAMO_TABLES.TableName,\n    keyNames: ['Id', 'Sk'],\n    attributes: item,\n    returnValues: 'NONE',\n  });\n\n  return item;\n});\n`);
+            `import { AppSyncResolverEvent } from 'aws-lambda';\nimport moment from 'moment';\nimport DynamoService from 'services/dynamoService';\nimport { ${e}, ${t} } from 'types/API';\nimport { DYNAMO_TABLES } from 'types/index';\nimport middy from 'utils/middy';\n\nexport const handler = middy.handler(async (event: AppSyncResolverEvent<${e}>): Promise<${t}> => {\n  const input = event.arguments.input;\n  const now = moment.tz('Asia/Tokyo').format();\n  const dynamoService = new DynamoService();\n  const item = {\n    ...input,\n    Id: input.Id,\n    Sk: \`${t}#\${input.ItemId}\`,\n    UpdatedAt: now,\n  } as ${t};\n\n  await dynamoService.updateAttributes({\n    tableName: DYNAMO_TABLES.TableName,\n    keyNames: ['Id', 'Sk'],\n    attributes: item,\n    returnValues: 'NONE',\n  });\n\n  return item;\n});\n`);
       },
       7022: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),

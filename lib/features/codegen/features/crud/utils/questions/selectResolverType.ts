@@ -1,12 +1,13 @@
 import { getLocaleLang } from 'features/codegen/features/crud/utils/getLocale';
 
-export default (lang: string) => ({
+export default (lang: string, apiName: string) => ({
   type: 'list',
   name: 'selectResolverType',
-  message: getLocaleLang(lang).inquirer.selectResolverType,
-  default: () => 'get',
+  message: `${apiName}: ${getLocaleLang(lang).inquirer.selectResolverType}`,
+  default: () => 'GetItem',
   choices: [
-    { title: 'LocalResolver', value: 'none' },
-    { title: 'GetItem', value: 'get' },
+    { title: 'LocalResolver', value: 'LocalResolver' },
+    { title: 'GetItem', value: 'GetItem' },
   ],
 });
+[];
