@@ -24,19 +24,19 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(4147)),
           n = r(a(6517)),
-          i = r(a(1017)),
-          o = {
+          o = r(a(1017)),
+          i = {
             npmVersion: s.default.version,
             repositoyUrl: 'https://github.com/ragate-inc/serverless-starter',
-            tmpPath: `${i.default.dirname(process.argv[1])}/../tmp`,
-            currentPath: i.default.resolve(),
+            tmpPath: `${o.default.dirname(process.argv[1])}/../tmp`,
+            currentPath: o.default.resolve(),
             templates: n.default
               .chain([{ category: 'Node.js', name: 'Node.js - aws-node-appsync', value: 'aws-node-appsync' }])
               .sortBy('category')
               .map((e) => ({ name: `${e.category} - ${e.name}`, value: e.value }))
               .value(),
           };
-        t.default = o;
+        t.default = i;
       },
       9026: function (e, t, a) {
         var r =
@@ -47,8 +47,8 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(6444)),
           n = r(a(9267)),
-          i = a(6870),
-          o = r(a(2322)),
+          o = a(6870),
+          i = r(a(2322)),
           l = a(8014),
           u = r(a(8798)),
           c = r(a(8072)),
@@ -59,7 +59,7 @@
         t.default = class {
           constructor() {
             try {
-              (0, i.init)(), (this.chalk = i.chalk);
+              (0, o.init)(), (this.chalk = o.chalk);
               const e = (0, n.default)(process.argv.slice(2))
                 .options({
                   lang: { default: this.langRef.default, type: this.langRef.type },
@@ -75,7 +75,7 @@
                 (this.region = e.region),
                 (this.locale = (0, l.getLocaleLang)(e.lang)),
                 (this.logger = s.default.getLogger(this.verbose ? 'debug' : 'info')),
-                (this.npmVersion = o.default.npmVersion);
+                (this.npmVersion = i.default.npmVersion);
             } finally {
               (0, f.cleanUpTmpDirectory)();
             }
@@ -95,7 +95,7 @@
           regionRef = { default: 'ap-northeast-1', type: 'string' };
           handleError(e) {
             const t = s.default.getLogger();
-            e.name && t.debug(e.name), e.stack && t.debug(e.stack), console.error('\n', i.chalk.red(e.message)), process.exit(1);
+            e.name && t.debug(e.name), e.stack && t.debug(e.stack), console.error('\n', o.chalk.red(e.message)), process.exit(1);
           }
           cli() {
             const { version: e, chalk: t, locale: a, lang: r } = this;
@@ -220,8 +220,8 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = a(6702),
           n = r(a(6444)),
-          i = r(a(9211)),
-          o = r(a(592)),
+          o = r(a(9211)),
+          i = r(a(592)),
           l = r(a(8785)),
           u = r(a(8806)),
           c = a(6870),
@@ -240,14 +240,14 @@
               .command(
                 'sns',
                 c.chalk.grey(a.command.description.sns),
-                (e) => new i.default.builder(this.args).build(e),
-                (e) => new i.default.handler(e).run()
+                (e) => new o.default.builder(this.args).build(e),
+                (e) => new o.default.handler(e).run()
               )
               .command(
                 'sqs',
                 c.chalk.grey(a.command.description.sns),
-                (e) => new o.default.builder(this.args).build(e),
-                (e) => new o.default.handler(e).run()
+                (e) => new i.default.builder(this.args).build(e),
+                (e) => new i.default.handler(e).run()
               )
               .command(
                 'basicauthlambda',
@@ -295,8 +295,8 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(6444)),
           n = a(6702),
-          i = r(a(6517)),
-          o = r(a(1325)),
+          o = r(a(6517)),
+          i = r(a(1325)),
           l = r(a(3290)),
           u = r(a(7973)),
           c = r(a(5837)),
@@ -304,9 +304,9 @@
           p = r(a(3448)),
           m = r(a(6849)),
           f = r(a(8391)),
-          g = r(a(245)),
-          h = r(a(7116)),
-          y = a(8854);
+          y = r(a(245)),
+          g = r(a(7116)),
+          h = a(8854);
         class v extends n.FeatureHandlerAbstract {
           constructor(e) {
             super(e);
@@ -319,7 +319,7 @@
           }
           async run() {
             const e = s.default.getLogger(),
-              t = (0, y.getLocaleLang)(this.lang),
+              t = (0, h.getLocaleLang)(this.lang),
               a = await l.default.prompt([
                 {
                   type: 'input',
@@ -348,22 +348,22 @@
                 },
               ]);
             e.debug(`input info values : ${JSON.stringify(a)}}`);
-            const r = new o.default({ region: this.argv.region, serverlessConfigPath: a.serverlessConfigPath, lang: this.lang });
+            const r = new i.default({ region: this.argv.region, serverlessConfigPath: a.serverlessConfigPath, lang: this.lang });
             if (!r.isExistsServelessConfig) throw new Error(t.error.notFoundServerlessConfig);
             const n = r.serverlessConfig;
             if (!(n.plugins ?? []).includes('serverless-appsync-plugin')) throw new Error(t.error.notInstalledAppSyncPlugin);
             const v = p.default.parseSlsRecursivelyReference(n.custom?.appSync);
-            if (i.default.isEmpty(v)) throw new Error(`${t.error.invalidServerlessCustomAppSync} : \${file(./appsync/stack.yml)}`);
-            const S = new h.default({ stackFilePath: v, lang: this.lang, region: this.argv.region }),
-              _ = S.appSyncStack;
-            if (_?.mappingTemplates.some((e) => e.type === a.apiType && e.field === a.apiName)) throw new Error(t.error.alreadyExistsMappingTemplate);
-            if ('PIPELINE' === a.resolverType && _?.functionConfigurations.some((e) => e.name === `Mutation${a.apiName}`)) throw new Error(t.error.alreadyExistsResolver);
+            if (o.default.isEmpty(v)) throw new Error(`${t.error.invalidServerlessCustomAppSync} : \${file(./appsync/stack.yml)}`);
+            const $ = new g.default({ stackFilePath: v, lang: this.lang, region: this.argv.region }),
+              S = $.appSyncStack;
+            if (S?.mappingTemplates.some((e) => e.type === a.apiType && e.field === a.apiName)) throw new Error(t.error.alreadyExistsMappingTemplate);
+            if ('PIPELINE' === a.resolverType && S?.functionConfigurations.some((e) => e.name === `Mutation${a.apiName}`)) throw new Error(t.error.alreadyExistsResolver);
             if ('Mutation' === a.apiType) {
-              if (_?.schema.isExistsMutationApi(a.apiName)) throw new Error(t.error.alreadyExistsAPI);
-              return (0, m.default)({ appSyncStackService: S, lang: this.lang, slsConfig: r, info: a });
+              if (S?.schema.isExistsMutationApi(a.apiName)) throw new Error(t.error.alreadyExistsAPI);
+              return (0, m.default)({ appSyncStackService: $, lang: this.lang, slsConfig: r, info: a });
             }
             if ('Query' === a.apiType) {
-              if (_?.schema.isExistsQueryApi(a.apiName)) throw new Error(t.error.alreadyExistsAPI);
+              if (S?.schema.isExistsQueryApi(a.apiName)) throw new Error(t.error.alreadyExistsAPI);
               const { queryOperation: e } = await l.default.prompt([
                 {
                   type: 'list',
@@ -373,8 +373,8 @@
                   validate: (e) => new u.default(e, this.lang).required().value(),
                 },
               ]);
-              if ('Query' === e) return (0, f.default)({ appSyncStackService: S, lang: this.lang, slsConfig: r, info: a });
-              if ('GetItem' === e) return (0, g.default)({ appSyncStackService: S, lang: this.lang, slsConfig: r, info: a });
+              if ('Query' === e) return (0, f.default)({ appSyncStackService: $, lang: this.lang, slsConfig: r, info: a });
+              if ('GetItem' === e) return (0, y.default)({ appSyncStackService: $, lang: this.lang, slsConfig: r, info: a });
             }
           }
         }
@@ -472,8 +472,8 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(6444)),
           n = r(a(3290)),
-          i = r(a(7973)),
-          o = r(a(2056)),
+          o = r(a(7973)),
+          i = r(a(2056)),
           l = r(a(1017)),
           u = r(a(6517)),
           c = a(7343),
@@ -482,10 +482,10 @@
         t.default = async (e) => {
           const { appSyncStackService: t, lang: a, slsConfig: r, info: m } = e,
             f = s.default.getLogger(),
-            g = (0, d.getLocaleLang)(a);
+            y = (0, d.getLocaleLang)(a);
           f.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const h = await (0, p.isCreateDataSource)({ lang: a, dataSource: t.appSyncStack?.dataSources ?? [] }),
-            y = async (e) => {
+          const g = await (0, p.isCreateDataSource)({ lang: a, dataSource: t.appSyncStack?.dataSources ?? [] }),
+            h = async (e) => {
               if ('AMAZON_DYNAMODB' === e.type) {
                 const {
                   template: e,
@@ -496,64 +496,64 @@
                     type: 'list',
                     name: 'template',
                     choices: ['getItem', 'getItemConsistentRead', 'localResolver'],
-                    message: g.services.common.inquirer.template,
-                    validate: (e) => new i.default(e, a).required().value(),
+                    message: y.services.common.inquirer.template,
+                    validate: (e) => new o.default(e, a).required().value(),
                   },
                   {
                     type: 'input',
                     name: 'primaryKeyName',
-                    message: g.services.common.inquirer.primaryKeyName,
+                    message: y.services.common.inquirer.primaryKeyName,
                     default: () => 'Id',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
+                    validate: (e) => new o.default(e, a).required().mustNoIncludeZenkaku().value(),
                   },
                   {
                     type: 'input',
                     name: 'sortKeyName',
-                    message: g.services.common.inquirer.sortKeyName,
+                    message: y.services.common.inquirer.sortKeyName,
                     default: () => 'Sk',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
+                    validate: (e) => new o.default(e, a).required().mustNoIncludeZenkaku().value(),
                   },
                 ]);
                 if ('getItem' === e)
                   return {
-                    before: o.default.templates.vtl.dynamoGetItemRequest({ consistentRead: !1, primaryKeyName: t, sortKeyName: r }),
-                    after: o.default.templates.vtl.dynamoGetItemResponse,
+                    before: i.default.templates.vtl.addDynamoGetItemRequest({ consistentRead: !1, primaryKeyName: t, sortKeyName: r }),
+                    after: i.default.templates.vtl.addDynamoGetItemResponse,
                   };
                 if ('getItemConsistentRead' === e)
                   return {
-                    before: o.default.templates.vtl.dynamoGetItemRequest({ consistentRead: !0, primaryKeyName: t, sortKeyName: r }),
-                    after: o.default.templates.vtl.dynamoGetItemResponse,
+                    before: i.default.templates.vtl.addDynamoGetItemRequest({ consistentRead: !0, primaryKeyName: t, sortKeyName: r }),
+                    after: i.default.templates.vtl.addDynamoGetItemResponse,
                   };
-                if ('localResolver' === e) return { before: o.default.templates.vtl.localResolverRequest, after: o.default.templates.vtl.localResolverResponse };
+                if ('localResolver' === e) return { before: i.default.templates.vtl.localResolverRequest, after: i.default.templates.vtl.localResolverResponse };
               } else {
                 if ('AMAZON_ELASTICSEARCH' === e.type) {
                   const { indexName: e } = await n.default.prompt([
                     {
                       type: 'input',
                       name: 'indexName',
-                      message: g.services.common.inquirer.indexName,
+                      message: y.services.common.inquirer.indexName,
                       default: () => m.apiName,
                       filter: (e) => e.replace(/\s+/g, ''),
                       transformer: (e) => e.replace(/\s+/g, ''),
-                      validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
+                      validate: (e) => new o.default(e, a).required().mustNoIncludeZenkaku().value(),
                     },
                   ]);
-                  return { before: o.default.templates.vtl.openSearchQueryRequest({ indexName: e }), after: o.default.templates.vtl.openSearchQueryResponse };
+                  return { before: i.default.templates.vtl.openSearchQueryRequest({ indexName: e }), after: i.default.templates.vtl.openSearchQueryResponse };
                 }
-                if ('RELATIONAL_DATABASE' === e.type) return { before: o.default.templates.vtl.rdbQueryRequest, after: o.default.templates.vtl.rdbQueryResponse };
-                if ('HTTP' === e.type) return { before: o.default.templates.vtl.httpQueryRequest, after: o.default.templates.vtl.httpQueryResponse };
+                if ('RELATIONAL_DATABASE' === e.type) return { before: i.default.templates.vtl.rdbQueryRequest, after: i.default.templates.vtl.rdbQueryResponse };
+                if ('HTTP' === e.type) return { before: i.default.templates.vtl.httpQueryRequest, after: i.default.templates.vtl.httpQueryResponse };
               }
               return { before: '{}', after: '{}' };
             },
             v = await (async () =>
-              h
+              g
                 ? await (0, p.addLambda)({ appSyncStackService: t, lang: a, slsConfig: r, info: m })
                 : await (0, p.selectDataSource)({ lang: a, appSyncStackService: t, slsConfig: r }))(),
-            S = await (async (e) => {
+            $ = await (async (e) => {
               const { dataSource: a } = e;
               if ('UNIT' === m.resolverType) return Promise.resolve(void 0);
               const r = t.appSyncStack?.functionConfigurationsLocation ?? './',
@@ -564,13 +564,13 @@
                   response: 'AWS_LAMBDA' !== a.type && `functions/${m.apiType}.${m.apiName}.response.vtl`,
                 };
               if ('AWS_LAMBDA' !== a.type) {
-                const { before: e, after: t } = await y(a);
-                u.default.isString(s.request) && new o.default({ filePath: l.default.join(r, s.request), code: e, type: 'vtl' }).write(),
-                  u.default.isString(s.response) && new o.default({ filePath: l.default.join(r, s.response), code: t, type: 'vtl' }).write();
+                const { before: e, after: t } = await h(a);
+                u.default.isString(s.request) && new i.default({ filePath: l.default.join(r, s.request), code: e, type: 'vtl' }).write(),
+                  u.default.isString(s.response) && new i.default({ filePath: l.default.join(r, s.response), code: t, type: 'vtl' }).write();
               }
               return t.addFunctionConfiguration({ functionConfiguration: s }), f.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
             })({ dataSource: v }),
-            _ = await (async (e) => {
+            S = await (async (e) => {
               const { dataSource: a, functionConfigurations: r } = e,
                 s = await (async () => {
                   if ('PIPELINE' === m.resolverType) {
@@ -584,8 +584,8 @@
                         functions: [r?.name],
                       };
                     return (
-                      new o.default({ filePath: l.default.join(e, a.request), code: o.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
-                      new o.default({ filePath: l.default.join(e, a.response), code: o.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
+                      new i.default({ filePath: l.default.join(e, a.request), code: i.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
+                      new i.default({ filePath: l.default.join(e, a.response), code: i.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
                       a
                     );
                   }
@@ -599,15 +599,15 @@
                   };
                   if ('AWS_LAMBDA' !== a.type) {
                     const r = t.appSyncStack?.mappingTemplatesLocation ?? './',
-                      { before: s, after: n } = await y(a);
-                    u.default.isString(e.request) && new o.default({ filePath: l.default.join(r, e.request), code: s, type: 'vtl' }).write(),
-                      u.default.isString(e.response) && new o.default({ filePath: l.default.join(r, e.response), code: n, type: 'vtl' }).write();
+                      { before: s, after: n } = await h(a);
+                    u.default.isString(e.request) && new i.default({ filePath: l.default.join(r, e.request), code: s, type: 'vtl' }).write(),
+                      u.default.isString(e.response) && new i.default({ filePath: l.default.join(r, e.response), code: n, type: 'vtl' }).write();
                   }
                   return e;
                 })();
               return t.addMappingTemplate({ mappingTemplate: s }), f.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: v, functionConfigurations: S }),
-            $ = await (async () => {
+            })({ dataSource: v, functionConfigurations: $ }),
+            _ = await (async () => {
               const e = t.graphqlEditor,
                 a = t.graphqlEditor.addExampleType(m.apiName);
               return (
@@ -616,7 +616,7 @@
                 Promise.resolve(e.customSchema)
               );
             })();
-          f.debug({ dataSource: v, functionConfigurations: S, mappingTemplate: _, schemaGraphql: $ });
+          f.debug({ dataSource: v, functionConfigurations: $, mappingTemplate: S, schemaGraphql: _ });
         };
       },
       6849: function (e, t, a) {
@@ -628,8 +628,8 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(6444)),
           n = r(a(2056)),
-          i = r(a(1017)),
-          o = r(a(6517)),
+          o = r(a(1017)),
+          i = r(a(6517)),
           l = a(6134);
         t.default = async (e) => {
           const { appSyncStackService: t, lang: a, slsConfig: r, info: u } = e,
@@ -643,7 +643,7 @@
             m = await ((e) => {
               const { dataSource: a } = e;
               if ('UNIT' === u.resolverType) return Promise.resolve(void 0);
-              const r = { dataSource: a.name, name: `${u.apiType}${o.default.upperFirst(u.apiName)}`, request: !1, response: !1 };
+              const r = { dataSource: a.name, name: `${u.apiType}${i.default.upperFirst(u.apiName)}`, request: !1, response: !1 };
               return t.addFunctionConfiguration({ functionConfiguration: r }), c.debug('finished functionConfigurationsProcess'), Promise.resolve(r);
             })({ dataSource: p }),
             f = await (async (e) => {
@@ -660,8 +660,8 @@
                         functions: [r?.name],
                       };
                     return (
-                      new n.default({ filePath: i.default.join(e, a.request), code: n.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
-                      new n.default({ filePath: i.default.join(e, a.response), code: n.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
+                      new n.default({ filePath: o.default.join(e, a.request), code: n.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
+                      new n.default({ filePath: o.default.join(e, a.response), code: n.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
                       a
                     );
                   }
@@ -669,7 +669,7 @@
                 })();
               return t.addMappingTemplate({ mappingTemplate: s }), c.debug('finished mappingTemplateProcess'), s;
             })({ dataSource: p, functionConfigurations: m }),
-            g = await (async () => {
+            y = await (async () => {
               const e = t.graphqlEditor,
                 a = t.graphqlEditor.addExampleType(u.apiName),
                 r = t.graphqlEditor.addExampleInput(u.apiName);
@@ -679,7 +679,7 @@
                 Promise.resolve(e.customSchema)
               );
             })();
-          c.debug({ dataSource: p, functionConfigurations: m, mappingTemplate: f, schemaGraphql: g });
+          c.debug({ dataSource: p, functionConfigurations: m, mappingTemplate: f, schemaGraphql: y });
         };
       },
       8391: function (e, t, a) {
@@ -691,8 +691,8 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(6444)),
           n = r(a(3290)),
-          i = r(a(7973)),
-          o = r(a(2056)),
+          o = r(a(7973)),
+          i = r(a(2056)),
           l = r(a(1017)),
           u = r(a(6517)),
           c = a(7343),
@@ -702,9 +702,9 @@
           const { appSyncStackService: t, lang: a, slsConfig: r, info: m } = e,
             f = s.default.getLogger();
           f.debug(`appsyncStack : ${JSON.stringify(t.appSyncStack)}`);
-          const g = (0, d.getLocaleLang)(a),
-            h = await (0, p.isCreateDataSource)({ lang: a, dataSource: t.appSyncStack?.dataSources ?? [] }),
-            y = async (e) => {
+          const y = (0, d.getLocaleLang)(a),
+            g = await (0, p.isCreateDataSource)({ lang: a, dataSource: t.appSyncStack?.dataSources ?? [] }),
+            h = async (e) => {
               if ('AMAZON_DYNAMODB' === e.type) {
                 const {
                   template: e,
@@ -715,73 +715,73 @@
                     type: 'list',
                     name: 'template',
                     choices: ['query', 'queryWithGsi', 'scan'],
-                    message: g.services.common.inquirer.template,
-                    validate: (e) => new i.default(e, a).required().value(),
+                    message: y.services.common.inquirer.template,
+                    validate: (e) => new o.default(e, a).required().value(),
                   },
                   {
                     type: 'input',
                     name: 'primaryKeyName',
-                    message: g.services.common.inquirer.primaryKeyName,
+                    message: y.services.common.inquirer.primaryKeyName,
                     default: () => 'Id',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
+                    validate: (e) => new o.default(e, a).required().mustNoIncludeZenkaku().value(),
                   },
                   {
                     type: 'input',
                     name: 'sortKeyName',
-                    message: g.services.common.inquirer.sortKeyName,
+                    message: y.services.common.inquirer.sortKeyName,
                     default: () => 'Sk',
                     filter: (e) => e.replace(/\s+/g, ''),
                     transformer: (e) => e.replace(/\s+/g, ''),
-                    validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
+                    validate: (e) => new o.default(e, a).required().mustNoIncludeZenkaku().value(),
                   },
                 ]);
                 if ('query' === e)
-                  return { before: o.default.templates.vtl.dynamoQueryRequest({ primaryKeyName: t, sortKeyName: r }), after: o.default.templates.vtl.dynamoGetItemResponse };
+                  return { before: i.default.templates.vtl.addDynamoQueryRequest({ primaryKeyName: t, sortKeyName: r }), after: i.default.templates.vtl.addDynamoGetItemResponse };
                 if ('queryWithGsi' === e) {
                   const { gsiName: e } = await n.default.prompt([
                     {
                       type: 'input',
                       name: 'gsiName',
-                      message: g.services.generateQueryService.inquirer.gsiName,
+                      message: y.services.generateQueryService.inquirer.gsiName,
                       default: () => 'ExampleIndex',
                       filter: (e) => e.replace(/\s+/g, ''),
                       transformer: (e) => e.replace(/\s+/g, ''),
-                      validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
+                      validate: (e) => new o.default(e, a).required().mustNoIncludeZenkaku().value(),
                     },
                   ]);
                   return {
-                    before: o.default.templates.vtl.dynamoQueryRequest({ gsiName: e, primaryKeyName: t, sortKeyName: r }),
-                    after: o.default.templates.vtl.dynamoGetItemResponse,
+                    before: i.default.templates.vtl.addDynamoQueryRequest({ gsiName: e, primaryKeyName: t, sortKeyName: r }),
+                    after: i.default.templates.vtl.addDynamoGetItemResponse,
                   };
                 }
-                if ('scan' === e) return { before: o.default.templates.vtl.dynamoScanRequest, after: o.default.templates.vtl.dynamoScanResponse };
+                if ('scan' === e) return { before: i.default.templates.vtl.dynamoScanRequest, after: i.default.templates.vtl.dynamoScanResponse };
               } else {
                 if ('AMAZON_ELASTICSEARCH' === e.type) {
                   const { indexName: e } = await n.default.prompt([
                     {
                       type: 'input',
                       name: 'indexName',
-                      message: g.services.common.inquirer.indexName,
+                      message: y.services.common.inquirer.indexName,
                       default: () => m.apiName,
                       filter: (e) => e.replace(/\s+/g, ''),
                       transformer: (e) => e.replace(/\s+/g, ''),
-                      validate: (e) => new i.default(e, a).required().mustNoIncludeZenkaku().value(),
+                      validate: (e) => new o.default(e, a).required().mustNoIncludeZenkaku().value(),
                     },
                   ]);
-                  return { before: o.default.templates.vtl.openSearchQueryRequest({ indexName: e }), after: o.default.templates.vtl.openSearchQueryResponse };
+                  return { before: i.default.templates.vtl.openSearchQueryRequest({ indexName: e }), after: i.default.templates.vtl.openSearchQueryResponse };
                 }
-                if ('RELATIONAL_DATABASE' === e.type) return { before: o.default.templates.vtl.rdbQueryRequest, after: o.default.templates.vtl.rdbQueryResponse };
-                if ('HTTP' === e.type) return { before: o.default.templates.vtl.httpQueryRequest, after: o.default.templates.vtl.httpQueryResponse };
+                if ('RELATIONAL_DATABASE' === e.type) return { before: i.default.templates.vtl.rdbQueryRequest, after: i.default.templates.vtl.rdbQueryResponse };
+                if ('HTTP' === e.type) return { before: i.default.templates.vtl.httpQueryRequest, after: i.default.templates.vtl.httpQueryResponse };
               }
               return { before: '{}', after: '{}' };
             },
             v = await (async () =>
-              h
+              g
                 ? await (0, p.addLambda)({ appSyncStackService: t, lang: a, slsConfig: r, info: m })
                 : await (0, p.selectDataSource)({ lang: a, appSyncStackService: t, slsConfig: r }))(),
-            S = await (async (e) => {
+            $ = await (async (e) => {
               const { dataSource: a } = e;
               if ('UNIT' === m.resolverType) return Promise.resolve(void 0);
               const r = t.appSyncStack?.functionConfigurationsLocation ?? './',
@@ -792,13 +792,13 @@
                   response: 'AWS_LAMBDA' !== a.type && `functions/${m.apiType}.${m.apiName}.response.vtl`,
                 };
               if ('AWS_LAMBDA' !== a.type) {
-                const { before: e, after: t } = await y(a);
-                u.default.isString(s.request) && new o.default({ filePath: l.default.join(r, s.request), code: e, type: 'vtl' }).write(),
-                  u.default.isString(s.response) && new o.default({ filePath: l.default.join(r, s.response), code: t, type: 'vtl' }).write();
+                const { before: e, after: t } = await h(a);
+                u.default.isString(s.request) && new i.default({ filePath: l.default.join(r, s.request), code: e, type: 'vtl' }).write(),
+                  u.default.isString(s.response) && new i.default({ filePath: l.default.join(r, s.response), code: t, type: 'vtl' }).write();
               }
               return t.addFunctionConfiguration({ functionConfiguration: s }), f.debug('finished functionConfigurationsProcess'), Promise.resolve(s);
             })({ dataSource: v }),
-            _ = await (async (e) => {
+            S = await (async (e) => {
               const { dataSource: a, functionConfigurations: r } = e,
                 s = await (async () => {
                   if ('PIPELINE' === m.resolverType) {
@@ -812,8 +812,8 @@
                         functions: [r?.name],
                       };
                     return (
-                      new o.default({ filePath: l.default.join(e, a.request), code: o.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
-                      new o.default({ filePath: l.default.join(e, a.response), code: o.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
+                      new i.default({ filePath: l.default.join(e, a.request), code: i.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
+                      new i.default({ filePath: l.default.join(e, a.response), code: i.default.templates.vtl.pipelineAfter, type: 'vtl' }).write(),
                       a
                     );
                   }
@@ -827,15 +827,15 @@
                   };
                   if ('AWS_LAMBDA' !== a.type) {
                     const r = t.appSyncStack?.mappingTemplatesLocation ?? './',
-                      { before: s, after: n } = await y(a);
-                    u.default.isString(e.request) && new o.default({ filePath: l.default.join(r, e.request), code: s, type: 'vtl' }).write(),
-                      u.default.isString(e.response) && new o.default({ filePath: l.default.join(r, e.response), code: n, type: 'vtl' }).write();
+                      { before: s, after: n } = await h(a);
+                    u.default.isString(e.request) && new i.default({ filePath: l.default.join(r, e.request), code: s, type: 'vtl' }).write(),
+                      u.default.isString(e.response) && new i.default({ filePath: l.default.join(r, e.response), code: n, type: 'vtl' }).write();
                   }
                   return e;
                 })();
               return t.addMappingTemplate({ mappingTemplate: s }), f.debug('finished mappingTemplateProcess'), s;
-            })({ dataSource: v, functionConfigurations: S }),
-            $ = await (async () => {
+            })({ dataSource: v, functionConfigurations: $ }),
+            _ = await (async () => {
               const e = t.graphqlEditor,
                 a = t.graphqlEditor.addExampleType(m.apiName);
               return (
@@ -844,7 +844,7 @@
                 Promise.resolve(e.customSchema)
               );
             })();
-          f.debug({ dataSource: v, functionConfigurations: S, mappingTemplate: _, schemaGraphql: $ });
+          f.debug({ dataSource: v, functionConfigurations: $, mappingTemplate: S, schemaGraphql: _ });
         };
       },
       8854: function (e, t, a) {
@@ -867,19 +867,19 @@
         Object.defineProperty(t, '__esModule', { value: !0 }), (t.selectDataSource = t.addLambda = t.isCreateDataSource = void 0);
         const s = r(a(3290)),
           n = r(a(7973)),
-          i = r(a(1092)),
-          o = r(a(5837)),
+          o = r(a(1092)),
+          i = r(a(5837)),
           l = r(a(2056)),
           u = a(6870),
           c = a(8854);
         (t.isCreateDataSource = async (e) => {
           const { lang: a, dataSource: r } = e,
-            i = (0, c.getLocaleLang)(a),
-            { createDataSource: o } = await s.default.prompt([
+            o = (0, c.getLocaleLang)(a),
+            { createDataSource: i } = await s.default.prompt([
               {
                 type: 'expand',
                 name: 'createDataSource',
-                message: i.services.common.inquirer.createDataSource,
+                message: o.services.common.inquirer.createDataSource,
                 choices: [
                   { key: 'y', name: 'yes', value: !0 },
                   { key: 'n', name: 'no', value: !1 },
@@ -887,13 +887,13 @@
                 validate: (e) => new n.default(e, a).required().value(),
               },
             ]);
-          return o || (0 === r.length && (console.log(u.chalk.red(i.services.common.error.notFoundDataSource)), (0, t.isCreateDataSource)(e)));
+          return i || (0 === r.length && (console.log(u.chalk.red(o.services.common.error.notFoundDataSource)), (0, t.isCreateDataSource)(e)));
         }),
           (t.addLambda = async (e) => {
             const { lang: t, slsConfig: a, info: r, appSyncStackService: u } = e,
               { apiName: d, apiType: p } = r,
               m = (0, c.getLocaleLang)(t),
-              { lambdaFunctionName: f, lambdaHandler: g } = await s.default.prompt([
+              { lambdaFunctionName: f, lambdaHandler: y } = await s.default.prompt([
                 {
                   type: 'input',
                   name: 'lambdaFunctionName',
@@ -909,12 +909,12 @@
                   message: m.services.common.inquirer.lambdaHandler,
                   default: () => `src/functions/appsync/${d}.handler`,
                   validate: (e) => new n.default(e, t).required().mustBeExtension().value(),
-                  transformer: (e) => new i.default(e).removeAllSpace().value(),
-                  filter: (e) => new o.default(e).removeAllSpace().value(),
+                  transformer: (e) => new o.default(e).removeAllSpace().value(),
+                  filter: (e) => new i.default(e).removeAllSpace().value(),
                 },
               ]);
-            a.addFunction({ lambdaFunctionName: f, lambdaHandler: g, code: l.default.templates.typescript.skeleton });
-            const h = {
+            a.addFunction({ lambdaFunctionName: f, lambdaHandler: y, code: l.default.templates.typescript.skeleton });
+            const g = {
               type: 'AWS_LAMBDA',
               name: f,
               description: `It is for ${p}.${d}`,
@@ -924,21 +924,21 @@
                 serviceRoleArn: { 'Fn::GetAtt': [u.appSyncLambdaRoleName, 'Arn'] },
               },
             };
-            return u.addIamRoleByDataSource({ dataSource: 'AWS_LAMBDA', sls: a }), u.addDataSource(h), h;
+            return u.addIamRoleByDataSource({ dataSource: 'AWS_LAMBDA', sls: a }), u.addDataSource(g), g;
           }),
           (t.selectDataSource = async (e) => {
             const { appSyncStackService: t, lang: a, slsConfig: r } = e,
-              i = (0, c.getLocaleLang)(a),
-              { dataSource: o } = await s.default.prompt([
+              o = (0, c.getLocaleLang)(a),
+              { dataSource: i } = await s.default.prompt([
                 {
                   type: 'list',
                   name: 'dataSource',
                   choices: t.appSyncStack?.dataSources.map((e) => e.name),
-                  message: i.services.common.inquirer.dataSource,
+                  message: o.services.common.inquirer.dataSource,
                   validate: (e) => new n.default(e, a).required().value(),
                 },
               ]),
-              l = t.appSyncStack?.dataSources.find((e) => e.name === o);
+              l = t.appSyncStack?.dataSources.find((e) => e.name === i);
             return t.addIamRoleByDataSource({ dataSource: l.type, sls: r }), l;
           });
       },
@@ -991,25 +991,25 @@
               if (null != e) for (var a in e) 'default' !== a && Object.prototype.hasOwnProperty.call(e, a) && r(t, e, a);
               return s(t, e), t;
             },
-          i =
+          o =
             (this && this.__importDefault) ||
             function (e) {
               return e && e.__esModule ? e : { default: e };
             };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = i(a(6444)),
+        const i = o(a(6444)),
           l = a(6702),
-          u = i(a(3290)),
-          c = i(a(7973)),
-          d = i(a(1092)),
-          p = i(a(5837)),
+          u = o(a(3290)),
+          c = o(a(7973)),
+          d = o(a(1092)),
+          p = o(a(5837)),
           m = n(a(7808)),
           f = n(a(2e3)),
-          g = i(a(2056)),
-          h = i(a(1325)),
-          y = i(a(3624)),
-          v = i(a(1325));
-        class S extends l.FeatureHandlerAbstract {
+          y = o(a(2056)),
+          g = o(a(1325)),
+          h = o(a(3624)),
+          v = o(a(1325));
+        class $ extends l.FeatureHandlerAbstract {
           constructor(e) {
             super(e);
           }
@@ -1021,7 +1021,7 @@
           lambdaEdgeTimeout = 5;
           lambdaEdgeMemorySize = 128;
           generateLambdaIamRoleCf() {
-            return y.default.generateCloudFormation(this.defaultLambdaRoleName, (e) => {
+            return h.default.generateCloudFormation(this.defaultLambdaRoleName, (e) => {
               const t = new m.Role(e, this.defaultLambdaRoleName, { assumedBy: new m.ServicePrincipal('edgelambda.amazonaws.com') });
               return (
                 t.addToPolicy(
@@ -1043,7 +1043,7 @@
             });
           }
           get defaultServerlessConfig() {
-            return h.default.generateServerlessConfig({
+            return g.default.generateServerlessConfig({
               service: 'basic-lambda-auth',
               provider: { region: 'us-east-1', environment: { LOG_LEVEL: 'WARN' }, iam: { role: this.defaultLambdaRoleName } },
               custom: { awsResourcePrefix: '${self:service}-${self:provider.region}-${self:provider.stage}-' },
@@ -1103,23 +1103,23 @@
               .then((e) => e);
           }
           async run() {
-            const e = o.default.getLogger(),
+            const e = i.default.getLogger(),
               t = await this.prompt();
             e.debug(`input values : ${JSON.stringify(t)}}`);
-            const { functionName: a, serverlessConfigPath: r, lamndaRoleCfPath: s, lamndaRoleName: n, lambdaHandler: i } = t,
+            const { functionName: a, serverlessConfigPath: r, lamndaRoleCfPath: s, lamndaRoleName: n, lambdaHandler: o } = t,
               l = new v.default({ region: this.argv.region, serverlessConfigPath: r, lang: this.lang });
             if ('us-east-1' !== l.region) throw new Error('lambda edge must be in us-east-1');
             l.addFunction({
               lambdaFunctionName: a,
-              lambdaHandler: i,
+              lambdaHandler: o,
               memorySize: this.lambdaEdgeMemorySize,
               timeout: this.lambdaEdgeTimeout,
-              code: g.default.templates.typescript.basicauthlambda,
+              code: y.default.templates.typescript.basicauthlambda,
             }),
               l.addResource({ filePath: s, resourceName: n, cf: this.generateLambdaIamRoleCf() });
           }
         }
-        t.default = S;
+        t.default = $;
       },
       8785: function (e, t, a) {
         var r =
@@ -1181,27 +1181,27 @@
               if (null != e) for (var a in e) 'default' !== a && Object.prototype.hasOwnProperty.call(e, a) && r(t, e, a);
               return s(t, e), t;
             },
-          i =
+          o =
             (this && this.__importDefault) ||
             function (e) {
               return e && e.__esModule ? e : { default: e };
             };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = i(a(6444)),
+        const i = o(a(6444)),
           l = a(6702),
-          u = i(a(6517)),
+          u = o(a(6517)),
           c = a(3362),
-          d = i(a(3290)),
-          p = i(a(7973)),
-          m = i(a(5837)),
-          f = i(a(1092)),
-          g = i(a(3624)),
-          h = n(a(8890)),
-          y = n(a(9087)),
+          d = o(a(3290)),
+          p = o(a(7973)),
+          m = o(a(5837)),
+          f = o(a(1092)),
+          y = o(a(3624)),
+          g = n(a(8890)),
+          h = n(a(9087)),
           v = n(a(6324)),
-          S = n(a(5862)),
-          _ = n(a(2e3)),
-          $ = i(a(1325));
+          $ = n(a(5862)),
+          S = n(a(2e3)),
+          _ = o(a(1325));
         class b extends l.FeatureHandlerAbstract {
           constructor(e) {
             super(e);
@@ -1213,28 +1213,28 @@
             return `serverless/${this.argv.region}/serverless.yml`;
           }
           generateSnsCf(e, t) {
-            return g.default.generateCloudFormation(e, (a) => {
-              const r = new h.Topic(a, e, { topicName: e });
+            return y.default.generateCloudFormation(e, (a) => {
+              const r = new g.Topic(a, e, { topicName: e });
               return (
                 t.forEach((t) => {
                   'email' === t
                     ? r.addSubscription(new v.EmailSubscription('****@****.com'))
                     : 'lambda' === t
                     ? r.addSubscription(
-                        new v.LambdaSubscription(S.Function.fromFunctionArn(a, `${e}Lambda`, `arn:aws:lambda:${this.argv.region}:${_.Fn.ref('AWS::AccountId')}:function:*****`))
+                        new v.LambdaSubscription($.Function.fromFunctionArn(a, `${e}Lambda`, `arn:aws:lambda:${this.argv.region}:${S.Fn.ref('AWS::AccountId')}:function:*****`))
                       )
                     : 'sms' === t
                     ? r.addSubscription(new v.SmsSubscription('0000000000'))
                     : 'url' === t
                     ? r.addSubscription(new v.UrlSubscription('https://*****.com'))
-                    : 'sqs' === t && r.addSubscription(new v.SqsSubscription(new y.Queue(a, `${e}SubscribeQueue`)));
+                    : 'sqs' === t && r.addSubscription(new v.SqsSubscription(new h.Queue(a, `${e}SubscribeQueue`)));
                 }),
                 r
               );
             });
           }
           async run() {
-            const e = o.default.getLogger(),
+            const e = i.default.getLogger(),
               t = (0, c.getLocaleLang)(this.lang),
               a = await d.default
                 .prompt([
@@ -1278,10 +1278,10 @@
                   ...e,
                 }));
             e.debug(`input values : ${JSON.stringify(a)}}`);
-            const { resourceName: r, filePath: s, subscriptions: n, serverlessConfigPath: i } = a,
-              l = new $.default({ region: this.argv.region, serverlessConfigPath: i, lang: this.lang }),
-              g = this.generateSnsCf(r, n);
-            l.addResource({ filePath: s, resourceName: r, cf: g });
+            const { resourceName: r, filePath: s, subscriptions: n, serverlessConfigPath: o } = a,
+              l = new _.default({ region: this.argv.region, serverlessConfigPath: o, lang: this.lang }),
+              y = this.generateSnsCf(r, n);
+            l.addResource({ filePath: s, resourceName: r, cf: y });
           }
         }
         t.default = b;
@@ -1363,23 +1363,23 @@
               if (null != e) for (var a in e) 'default' !== a && Object.prototype.hasOwnProperty.call(e, a) && r(t, e, a);
               return s(t, e), t;
             },
-          i =
+          o =
             (this && this.__importDefault) ||
             function (e) {
               return e && e.__esModule ? e : { default: e };
             };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = i(a(6444)),
+        const i = o(a(6444)),
           l = a(6702),
-          u = i(a(6517)),
-          c = i(a(3290)),
-          d = i(a(7973)),
-          p = i(a(5837)),
-          m = i(a(1092)),
+          u = o(a(6517)),
+          c = o(a(3290)),
+          d = o(a(7973)),
+          p = o(a(5837)),
+          m = o(a(1092)),
           f = n(a(9087)),
-          g = i(a(3624)),
-          h = i(a(1325));
-        class y extends l.FeatureHandlerAbstract {
+          y = o(a(3624)),
+          g = o(a(1325));
+        class h extends l.FeatureHandlerAbstract {
           constructor(e) {
             super(e);
           }
@@ -1392,21 +1392,21 @@
           defaultMaxMessageSizeBytes = 262144;
           defaultMaxReceiveCount = 3;
           generateSqsCf(e, t) {
-            return g.default.generateCloudFormation(e, (a) => {
+            return y.default.generateCloudFormation(e, (a) => {
               const r = 'Fifo' === t.queueType;
               if (t.useDeadLetterQueue) {
                 const s = { queueName: `${e}DeadLetter` };
                 r && u.default.assign(s, { queueName: `${e}DeadLetter.fifo`, fifo: !0 });
                 const n = new f.Queue(a, `${e}DeadLetter`, s),
-                  i = { queueName: e, fifo: r, maxMessageSizeBytes: this.defaultMaxMessageSizeBytes, deadLetterQueue: { maxReceiveCount: this.defaultMaxReceiveCount, queue: n } };
-                return r && u.default.assign(i, { queueName: `${e}.fifo`, contentBasedDeduplication: t.contentBasedDeduplication }), new f.Queue(a, e, i);
+                  o = { queueName: e, fifo: r, maxMessageSizeBytes: this.defaultMaxMessageSizeBytes, deadLetterQueue: { maxReceiveCount: this.defaultMaxReceiveCount, queue: n } };
+                return r && u.default.assign(o, { queueName: `${e}.fifo`, contentBasedDeduplication: t.contentBasedDeduplication }), new f.Queue(a, e, o);
               }
               const s = { queueName: e, fifo: r, maxMessageSizeBytes: this.defaultMaxMessageSizeBytes };
               return r && u.default.assign(s, { queueName: `${e}.fifo`, contentBasedDeduplication: t.contentBasedDeduplication }), new f.Queue(a, e, s);
             });
           }
           async run() {
-            const e = o.default.getLogger(),
+            const e = i.default.getLogger(),
               t = await c.default
                 .prompt([
                   {
@@ -1461,13 +1461,13 @@
                   ...e,
                 }));
             e.debug(`input values : ${JSON.stringify(t)}}`);
-            const { resourceName: a, queueType: r, useDeadLetterQueue: s, contentBasedDeduplication: n, filePath: i, serverlessConfigPath: l } = t,
-              u = new h.default({ region: this.argv.region, serverlessConfigPath: l, lang: this.lang }),
+            const { resourceName: a, queueType: r, useDeadLetterQueue: s, contentBasedDeduplication: n, filePath: o, serverlessConfigPath: l } = t,
+              u = new g.default({ region: this.argv.region, serverlessConfigPath: l, lang: this.lang }),
               f = this.generateSqsCf(a, { queueType: r, useDeadLetterQueue: s, contentBasedDeduplication: n });
-            u.addResource({ filePath: i, resourceName: a, cf: f });
+            u.addResource({ filePath: o, resourceName: a, cf: f });
           }
         }
-        t.default = y;
+        t.default = h;
       },
       592: function (e, t, a) {
         var r =
@@ -1526,8 +1526,8 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = a(6702),
           n = a(6870),
-          i = r(a(8798)),
-          o = a(2848),
+          o = r(a(8798)),
+          i = a(2848),
           l = r(a(6444)),
           u = r(a(5237));
         class c extends s.FeatureBuilderAbstract {
@@ -1536,7 +1536,7 @@
           }
           build(e) {
             const t = this.args.lang,
-              a = (0, o.getLocaleLang)(t);
+              a = (0, i.getLocaleLang)(t);
             return (
               l.default.getLogger(),
               e
@@ -1553,7 +1553,7 @@
                   n.chalk.grey('<command> <options>'),
                   () => ({}),
                   (e) => {
-                    if (1 === e._.length) return new i.default.handler(e).run();
+                    if (1 === e._.length) return new o.default.handler(e).run();
                     throw new Error('locale.error.unProcessed');
                   }
                 )
@@ -1562,6 +1562,242 @@
         }
         t.default = c;
       },
+      7379: (e, t, a) => {
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const r = a(6702);
+        class s extends r.FeatureBuilderAbstract {
+          constructor(e) {
+            super(e);
+          }
+          build(e) {
+            return e.version(!1).usage('Usage: $0 crud');
+          }
+        }
+        t.default = s;
+      },
+      2303: function (e, t, a) {
+        var r =
+            (this && this.__createBinding) ||
+            (Object.create
+              ? function (e, t, a, r) {
+                  void 0 === r && (r = a);
+                  var s = Object.getOwnPropertyDescriptor(t, a);
+                  (s && !('get' in s ? !t.__esModule : s.writable || s.configurable)) ||
+                    (s = {
+                      enumerable: !0,
+                      get: function () {
+                        return t[a];
+                      },
+                    }),
+                    Object.defineProperty(e, r, s);
+                }
+              : function (e, t, a, r) {
+                  void 0 === r && (r = a), (e[r] = t[a]);
+                }),
+          s =
+            (this && this.__setModuleDefault) ||
+            (Object.create
+              ? function (e, t) {
+                  Object.defineProperty(e, 'default', { enumerable: !0, value: t });
+                }
+              : function (e, t) {
+                  e.default = t;
+                }),
+          n =
+            (this && this.__importStar) ||
+            function (e) {
+              if (e && e.__esModule) return e;
+              var t = {};
+              if (null != e) for (var a in e) 'default' !== a && Object.prototype.hasOwnProperty.call(e, a) && r(t, e, a);
+              return s(t, e), t;
+            },
+          o =
+            (this && this.__importDefault) ||
+            function (e) {
+              return e && e.__esModule ? e : { default: e };
+            };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const i = a(6702),
+          l = o(a(3290)),
+          u = a(7704),
+          c = o(a(7147)),
+          d = n(a(7343)),
+          p = o(a(6517)),
+          m = o(a(1325)),
+          f = o(a(3448)),
+          y = a(3462),
+          g = o(a(5265)),
+          h = a(2762),
+          v = o(a(2056)),
+          $ = o(a(2377));
+        class S extends i.FeatureHandlerAbstract {
+          constructor(e) {
+            super(e), l.default.registerPrompt('table', g.default);
+          }
+          get defaultServerlessConfigPath() {
+            return `serverless/${this.argv.region}/serverless.yml`;
+          }
+          getSchemaGraphql(e) {
+            return p.default
+              .chain(e)
+              .thru((e) => (p.default.isString(e) ? [e] : e))
+              .map((e) => c.default.readFileSync(e).toString())
+              .join('\n')
+              .value();
+          }
+          buildSchemaGraphqlInfo(e) {
+            const t = [],
+              a = d.parse(e);
+            return (
+              d.visit(a, {
+                enter(e) {
+                  'ObjectTypeDefinition' !== e.kind ||
+                    ('Query' !== e.name.value && 'Mutation' !== e.name.value) ||
+                    p.default.each(e.fields, (a) => {
+                      t.push({
+                        type: e.name.value,
+                        name: a.name.value,
+                        arguments: p.default.map(a.arguments, (e) => ({
+                          name: e.name.value,
+                          type: p.default.get(e, 'type.type.name.value', p.default.get(e, 'type.name.value', 'other')),
+                          nonnull: e.type.kind === d.Kind.NON_NULL_TYPE,
+                        })),
+                        returnValue: p.default.get(a, 'type.type.name.value', p.default.get(a, 'type.name.value', 'other')),
+                      });
+                    });
+                },
+              }),
+              t
+            );
+          }
+          async run() {
+            const e = (0, u.getLocaleLang)(this.lang),
+              t = await l.default.prompt([$.default.serverlessConfigPath(this.lang, this.defaultServerlessConfigPath)]).then(({ serverlessConfigPath: e }) => e),
+              a = new m.default({ region: this.argv.region, serverlessConfigPath: t, lang: this.lang });
+            if (!a.isExistsServelessConfig) throw new Error(e.error.notFoundServerlessConfig);
+            const r = a.serverlessConfig;
+            if (!(r.plugins ?? []).includes('serverless-appsync-plugin')) throw new Error(e.error.notInstalledAppSyncPlugin);
+            const s = f.default.parseSlsRecursivelyReference(r.appSync);
+            if (p.default.isEmpty(s)) throw new Error(`${e.error.invalidServerlessCustomAppSync} : \${file(./appsync/stack.yml)}`);
+            const n = (0, y.loadYaml)(s);
+            if (p.default.isEmpty(n)) throw new Error(`${e.error.invalidServerlessCustomAppSync} : ${s}`);
+            const o = this.getSchemaGraphql(n.schema),
+              i = this.buildSchemaGraphqlInfo(o),
+              c = await l.default
+                .prompt([$.default.resolverInfo(this.lang, i)])
+                .then((e) =>
+                  p.default.reduce(
+                    e.resolverInfo,
+                    (e, t, a) => {
+                      const [r, s] = p.default.split(t, ',');
+                      return e[r].push({ resolver: r, type: s, name: i[a].name, returnValue: i[a].returnValue }), e;
+                    },
+                    { vtl: [], lambda: [] }
+                  )
+                )
+                .then(async (e) => {
+                  const t = p.default.filter(e.vtl, (e) => 'get' === e.type);
+                  for (let e = 0; e < t.length; e++) {
+                    const a = await l.default.prompt([$.default.type]);
+                    t[e].type = a.type;
+                  }
+                  return e;
+                });
+            if (
+              (p.default.isArray(n.dataSources) &&
+                p.default.each(n.dataSources, (e) => {
+                  if (!p.default.includes(e, 'datasources.yml')) return;
+                  const t = f.default.parseSlsRecursivelyReference(e),
+                    a = (0, y.loadYaml)(t);
+                  p.default.each(c.lambda, (e) => {
+                    const t = p.default.upperFirst(e.name),
+                      r = `${t}LambdaFunction`;
+                    a[r] = {
+                      ...a[r],
+                      type: 'AWS_LAMBDA',
+                      description: r,
+                      config: {
+                        functionName: t,
+                        lambdaFunctionArn: { 'Fn::GetAtt': ['UpdatePostLambdaFunction', 'Arn'] },
+                        serviceRoleArn: { 'Fn::GetAtt': ['AppSyncLambdaServiceRole', 'Arn'] },
+                      },
+                    };
+                  }),
+                    (0, y.writeYaml)(t, a);
+                }),
+              p.default.isArray(n.pipelineFunctions) &&
+                p.default.each(n.pipelineFunctions, (e) => {
+                  if (!p.default.includes(e, 'pipelineFunctions.yml')) return;
+                  const t = f.default.parseSlsRecursivelyReference(e),
+                    a = (0, y.loadYaml)(t);
+                  p.default.each(c.vtl, (e) => {
+                    const t = p.default.upperFirst(e.name),
+                      r = a[t]?.dataSource || 'YourDataSourceName',
+                      s = `appsync/resolvers/functions/Query.${t}.request`;
+                    if (!(0, h.isFileExists)(`${s}.vtl`)) {
+                      const t = (() => {
+                        switch (e.type) {
+                          case 'get':
+                            return v.default.templates.vtl.codegenDynamoGetItemRequest;
+                          case 'none':
+                            return v.default.templates.vtl.localResolverRequest;
+                          case 'query':
+                            return v.default.templates.vtl.codegenDynamoQueryRequest;
+                          default:
+                            return '';
+                        }
+                      })();
+                      new v.default({ filePath: s, code: t, type: 'vtl' }).write();
+                    }
+                    a[t] = { ...a[t], dataSource: r, request: `${s}.vtl`, response: 'appsync/resolvers/common/resolver.response.vtl' };
+                  }),
+                    p.default.each(c.lambda, (e) => {
+                      const t = p.default.upperFirst(e.name),
+                        r = `${t}LambdaFunction`;
+                      a[t] = { ...a[t], dataSource: r };
+                    }),
+                    (0, y.writeYaml)(t, a);
+                }),
+              p.default.isArray(n.resolvers) &&
+                p.default.each(n.resolvers, (e) => {
+                  if (!p.default.includes(e, 'resolvers.yml')) return;
+                  const t = f.default.parseSlsRecursivelyReference(e),
+                    a = (0, y.loadYaml)(t);
+                  p.default.each(c.vtl, (e) => {
+                    const t = `Query.${e.name}`,
+                      r = `appsync/resolvers/queries/${e.name}.request`,
+                      s = p.default.upperFirst(e.name);
+                    new v.default({ filePath: r, code: v.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
+                      (a[t] = { ...a[t], request: `${r}.vtl`, response: 'appsync/resolvers/common/pipeline.after.vtl', functions: [s] });
+                  }),
+                    p.default.each(c.lambda, (e) => {
+                      const t = `Mutation.${e.name}`,
+                        r = p.default.upperFirst(e.name);
+                      a[t] = { ...a[t], functions: [r] };
+                    }),
+                    (0, y.writeYaml)(t, a);
+                }),
+              !p.default.isString(r.functions))
+            )
+              throw new Error(e.error.notFoundFunctionsConfig);
+            const d = f.default.parseSlsRecursivelyReference(r.functions);
+            if (p.default.isEmpty(d)) throw new Error(`${e.error.notFoundFunctionsConfig} : \${file(./serverless/ap-northeast-1/resources/functions.yml)}`);
+            const g = (0, y.loadYaml)(d);
+            p.default.each(c.lambda, (e) => {
+              const t = p.default.upperFirst(e.name),
+                a = `src/functions/appsync/${e.name}`,
+                r = `${a}.handler`,
+                s = `\${self:custom.awsResourcePrefix}${t}`,
+                n = p.default.includes(['create', 'update', 'delete'], e.type)
+                  ? v.default.templates.typescript[e.type](`${t}MutationVariables`, e.returnValue)
+                  : v.default.templates.typescript.skeleton;
+              new v.default({ filePath: a, code: n, type: 'typescript' }).write(), (g[t] = { ...g[t], handler: r, name: s });
+            }),
+              (0, y.writeYaml)(d, g);
+          }
+        }
+        t.default = S;
+      },
       5237: function (e, t, a) {
         var r =
           (this && this.__importDefault) ||
@@ -1569,9 +1805,190 @@
             return e && e.__esModule ? e : { default: e };
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const s = r(a(6433)),
-          n = r(a(2917));
+        const s = r(a(7379)),
+          n = r(a(2303));
         t.default = { builder: s.default, handler: n.default };
+      },
+      1041: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            error: {
+              notFoundServerlessConfig: 'Serverless.yml does not exist',
+              notInstalledAppSyncPlugin: 'serverless-appsync-plugin is not installed',
+              notFoundFunctionsConfig: 'No functions configuration exists',
+              invalidServerlessCustomAppSync: 'The custom.appsync in serverless.yml is incorrect, custom.appsync must have the following string set',
+              alreadyExistsMappingTemplate: 'A definition already exists in the mapping template',
+              alreadyExistsResolver: 'A definition already exists in the resolver',
+              alreadyExistsAPI: 'A definition already exists in the API',
+              required: 'Please enter all items',
+            },
+            inquirer: {
+              apiName: 'Enter API name',
+              apiType: 'Select API Type',
+              resolverInfo: 'Enter Resolver Info',
+              resolverType: 'Select Resolver Type',
+              serverlessConfigPath: 'Enter the path to serverless.yml',
+              schemaGraphqlFilePath: 'Enter the path to schema.graphql',
+              queryOperation: 'Select Query Type',
+              dataSource: 'Select Data Source',
+              selectResolverType: 'Select Resolver Type',
+            },
+            services: {
+              common: {
+                inquirer: {
+                  createDataSource: 'Do you want to create a new data source?',
+                  lambdaFunctionName: 'Enter Lambda function name',
+                  lambdaHandler: 'Enter the path to the Lambda handler',
+                  dataSource: 'Select Data Source',
+                  template: 'Select a template',
+                  primaryKeyName: 'Enter primary key name',
+                  sortKeyName: 'Enter sort key name',
+                  indexName: 'Enter index name',
+                },
+                error: { notFoundDataSource: 'Data source does not exist, data source must be created' },
+              },
+              generateQueryService: { inquirer: { gsiName: 'Enter GSI name' } },
+            },
+          });
+      },
+      1279: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = {
+            error: {
+              notFoundServerlessConfig: 'serverless.ymlが存在しません',
+              notInstalledAppSyncPlugin: 'serverless-appsync-pluginがインストールされていません',
+              notFoundFunctionsConfig: 'functionsの設定が存在しません',
+              invalidServerlessCustomAppSync: 'serverless.ymlのcustom.appsyncが不正です、custom.appsyncには、以下のような文字列が設定されている必要があります',
+              alreadyExistsMappingTemplate: '既にマッピングテンプレートに定義が存在します',
+              alreadyExistsResolver: '既にリゾルバーに定義が存在します',
+              alreadyExistsAPI: '既にAPIに定義が存在します',
+              required: '全ての項目を入力してください',
+            },
+            inquirer: {
+              apiName: 'API名を入力',
+              apiType: 'APIタイプを選択',
+              resolverInfo: 'リゾルバー情報を入力',
+              resolverType: 'リゾルバータイプを選択',
+              serverlessConfigPath: 'serverless.ymlのパスを入力',
+              schemaGraphqlFilePath: 'schema.graphqlのパスを入力',
+              queryOperation: 'Queryのタイプを選択',
+              dataSource: 'データソースを選択',
+              selectResolverType: 'リゾルバータイプを選択',
+            },
+            services: {
+              common: {
+                inquirer: {
+                  createDataSource: 'データソースを新しく作成しますか？',
+                  lambdaFunctionName: 'Lambda関数名を入力',
+                  lambdaHandler: 'Lambdaハンドラーのパスを入力',
+                  dataSource: 'データソースを選択',
+                  template: 'テンプレートを選択',
+                  primaryKeyName: 'プライマリーキー名を入力',
+                  sortKeyName: 'ソートキー名を入力',
+                  indexName: 'インデックス名を入力',
+                },
+                error: { notFoundDataSource: 'データソースが存在しません、データソースを作成する必要があります' },
+              },
+              generateQueryService: { inquirer: { gsiName: 'GSI名を入力' } },
+            },
+          });
+      },
+      7704: function (e, t, a) {
+        var r =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 }), (t.getLocaleLang = void 0);
+        const s = r(a(1279)),
+          n = r(a(1041));
+        t.getLocaleLang = (e) => ('ja' === e ? s.default : n.default);
+      },
+      2377: function (e, t, a) {
+        var r =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const s = r(a(941)),
+          n = r(a(1148)),
+          o = r(a(1200));
+        t.default = { serverlessConfigPath: s.default, resolverInfo: n.default, type: o.default };
+      },
+      1148: function (e, t, a) {
+        var r =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const s = a(7704),
+          n = r(a(7973)),
+          o = a(6517);
+        t.default = (e, t) => ({
+          type: 'table',
+          name: 'resolverInfo',
+          message: (0, s.getLocaleLang)(e).inquirer.resolverInfo,
+          columns: [
+            { name: 'VTL(Get)', value: 'vtl,get' },
+            { name: 'VTL(Query)', value: 'vtl,query' },
+            { name: 'Lambda(Create)', value: 'lambda,create' },
+            { name: 'Lambda(Update)', value: 'lambda,update' },
+            { name: 'Lambda(Delete)', value: 'lambda,delete' },
+          ],
+          rows: (0, o.map)(t, (e) => ({
+            name: e.name,
+            value: (0, o.chain)(e.name)
+              .thru((e) => {
+                const t = [
+                  { name: 'get', value: 'vtl,get' },
+                  { name: 'list', value: 'vtl,query' },
+                  { name: 'create', value: 'lambda,create' },
+                  { name: 'update', value: 'lambda,update' },
+                  { name: 'delete', value: 'lambda,delete' },
+                ].find((t) => e.startsWith(t.name));
+                return t?.value;
+              })
+              .value(),
+          })),
+          validate: (t) => new n.default(t, e).required().value(),
+        });
+      },
+      941: function (e, t, a) {
+        var r =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const s = a(7704),
+          n = r(a(7973)),
+          o = r(a(5837)),
+          i = r(a(1092));
+        t.default = (e, t) => ({
+          type: 'input',
+          name: 'serverlessConfigPath',
+          message: (0, s.getLocaleLang)(e).inquirer.serverlessConfigPath,
+          default: () => t,
+          validate: (t) => new n.default(t, e).required().mustBeYamlFilePath().value(),
+          transformer: (e) => new i.default(e).removeAllSpace().value(),
+          filter: (e) => new o.default(e).removeAllSpace().value(),
+        });
+      },
+      1200: (e, t, a) => {
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const r = a(7704);
+        t.default = (e) => ({
+          type: 'list',
+          name: 'type',
+          message: (0, r.getLocaleLang)(e).inquirer.selectResolverType,
+          default: () => 'get',
+          choices: [
+            { title: 'LocalResolver', value: 'none' },
+            { title: 'GetItem', value: 'get' },
+          ],
+        });
       },
       9189: function (e, t, a) {
         var r =
@@ -1609,8 +2026,8 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = a(6702),
           n = a(6870),
-          i = r(a(8798));
-        class o extends s.FeatureBuilderAbstract {
+          o = r(a(8798));
+        class i extends s.FeatureBuilderAbstract {
           constructor(e) {
             super(e);
           }
@@ -1623,13 +2040,13 @@
                 n.chalk.grey('<command> <options>'),
                 () => ({}),
                 (e) => {
-                  if (1 === e._.length) return new i.default.handler(e).run();
+                  if (1 === e._.length) return new o.default.handler(e).run();
                   throw new Error('locale.error.unProcessed');
                 }
               );
           }
         }
-        t.default = o;
+        t.default = i;
       },
       975: function (e, t, a) {
         var r =
@@ -1640,8 +2057,8 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(3290)),
           n = r(a(2322)),
-          i = a(2868),
-          o = r(a(6517)),
+          o = a(2868),
+          i = r(a(6517)),
           l = r(a(169)),
           u = a(2762),
           c = r(a(6444)),
@@ -1655,7 +2072,7 @@
             const { argv: e } = this,
               t = c.default.getLogger();
             t.debug('create hander : ', e);
-            const a = (0, i.getLocaleLang)(this.lang),
+            const a = (0, o.getLocaleLang)(this.lang),
               r = await s.default
                 .prompt([
                   {
@@ -1663,14 +2080,14 @@
                     name: 'template',
                     emptyText: a.inquirer.template.autocomplete.emptyText,
                     message: a.inquirer.template.choiceTemplate,
-                    source: (e, t) => (o.default.isEmpty(t) ? n.default.templates : n.default.templates.filter((e) => e.name.includes(t))),
+                    source: (e, t) => (i.default.isEmpty(t) ? n.default.templates : n.default.templates.filter((e) => e.name.includes(t))),
                   },
                   {
                     type: 'input',
                     name: 'projectName',
                     message: 'input a project name',
                     default: (e) => e.template,
-                    validate: (e) => !o.default.isEmpty(e) || 'required input a project name',
+                    validate: (e) => !i.default.isEmpty(e) || 'required input a project name',
                   },
                 ])
                 .then((e) => e);
@@ -1766,25 +2183,25 @@
               if (null != e) for (var a in e) 'default' !== a && Object.prototype.hasOwnProperty.call(e, a) && r(t, e, a);
               return s(t, e), t;
             },
-          i =
+          o =
             (this && this.__importDefault) ||
             function (e) {
               return e && e.__esModule ? e : { default: e };
             };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = i(a(1017)),
-          l = i(a(6444)),
+        const i = o(a(1017)),
+          l = o(a(6444)),
           u = a(3462),
-          c = i(a(8705)),
-          d = i(a(6517)),
-          p = i(a(7147)),
-          m = i(a(2322)),
-          f = i(a(3448)),
-          g = i(a(3624)),
-          h = n(a(7808)),
-          y = n(a(2e3)),
+          c = o(a(8705)),
+          d = o(a(6517)),
+          p = o(a(7147)),
+          m = o(a(2322)),
+          f = o(a(3448)),
+          y = o(a(3624)),
+          g = n(a(7808)),
+          h = n(a(2e3)),
           v = a(7347),
-          S = i(a(4259));
+          $ = o(a(4259));
         t.default = class {
           constructor(e) {
             (this.logger = l.default.getLogger()),
@@ -1792,7 +2209,7 @@
               (this._lang = e.lang),
               (this._region = e.region),
               (this._defaultIamRolePath = `serverless/${e.region}/resources/iamrole/appsync.yml`),
-              (this._graphqlEditor = new S.default()),
+              (this._graphqlEditor = new $.default()),
               this.setAppSyncStackObject();
           }
           _graphqlEditor;
@@ -1847,13 +2264,13 @@
           }
           setAppSyncStackObject() {
             const e = this.getAppSyncStackConfig(),
-              { schema: t, dataSources: a, mappingTemplates: r, mappingTemplatesLocation: s, functionConfigurationsLocation: n, functionConfigurations: i } = e;
+              { schema: t, dataSources: a, mappingTemplates: r, mappingTemplatesLocation: s, functionConfigurationsLocation: n, functionConfigurations: o } = e;
             this._appSyncStack = {
               mappingTemplatesLocation: s,
               functionConfigurationsLocation: n,
               functionConfigurations:
                 d.default
-                  .chain(i)
+                  .chain(o)
                   .map((e) => (0, u.loadYaml)(f.default.parseSlsRecursivelyReference(e)))
                   .flatten()
                   .filter((e) => e && !d.default.isEmpty(e))
@@ -1876,13 +2293,13 @@
                 .chain(t)
                 .thru((e) => {
                   if (d.default.isString(e) && !d.default.isEmpty(e)) {
-                    const t = p.default.readFileSync(o.default.join(m.default.currentPath, e), 'utf8');
+                    const t = p.default.readFileSync(i.default.join(m.default.currentPath, e), 'utf8');
                     return d.default.isEmpty(t) ? [] : [t];
                   }
                   return d.default.isArray(e) && !d.default.isEmpty(e)
                     ? e
                         .map((e) => {
-                          const t = p.default.readFileSync(o.default.join(m.default.currentPath, e), 'utf8');
+                          const t = p.default.readFileSync(i.default.join(m.default.currentPath, e), 'utf8');
                           return d.default.isEmpty(t) ? '' : t;
                         })
                         .filter((e) => !d.default.isEmpty(e))
@@ -1980,13 +2397,13 @@
                 a.addResource({
                   resourceName: this.appSyncDynamoDBRoleName,
                   filePath: this.defaultIamRolePath,
-                  cf: g.default.generateCloudFormation(this.appSyncDynamoDBRoleName, (e) => {
-                    const t = new h.Role(e, this.appSyncDynamoDBRoleName, { assumedBy: new h.ServicePrincipal('appsync.amazonaws.com') });
+                  cf: y.default.generateCloudFormation(this.appSyncDynamoDBRoleName, (e) => {
+                    const t = new g.Role(e, this.appSyncDynamoDBRoleName, { assumedBy: new g.ServicePrincipal('appsync.amazonaws.com') });
                     return (
                       t.addToPolicy(
-                        new h.PolicyStatement({
-                          effect: h.Effect.ALLOW,
-                          resources: [y.Fn.join(':', ['arn:aws:dynamodb', this.region, y.Fn.ref('AWS::AccountId'), 'table/*'])],
+                        new g.PolicyStatement({
+                          effect: g.Effect.ALLOW,
+                          resources: [h.Fn.join(':', ['arn:aws:dynamodb', this.region, h.Fn.ref('AWS::AccountId'), 'table/*'])],
                           actions: ['dynamodb:*'],
                         })
                       ),
@@ -1999,13 +2416,13 @@
                 a.addResource({
                   resourceName: this.appSyncRDSRoleName,
                   filePath: this.defaultIamRolePath,
-                  cf: g.default.generateCloudFormation(this.appSyncRDSRoleName, (e) => {
-                    const t = new h.Role(e, this.appSyncRDSRoleName, { assumedBy: new h.ServicePrincipal('appsync.amazonaws.com') });
+                  cf: y.default.generateCloudFormation(this.appSyncRDSRoleName, (e) => {
+                    const t = new g.Role(e, this.appSyncRDSRoleName, { assumedBy: new g.ServicePrincipal('appsync.amazonaws.com') });
                     return (
                       t.addToPolicy(
-                        new h.PolicyStatement({
-                          effect: h.Effect.ALLOW,
-                          resources: [y.Fn.join(':', ['arn:aws:rds', this.region, y.Fn.ref('AWS::AccountId'), 'secret:*'])],
+                        new g.PolicyStatement({
+                          effect: g.Effect.ALLOW,
+                          resources: [h.Fn.join(':', ['arn:aws:rds', this.region, h.Fn.ref('AWS::AccountId'), 'secret:*'])],
                           actions: [
                             'rds-data:DeleteItems',
                             'rds-data:ExecuteSql',
@@ -2017,9 +2434,9 @@
                         })
                       ),
                       t.addToPolicy(
-                        new h.PolicyStatement({
-                          effect: h.Effect.ALLOW,
-                          resources: [y.Fn.join(':', ['arn:aws:secretsmanager', this.region, y.Fn.ref('AWS::AccountId'), 'table/*'])],
+                        new g.PolicyStatement({
+                          effect: g.Effect.ALLOW,
+                          resources: [h.Fn.join(':', ['arn:aws:secretsmanager', this.region, h.Fn.ref('AWS::AccountId'), 'table/*'])],
                           actions: ['secretsmanager:GetSecretValue'],
                         })
                       ),
@@ -2032,9 +2449,9 @@
                 a.addResource({
                   resourceName: this.appSyncOpenSearchRoleName,
                   filePath: this.defaultIamRolePath,
-                  cf: g.default.generateCloudFormation(
+                  cf: y.default.generateCloudFormation(
                     this.appSyncOpenSearchRoleName,
-                    (e) => new h.Role(e, this.appSyncOpenSearchRoleName, { assumedBy: new h.ServicePrincipal('appsync.amazonaws.com') })
+                    (e) => new g.Role(e, this.appSyncOpenSearchRoleName, { assumedBy: new g.ServicePrincipal('appsync.amazonaws.com') })
                   ),
                 });
                 break;
@@ -2042,13 +2459,13 @@
                 a.addResource({
                   resourceName: this.appSyncLambdaRoleName,
                   filePath: this.defaultIamRolePath,
-                  cf: g.default.generateCloudFormation(this.appSyncLambdaRoleName, (e) => {
-                    const t = new h.Role(e, this.appSyncLambdaRoleName, { assumedBy: new h.ServicePrincipal('appsync.amazonaws.com') });
+                  cf: y.default.generateCloudFormation(this.appSyncLambdaRoleName, (e) => {
+                    const t = new g.Role(e, this.appSyncLambdaRoleName, { assumedBy: new g.ServicePrincipal('appsync.amazonaws.com') });
                     return (
                       t.addToPolicy(
-                        new h.PolicyStatement({
-                          effect: h.Effect.ALLOW,
-                          resources: [y.Fn.join(':', ['arn:aws:lambda', this.region, y.Fn.ref('AWS::AccountId'), 'function:*'])],
+                        new g.PolicyStatement({
+                          effect: g.Effect.ALLOW,
+                          resources: [h.Fn.join(':', ['arn:aws:lambda', this.region, h.Fn.ref('AWS::AccountId'), 'function:*'])],
                           actions: ['lambda:invokeFunction'],
                         })
                       ),
@@ -2061,7 +2478,7 @@
                 a.addResource({
                   resourceName: 'AppSyncHttpRole',
                   filePath: this.defaultIamRolePath,
-                  cf: g.default.generateCloudFormation('AppSyncHttpRole', (e) => new h.Role(e, 'AppSyncHttpRole', { assumedBy: new h.ServicePrincipal('appsync.amazonaws.com') })),
+                  cf: y.default.generateCloudFormation('AppSyncHttpRole', (e) => new g.Role(e, 'AppSyncHttpRole', { assumedBy: new g.ServicePrincipal('appsync.amazonaws.com') })),
                 });
             }
           }
@@ -2076,7 +2493,7 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(6444)),
           n = a(6817),
-          i = a(2726);
+          o = a(2726);
         t.default = class {
           static generateCloudFormation = (e, t) => {
             class a extends n.Stack {
@@ -2085,8 +2502,8 @@
               }
             }
             const r = s.default.getLogger(),
-              o = new a(new n.App(), 'ragate'),
-              l = i.SynthUtils.toCloudFormation(o);
+              i = new a(new n.App(), 'ragate'),
+              l = o.SynthUtils.toCloudFormation(i);
             return r.debug('generated cloudFormation template:'), r.debug(l), l.Resources;
           };
         };
@@ -2100,23 +2517,23 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(3448)),
           n = r(a(5053)),
-          i = r(a(7112)),
-          o = a(2762),
+          o = r(a(7112)),
+          i = a(2762),
           l = r(a(7147)),
           u = r(a(6444)),
           c = a(7347);
         t.default = class {
           static get templates() {
-            return { typescript: n.default, vtl: i.default };
+            return { typescript: n.default, vtl: o.default };
           }
           constructor(e) {
             const { filePath: t, code: a, type: r } = e,
-              [n, i] = s.default.parseFilePath(t);
+              [n, o] = s.default.parseFilePath(t);
             (this.type = r),
               (this.filePath = t),
               (this.code = a),
               (this.destinationPath = n.join('/') + '/'),
-              (this.fileName = 'typescript' === r ? s.default.extractFilename(i) : i),
+              (this.fileName = 'typescript' === r ? s.default.extractFilename(o) : o),
               (this.logger = u.default.getLogger());
           }
           filePath;
@@ -2136,10 +2553,10 @@
             }
           }
           write() {
-            const e = `${(0, o.asFullPath)(this.destinationPath)}${this.fileName}.${this.extension}`;
-            (0, o.isFileExists)(e)
+            const e = `${(0, i.asFullPath)(this.destinationPath)}${this.fileName}.${this.extension}`;
+            (0, i.isFileExists)(e)
               ? this.logger.info(`already exists file, skip write : ${e}`)
-              : ((0, o.createDirectories)(this.destinationPath),
+              : ((0, i.createDirectories)(this.destinationPath),
                 this.logger.info(`create directories : ${this.destinationPath}`),
                 l.default.writeFileSync(e, this.code, 'utf8'),
                 this.logger.info(`write : ${e}`),
@@ -2152,6 +2569,16 @@
           (t.default =
             "import { Context, CloudFrontRequest, Callback, CloudFrontRequestEvent, CloudFrontResultResponse } from 'aws-lambda';\n\nexport const handler = (event: CloudFrontRequestEvent, _context: Context, callback: Callback): void => {\n  const request: CloudFrontRequest = event.Records[0].cf.request;\n  const headers = request.headers;\n\n  const authUser = 'ragate'; // Basic認証のユーザー名\n  const authPass = '20210525'; // Basic認証のパスワード\n\n  const authString = 'Basic ' + Buffer.from(authUser + ':' + authPass).toString('base64');\n  if (typeof headers.authorization === 'undefined' || headers.authorization[0].value !== authString) {\n    const body = 'Unauthorized';\n    const response: CloudFrontResultResponse = {\n      status: '401',\n      statusDescription: 'Unauthorized',\n      body: body,\n      headers: {\n        'www-authenticate': [{ key: 'WWW-Authenticate', value: 'Basic' }],\n      },\n    };\n    callback(null, response);\n  }\n  callback(null, request);\n};\n");
       },
+      2139: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = (e, t) =>
+            `import { AppSyncResolverEvent } from 'aws-lambda';\nimport moment from 'moment';\nimport DynamoService from 'services/dynamoService';\nimport { ${e}, ${t} } from 'types/API';\nimport { DYNAMO_TABLES } from 'types/index';\nimport { v4 as uuid } from 'uuid';\nimport middy from 'utils/middy';\n\nexport const handler = middy.handler(async (event: AppSyncResolverEvent<${e}>): Promise<${t}> => {\n  const input = event.arguments.input;\n  const now = moment.tz('Asia/Tokyo').format();\n  const dynamoService = new DynamoService();\n  const Id = uuid();\n  const itemId = uuid();\n  const item: ${t} = {\n    Id: Id,\n    Sk: \`${t}#\${itemId}\`,\n    ItemId: itemId,\n    ...input,\n    CreatedAt: now,\n    UpdatedAt: now,\n  };\n  await dynamoService.putItem({\n    putItemCommandInput: {\n      TableName: DYNAMO_TABLES.TableName,\n      Item: item,\n      ConditionExpression: 'attribute_not_exists(Id) and attribute_not_exists(Sk)',\n    },\n  });\n\n  return item;\n});\n`);
+      },
+      8967: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = (e, t) =>
+            `import { AppSyncResolverEvent } from 'aws-lambda';\nimport { ${e}, ${t} } from 'types/API';\nimport { DYNAMO_TABLES } from 'types/index';\nimport DynamoService from 'services/dynamoService';\nimport middy from 'utils/middy';\n\nexport const handler = middy.handler(async (event: AppSyncResolverEvent<${e}>): Promise<${t}> => {\n  const dynamoService = new DynamoService();\n  const item = await dynamoService\n    .deleteItem({\n      deleteItemCommandInput: {\n        TableName: DYNAMO_TABLES.TableName,\n        Key: {\n          Id: event.arguments.input.Id,\n          Sk: \`${t}#\${event.arguments.input.ItemId}\`,\n        },\n        ReturnValues: 'ALL_OLD',\n      },\n    })\n    .then(({ Attributes }) => Attributes as ${t});\n\n  return item;\n});\n`);
+      },
       5053: function (e, t, a) {
         var r =
           (this && this.__importDefault) ||
@@ -2160,15 +2587,23 @@
           };
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(5955)),
-          n = r(a(146));
-        t.default = { basicauthlambda: s.default, skeleton: n.default };
+          n = r(a(146)),
+          o = r(a(2139)),
+          i = r(a(9652)),
+          l = r(a(8967));
+        t.default = { basicauthlambda: s.default, skeleton: n.default, create: o.default, update: i.default, delete: l.default };
       },
       146: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default =
-            "import { asyncHandlerWrapper } from 'functions/wrapper';\nimport { AppSyncResolverEvent, Context } from 'aws-lambda';\n\ntype Input = {\n  example: string;\n};\n\ntype Response = {\n  example: string;\n};\n\nexport const handler = asyncHandlerWrapper<AppSyncResolverEvent<Input>, Context, Response>(async (event) => {\n  console.log('It is skeleton 👻');\n});\n");
+            "import { asyncHandlerWrapper } from 'functions/wrapper';\nimport { AppSyncResolverEvent, Context } from 'aws-lambda';\nimport middy from 'utils/middy';\n\ntype Input = {\n  example: string;\n};\n\ntype Response = {\n  example: string;\n};\n\nexport const handler = middy.handler((async (event: AppSyncResolverEvent<Input>): Promise<Response> => {\n  console.log('It is skeleton 👻');\n});\n");
       },
-      790: (e, t) => {
+      9652: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default = (e, t) =>
+            `import { AppSyncResolverEvent } from 'aws-lambda';\nimport moment from 'moment';\nimport DynamoService from 'services/dynamoService';\nimport { ${e}, ${t} } from 'types/API';\nimport { DYNAMO_TABLES } from 'types/index';\nimport { NotFoundError } from 'exceptions/index';\nimport middy from 'utils/middy';\n\nexport const handler = middy.handler(async (event: AppSyncResolverEvent<${e}>): Promise<${t}> => {\n  const input = event.arguments.input;\n  const now = moment.tz('Asia/Tokyo').format();\n  const dynamoService = new DynamoService();\n  const beforeItem = await dynamoService\n    .getItem({\n      getItemCommandInput: {\n        TableName: DYNAMO_TABLES.TableName,\n        Key: {\n          Id: input.Id,\n          Sk: \`${t}#\${input.ItemId}\`,\n        },\n      },\n    })\n    .then(({ Item }) => Item as ${t});\n  if (!beforeItem) {\n    throw new NotFoundError('Item is not found');\n  }\n  const item: ${t} = {\n    Id: input.Id,\n    Sk: \`${t}#\${input.ItemId}\`,\n    ItemId: input.ItemId,\n    ...input,\n    CreatedAt: beforeItem.CreatedAt,\n    UpdatedAt: now,\n  };\n\n  await dynamoService.updateAttributes({\n    tableName: DYNAMO_TABLES.TableName,\n    keyNames: ['Id', 'Sk'],\n    attributes: item,\n    returnValues: 'NONE',\n  });\n\n  return item;\n});\n`);
+      },
+      7022: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = (e) =>
             `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n## [Start] 共通設定\n#set( $primaryValue = "your primary key value" )\n#set( $sortKeyValue = "your sort key value" )\n## [End] 共通設定\n\n## [Start] 自動設定\n#set( $consistentRead = ${e.consistentRead.toString()} )\n#set( $primaryKey = "${
@@ -2177,12 +2612,12 @@
               e.sortKeyName
             }" )\n## [End] 自動設定\n\n## [Start] バリデーション\n#set( $modelExpression = {\n    "version" : "2017-02-28",\n    "operation" : "GetItem",\n    "key" : {},\n    "consistentRead" : $consistentRead\n} )\n#if( $util.isNullOrEmpty($primaryValue) )\n  $util.error("PrimaryValue is null.", "InvalidIndexValueError")\n#else\n  $util.qr($modelExpression.key.put($primaryKey, $util.dynamodb.toDynamoDB($primaryValue)))\n#end\n#if( !$util.isNullOrEmpty($sortKeyName) && $util.isNullOrEmpty($sortKeyValue) )\n  $util.error("sortKeyValue is null.", "InvalidIndexValueError")\n#elseif( !$util.isNullOrEmpty($sortKeyName) && !$util.isNullOrEmpty($sortKeyValue) )\n  $util.qr($modelExpression.key.put($sortKeyName, $util.dynamodb.toDynamoDB($sortKeyValue)))\n#end\n## [End] バリデーション\n\n$util.toJson($modelExpression)\n`);
       },
-      6178: (e, t) => {
+      4981: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default =
             '\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n');
       },
-      4771: (e, t) => {
+      3289: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = (e) =>
             `\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n## [Start] 手動設定\n#set( $primaryValue = "your primary key value" )\n#set( $sortKeyValue = "your sort key value" )\n## [End] 手動設定\n\n## [Start] 自動設定\n${
@@ -2191,10 +2626,30 @@
               e.sortKeyName
             }" )\n## [End] 自動設定\n\n## [Start] バリデーション\n#set( $modelQueryExpression = {} )\n#if( $util.isNullOrEmpty($primaryValue) )\n  $util.error("PrimaryValue is null.", "InvalidIndexValueError")\n#else\n  #set( $modelQueryExpression.expression = "#$primaryKey = :$primaryKey" )\n  #set( $modelQueryExpression.expressionNames = {\n    "#$primaryKey": $primaryKey\n  })\n  #set( $modelQueryExpression.expressionValues = {\n    ":$primaryKey": $util.dynamodb.toDynamoDB($primaryValue)\n  })\n#end\n## [End] バリデーション\n\n## [Start] ソートキー用クエリー生成\n#if( !$util.isNullOrEmpty($sortKeyName) && !$util.isNullOrEmpty($sortKeyValue) )\n  #if( !$util.isNull($sortKeyValue.beginsWith) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND begins_with(#sortKey, :sortKey)" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey",  $util.dynamodb.toDynamoDB("$sortKeyValue.beginsWith") ))\n  #elseif( !$util.isNull($sortKeyValue.between) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey BETWEEN :sortKey0 AND :sortKey1" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey0", $util.dynamodb.toDynamoDB("$sortKeyValue.between[0]") ))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey1", $util.dynamodb.toDynamoDB("$sortKeyValue.between[1]") ))\n  #elseif( !$util.isNull($sortKeyValue.eq) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey = :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.eq") ))\n  #elseif( !$util.isNull($sortKeyValue.lt) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey < :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.lt") ))\n  #elseif( !$util.isNull($sortKeyValue.le) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey <= :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.le") ))\n  #elseif( !$util.isNull($sortKeyValue.gt) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey > :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.gt") ))\n  #elseif( !$util.isNull($sortKeyValue.ge) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey >= :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.ge") ))\n  #elseif( !$util.isNull($sortKeyValue.contains) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND contains(#sortKey, :sortKey)" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.contains") ))\n  #elseif( !$util.isNull($sortKeyValue.notContains) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND notContains(#sortKey, :sortKey)" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.notContains") ))\n  #else\n  #end\n#end\n## [End] ソートキー用クエリー生成\n\n## [Start] VTL文字列出力\n#set( $limit = $util.defaultIfNull($args.limit, 100) )\n#set( $request = {\n  "version": "2018-05-29",\n  "limit": $limit\n} )\n#if( $args.nextToken && !$util.isNullOrEmpty($args.nextToken) )\n  #set( $request.nextToken = $args.nextToken )\n#end\n#if( $args.filter )\n  #set( $request.filter = $util.parseJson("$util.transform.toDynamoDBFilterExpression($args.filter)") )\n#end\n#if( !$util.isNull($modelQueryExpression) && !$util.isNullOrEmpty($modelQueryExpression.expression) )\n  $util.qr($request.put("operation", "Query"))\n  $util.qr($request.put("query", $modelQueryExpression))\n  #if( $util.isNullOrEmpty($args.sortDirection) )\n    #set( $request.scanIndexForward = false )\n  #elseif( $args.sortDirection == "ASC" )\n    #set( $request.scanIndexForward = true )\n  #elseif( $args.sortDirection == "DESC" )\n    #set( $request.scanIndexForward = false )\n  #end\n#else\n  $util.qr($request.put("operation", "Scan"))\n#end\n#if(!$util.isNull($indexName))\n    $util.qr($request.put("index", $indexName))\n#end\n$util.toJson($request)\n## [End] VTL文字列出力`);
       },
-      7230: (e, t) => {
+      563: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default =
             '\n## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n');
+      },
+      7044: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default =
+            '## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n## [Start] 共通設定\n#set( $primaryKey = "primary key name" )\n#set( $sortKeyName = "sort key name" )\n#set( $primaryValue = "your primary key value" )\n#set( $sortKeyValue = "your sort key value" )\n#set( $consistentRead = false )\n## [End] 共通設定\n\n## [Start] 自動設定\n## [End] 自動設定\n\n## [Start] バリデーション\n#set( $modelExpression = {\n    "version" : "2017-02-28",\n    "operation" : "GetItem",\n    "key" : {},\n    "consistentRead" : $consistentRead\n} )\n#if( $util.isNullOrEmpty($primaryValue) )\n  $util.error("PrimaryValue is null.", "InvalidIndexValueError")\n#else\n  $util.qr($modelExpression.key.put($primaryKey, $util.dynamodb.toDynamoDB($primaryValue)))\n#end\n#if( !$util.isNullOrEmpty($sortKeyName) && $util.isNullOrEmpty($sortKeyValue) )\n  $util.error("sortKeyValue is null.", "InvalidIndexValueError")\n#elseif( !$util.isNullOrEmpty($sortKeyName) && !$util.isNullOrEmpty($sortKeyValue) )\n  $util.qr($modelExpression.key.put($sortKeyName, $util.dynamodb.toDynamoDB($sortKeyValue)))\n#end\n## [End] バリデーション\n\n$util.toJson($modelExpression)\n');
+      },
+      8383: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default =
+            '## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n');
+      },
+      713: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default =
+            '## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n## [Start] 手動設定\n##set( $indexName = "gsi index name" )\n#set( $primaryKey = "primary key name" )\n#set( $sortKeyName = "sort key name" )\n#set( $primaryValue = "your primary key value" )\n#set( $sortKeyValue = "your sort key value" )\n#if( $util.isNullOrEmpty($sortKeyValue) )\n    #set( $sortKeyValue = {\n    "beginsWith" : "FacetsName#"\n  } )\n#end\n## [End] 手動設定\n\n## [Start] 自動設定\n#set( $args = $ctx.args )\n## [End] 自動設定\n\n## [Start] バリデーション\n#set( $modelQueryExpression = {} )\n#if( $util.isNullOrEmpty($primaryValue) )\n  $util.error("PrimaryValue is null.", "InvalidIndexValueError")\n#else\n  #set( $modelQueryExpression.expression = "#$primaryKey = :$primaryKey" )\n  #set( $modelQueryExpression.expressionNames = {\n    "#$primaryKey": $primaryKey\n  })\n  #set( $modelQueryExpression.expressionValues = {\n    ":$primaryKey": $util.dynamodb.toDynamoDB($primaryValue)\n  })\n#end\n## [End] バリデーション\n\n## [Start] ソートキー用クエリー生成\n#if( !$util.isNullOrEmpty($sortKeyName) && !$util.isNullOrEmpty($sortKeyValue) )\n  #if( !$util.isNull($sortKeyValue.beginsWith) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND begins_with(#sortKey, :sortKey)" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey",  $util.dynamodb.toDynamoDB("$sortKeyValue.beginsWith") ))\n  #elseif( !$util.isNull($sortKeyValue.between) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey BETWEEN :sortKey0 AND :sortKey1" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey0", $util.dynamodb.toDynamoDB("$sortKeyValue.between[0]") ))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey1", $util.dynamodb.toDynamoDB("$sortKeyValue.between[1]") ))\n  #elseif( !$util.isNull($sortKeyValue.eq) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey = :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.eq") ))\n  #elseif( !$util.isNull($sortKeyValue.lt) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey < :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.lt") ))\n  #elseif( !$util.isNull($sortKeyValue.le) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey <= :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.le") ))\n  #elseif( !$util.isNull($sortKeyValue.gt) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey > :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.gt") ))\n  #elseif( !$util.isNull($sortKeyValue.ge) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND #sortKey >= :sortKey" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.ge") ))\n  #elseif( !$util.isNull($sortKeyValue.contains) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND contains(#sortKey, :sortKey)" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.contains") ))\n  #elseif( !$util.isNull($sortKeyValue.notContains) )\n    #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND notContains(#sortKey, :sortKey)" )\n    $util.qr($modelQueryExpression.expressionNames.put("#sortKey", "$sortKeyName"))\n    $util.qr($modelQueryExpression.expressionValues.put(":sortKey", $util.dynamodb.toDynamoDB("$sortKeyValue.notContains") ))\n  #else\n  #end\n#end\n## [End] ソートキー用クエリー生成\n\n## [Start] VTL文字列出力\n#set( $limit = $util.defaultIfNull($args.limit, 100) )\n#set( $request = {\n  "version": "2018-05-29",\n  "limit": $limit\n} )\n#if( $args.nextToken && !$util.isNullOrEmpty($args.nextToken) )\n  #set( $request.nextToken = $args.nextToken )\n#end\n#if( $args.filter )\n  #set( $request.filter = $util.parseJson("$util.transform.toDynamoDBFilterExpression($args.filter)") )\n#end\n#if( !$util.isNull($modelQueryExpression) && !$util.isNullOrEmpty($modelQueryExpression.expression) )\n  $util.qr($request.put("operation", "Query"))\n  $util.qr($request.put("query", $modelQueryExpression))\n  #if( $util.isNullOrEmpty($args.sortDirection) )\n    #set( $request.scanIndexForward = false )\n  #elseif( $args.sortDirection == "ASC" )\n    #set( $request.scanIndexForward = true )\n  #elseif( $args.sortDirection == "DESC" )\n    #set( $request.scanIndexForward = false )\n  #end\n#else\n  $util.qr($request.put("operation", "Scan"))\n#end\n#if(!$util.isNull($indexName))\n    $util.qr($request.put("index", $indexName))\n#end\n$util.toJson($request)\n## [End] VTL文字列出力');
+      },
+      9379: (e, t) => {
+        Object.defineProperty(t, '__esModule', { value: !0 }),
+          (t.default =
+            '## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html\n\n#if( $ctx.error )\n  $util.error($ctx.error.message, $ctx.error.type)\n#else\n  $util.toJson($ctx.result)\n#end\n');
       },
       2525: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
@@ -2225,37 +2680,45 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(4709)),
           n = r(a(5951)),
-          i = r(a(8520)),
-          o = r(a(8382)),
-          l = r(a(4771)),
-          u = r(a(7230)),
-          c = r(a(2525)),
-          d = r(a(9064)),
-          p = r(a(790)),
-          m = r(a(6178)),
-          f = r(a(2592)),
-          g = r(a(2922)),
-          h = r(a(2292)),
-          y = r(a(9768)),
-          v = r(a(1954)),
-          S = r(a(8002));
+          o = r(a(8520)),
+          i = r(a(8382)),
+          l = r(a(3289)),
+          u = r(a(563)),
+          c = r(a(713)),
+          d = r(a(9379)),
+          p = r(a(2525)),
+          m = r(a(9064)),
+          f = r(a(7022)),
+          y = r(a(4981)),
+          g = r(a(7044)),
+          h = r(a(8383)),
+          v = r(a(2592)),
+          $ = r(a(2922)),
+          S = r(a(2292)),
+          _ = r(a(9768)),
+          b = r(a(1954)),
+          w = r(a(8002));
         t.default = {
           pipelineAfter: s.default,
           pipelineBefore: n.default,
-          dynamoGetItemRequest: p.default,
-          dynamoGetItemResponse: m.default,
-          dynamoQueryRequest: l.default,
-          dynamoQueryResponse: u.default,
-          localResolverRequest: i.default,
-          localResolverResponse: o.default,
-          dynamoScanRequest: c.default,
-          dynamoScanResponse: d.default,
-          openSearchQueryRequest: f.default,
-          openSearchQueryResponse: g.default,
-          httpQueryRequest: h.default,
-          httpQueryResponse: y.default,
-          rdbQueryRequest: v.default,
-          rdbQueryResponse: S.default,
+          addDynamoGetItemRequest: f.default,
+          addDynamoGetItemResponse: y.default,
+          addDynamoQueryRequest: l.default,
+          addDynamoQueryResponse: u.default,
+          codegenDynamoGetItemRequest: g.default,
+          codegenDynamoGetItemResponse: h.default,
+          codegenDynamoQueryRequest: c.default,
+          codegenDynamoQueryResponse: d.default,
+          localResolverRequest: o.default,
+          localResolverResponse: i.default,
+          dynamoScanRequest: p.default,
+          dynamoScanResponse: m.default,
+          openSearchQueryRequest: v.default,
+          openSearchQueryResponse: $.default,
+          httpQueryRequest: S.default,
+          httpQueryResponse: _.default,
+          rdbQueryRequest: b.default,
+          rdbQueryResponse: w.default,
         };
       },
       8520: (e, t) => {
@@ -2329,22 +2792,22 @@
               if (null != e) for (var a in e) 'default' !== a && Object.prototype.hasOwnProperty.call(e, a) && r(t, e, a);
               return s(t, e), t;
             },
-          i =
+          o =
             (this && this.__importDefault) ||
             function (e) {
               return e && e.__esModule ? e : { default: e };
             };
         Object.defineProperty(t, '__esModule', { value: !0 });
-        const o = i(a(1017)),
-          l = i(a(6444)),
+        const i = o(a(1017)),
+          l = o(a(6444)),
           u = a(7347),
-          c = i(a(6517)),
+          c = o(a(6517)),
           d = a(3462),
-          p = i(a(3448)),
-          m = i(a(2056)),
-          f = i(a(3624)),
-          g = n(a(7808)),
-          h = n(a(2e3));
+          p = o(a(3448)),
+          m = o(a(2056)),
+          f = o(a(3624)),
+          y = n(a(7808)),
+          g = n(a(2e3));
         t.default = class {
           constructor(e) {
             (this.logger = l.default.getLogger()),
@@ -2406,7 +2869,7 @@
               { filePath: a, resourceName: r, cf: s } = e;
             (() => {
               const e = this.serverlessConfig,
-                r = o.default.join('./', a),
+                r = i.default.join('./', a),
                 s = e.resources ?? [];
               if (s.some((e) => e.includes(r))) t.warn(`already exists resource file path : ${r}`);
               else {
@@ -2432,32 +2895,32 @@
           addFunction = (e) => {
             if (this.cannotProces()) return;
             const { lambdaFunctionName: t, lambdaHandler: a, memorySize: r, timeout: s, code: n } = e,
-              i = this.logger;
-            i.debug("functionsYamlPath', functionsYamlPath"),
+              o = this.logger;
+            o.debug("functionsYamlPath', functionsYamlPath"),
               (() => {
                 const e = this.serverlessConfig;
                 if (c.default.isEmpty(e.functions)) {
                   const t = (0, d.writeYaml)(this.serverlessConfigPath, { ...e, functions: `\${file(./${this.defaultFunctionYamlPath})}` });
-                  i.info('write functions property'), i.info((0, u.chalk)().green(t));
+                  o.info('write functions property'), o.info((0, u.chalk)().green(t));
                 }
               })(),
               (() => {
                 const e = this.functionsYamlPath ?? this.defaultFunctionYamlPath;
                 try {
                   const n = (0, d.loadYaml)(e) ?? {};
-                  if (c.default.has(n, t)) i.warn(`already exists lambda function at, skip update : ${t}`);
+                  if (c.default.has(n, t)) o.warn(`already exists lambda function at, skip update : ${t}`);
                   else {
-                    const o = (0, d.writeYaml)(e, {
+                    const i = (0, d.writeYaml)(e, {
                       ...n,
                       ...this.generateFunctionYamlProperty(t, { handler: a, memorySize: r ?? this.defaultMemorySize, timeout: s ?? this.defaultLambdaTimeOut }),
                     });
-                    i.info('write functions property'), i.info((0, u.chalk)().green(o));
+                    o.info('write functions property'), o.info((0, u.chalk)().green(i));
                   }
                 } catch (n) {
-                  const o = (0, d.writeYaml)(e, {
+                  const i = (0, d.writeYaml)(e, {
                     ...this.generateFunctionYamlProperty(t, { handler: a, memorySize: r ?? this.defaultMemorySize, timeout: s ?? this.defaultLambdaTimeOut }),
                   });
-                  i.info('write functions property'), i.info((0, u.chalk)().green(o));
+                  o.info('write functions property'), o.info((0, u.chalk)().green(i));
                 }
               })(),
               new m.default({ filePath: a, code: n, type: 'typescript' }).write(),
@@ -2483,19 +2946,19 @@
           }
           generateDefaultLambdaRoleCf(e) {
             return f.default.generateCloudFormation(e, (t) => {
-              const a = new g.Role(t, e, { assumedBy: new g.ServicePrincipal('lambda.amazonaws.com') });
+              const a = new y.Role(t, e, { assumedBy: new y.ServicePrincipal('lambda.amazonaws.com') });
               return (
                 a.addToPolicy(
-                  new g.PolicyStatement({
-                    effect: g.Effect.ALLOW,
-                    resources: [h.Fn.join(':', ['arn:aws:logs', h.Fn.ref('AWS::Region'), h.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],
+                  new y.PolicyStatement({
+                    effect: y.Effect.ALLOW,
+                    resources: [g.Fn.join(':', ['arn:aws:logs', g.Fn.ref('AWS::Region'), g.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],
                     actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
                   })
                 ),
                 a.addToPolicy(
-                  new g.PolicyStatement({
-                    effect: g.Effect.ALLOW,
-                    resources: [h.Fn.join(':', ['arn:aws:logs', this.region, h.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],
+                  new y.PolicyStatement({
+                    effect: y.Effect.ALLOW,
+                    resources: [g.Fn.join(':', ['arn:aws:logs', this.region, g.Fn.ref('AWS::AccountId'), 'log-group:/aws/lambda/*:*:*'])],
                     actions: ['logs:CreateLogGroup', 'logs:CreateLogStream', 'logs:PutLogEvents'],
                   })
                 ),
@@ -2616,8 +3079,8 @@
           (t.asFullPath = t.createDirectories = t.isFileExists = t.isExistsDirectory = t.cleanUpTmpDirectory = t.moveDirectory = t.gitClone = void 0);
         const s = a(5033),
           n = r(a(6444)),
-          i = r(a(4470)),
-          o = r(a(2322)),
+          o = r(a(4470)),
+          i = r(a(2322)),
           l = r(a(6237)),
           u = r(a(1155)),
           c = r(a(1017));
@@ -2625,8 +3088,8 @@
           const a = n.default.getLogger();
           try {
             a.debug(`git clone : ${e} -> ${t}`),
-              await i.default.promises.mkdir(t, { recursive: !0 }),
-              await l.default.clone({ fs: i.default, http: u.default, dir: t, url: e, singleBranch: !0, depth: 1 });
+              await o.default.promises.mkdir(t, { recursive: !0 }),
+              await l.default.clone({ fs: o.default, http: u.default, dir: t, url: e, singleBranch: !0, depth: 1 });
           } catch (e) {
             const t = e;
             throw new s.CLIError(t.message);
@@ -2635,7 +3098,7 @@
           (t.moveDirectory = function (e, t) {
             const a = n.default.getLogger();
             try {
-              a.debug(`move : ${e} -> ${t}`), i.default.renameSync(e, t);
+              a.debug(`move : ${e} -> ${t}`), o.default.renameSync(e, t);
             } catch (e) {
               const t = e;
               throw new s.CLIError(t.message);
@@ -2644,10 +3107,10 @@
           (t.cleanUpTmpDirectory = function () {
             const e = n.default.getLogger();
             try {
-              e.debug(`clean up tmp directory : ${o.default.tmpPath}`),
-                i.default.removeSync(o.default.tmpPath),
-                e.debug(`create tmp directory : ${o.default.tmpPath}`),
-                i.default.mkdirSync(o.default.tmpPath, { recursive: !0 });
+              e.debug(`clean up tmp directory : ${i.default.tmpPath}`),
+                o.default.removeSync(i.default.tmpPath),
+                e.debug(`create tmp directory : ${i.default.tmpPath}`),
+                o.default.mkdirSync(i.default.tmpPath, { recursive: !0 });
             } catch (e) {
               const t = e;
               throw new s.CLIError(t.message);
@@ -2656,7 +3119,7 @@
           (t.isExistsDirectory = function (e) {
             const t = n.default.getLogger();
             try {
-              return t.debug(`check exists directory : ${e}`), i.default.statSync(e).isDirectory();
+              return t.debug(`check exists directory : ${e}`), o.default.statSync(e).isDirectory();
             } catch (e) {
               if ('ENOENT' === e.code) return !1;
               throw e;
@@ -2664,7 +3127,7 @@
           }),
           (t.isFileExists = function (e) {
             try {
-              return i.default.accessSync(e), !0;
+              return o.default.accessSync(e), !0;
             } catch (e) {
               return !1;
             }
@@ -2672,9 +3135,9 @@
           (t.createDirectories = (e) => {
             e.split(c.default.sep)
               .slice(0, -1)
-              .reduce((e, t) => ((e = c.default.join(e, t)), i.default.existsSync(e) || i.default.mkdirSync(e), e), '');
+              .reduce((e, t) => ((e = c.default.join(e, t)), o.default.existsSync(e) || o.default.mkdirSync(e), e), '');
           }),
-          (t.asFullPath = (e) => c.default.join(o.default.currentPath, e));
+          (t.asFullPath = (e) => c.default.join(i.default.currentPath, e));
       },
       8705: function (e, t, a) {
         var r =
@@ -2685,12 +3148,12 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = a(4361),
           n = a(4626),
-          i = a(1770),
-          o = r(a(6517));
+          o = a(1770),
+          i = r(a(6517));
         t.default = class {
           constructor(e) {
             (this._schema = e),
-              (this._schemaComposer = o.default.isEmpty(e) ? [new s.SchemaComposer()] : e.map((e) => new s.SchemaComposer((0, i.addScalrs)(e)))),
+              (this._schemaComposer = i.default.isEmpty(e) ? [new s.SchemaComposer()] : e.map((e) => new s.SchemaComposer((0, o.addScalrs)(e)))),
               (this._mergedSchema = (0, n.mergeSchemas)({ schemas: this._schemaComposer.map((e) => e.buildSchema()) })),
               (this._mutations = this._schemaComposer.map((e) => {
                 try {
@@ -2739,13 +3202,13 @@
             return this._mergedSchema;
           }
           isExistsMutationApi(e) {
-            return o.default.some(this.mutations, (t) => o.default.has(t, e));
+            return i.default.some(this.mutations, (t) => i.default.has(t, e));
           }
           isExistsQueryApi(e) {
-            return o.default.some(this.queries, (t) => o.default.has(t, e));
+            return i.default.some(this.queries, (t) => i.default.has(t, e));
           }
           isExistsSubscriptionApi(e) {
-            return o.default.some(this.subscriptions, (t) => o.default.has(t, e));
+            return i.default.some(this.subscriptions, (t) => i.default.has(t, e));
           }
         };
       },
@@ -2764,15 +3227,15 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = a(4361),
           n = a(7343),
-          i = r(a(6444)),
-          o = r(a(6517)),
+          o = r(a(6444)),
+          i = r(a(6517)),
           l = a(2762),
           u = r(a(7147)),
           c = a(7347),
           d = a(1770);
         t.default = class {
           constructor(e) {
-            (this.logger = i.default.getLogger()),
+            (this.logger = o.default.getLogger()),
               (this._customSchemaPath = e?.customSchemaPath ?? this.defaultCustomSchemaPath),
               (this._defaultSchemaPath = e?.defaultSchemaPath ?? this.defaultDefaultSchemaPath),
               this.readOrSetCustomSchema(),
@@ -2854,9 +3317,9 @@
             let s = !1;
             if (
               (t || a
-                ? (t && (o.default.has(this.listQueies(), t.apiName) ? (this.logger.warn(`Query ${t.apiName} is already exists.`), (s = !1)) : (this.addQueryField(t), (s = !0))),
+                ? (t && (i.default.has(this.listQueies(), t.apiName) ? (this.logger.warn(`Query ${t.apiName} is already exists.`), (s = !1)) : (this.addQueryField(t), (s = !0))),
                   a &&
-                    (o.default.has(this.listMutation(), a.apiName)
+                    (i.default.has(this.listMutation(), a.apiName)
                       ? (this.logger.warn(`Mutation ${a.apiName} is already exists.`), (s = !1))
                       : (this.addMutationField(a), (s = !0))))
                 : this.logger.warn('query or mutation is empty.'),
@@ -2901,6 +3364,22 @@
           }
         };
       },
+      5265: function (e, t, a) {
+        var r =
+          (this && this.__importDefault) ||
+          function (e) {
+            return e && e.__esModule ? e : { default: e };
+          };
+        Object.defineProperty(t, '__esModule', { value: !0 });
+        const s = r(a(9829)),
+          n = r(a(6517));
+        class o extends s.default {
+          constructor(e, t, a) {
+            super(e, t, a), (this.values = n.default.map(e.rows, (e) => e.value));
+          }
+        }
+        t.default = o;
+      },
       1092: function (e, t, a) {
         var r =
           (this && this.__importDefault) ||
@@ -2931,15 +3410,15 @@
         Object.defineProperty(t, '__esModule', { value: !0 });
         const s = r(a(8545)),
           n = r(a(4233)),
-          i = a(6870),
-          o = r(a(6517)),
+          o = a(6870),
+          i = r(a(6517)),
           l = (0, n.default)({
             colorize: !0,
             messageFormat: (e, t) => {
-              const a = (t) => (30 === e.level ? i.chalk.white(t) : e.level < 30 ? i.chalk.grey(t) : 40 === e.level ? i.chalk.yellow(t) : e.level >= 50 ? i.chalk.red(t) : t),
+              const a = (t) => (30 === e.level ? o.chalk.white(t) : e.level < 30 ? o.chalk.grey(t) : 40 === e.level ? o.chalk.yellow(t) : e.level >= 50 ? o.chalk.red(t) : t),
                 r = e[t];
-              return o.default.isEmpty(r)
-                ? o.default
+              return i.default.isEmpty(r)
+                ? i.default
                     .chain(e)
                     .omit(['level', 'time', 'pid', 'hostname'])
                     .thru((e) => JSON.stringify(e, null, 2))
@@ -3019,9 +3498,9 @@
           }
           required = () => (
             this.validations.push(() =>
-              s.default.isUndefined(this.input) || s.default.isNull(this.input)
+              s.default.isUndefined(this.input) || s.default.isNull(this.input) || (s.default.isString(this.input) && s.default.isEmpty(this.input))
                 ? this.locale.required
-                : !s.default.isString(this.input) || !s.default.isEmpty(this.input) || this.locale.required
+                : !(s.default.isArray(this.input) && !s.default.every(this.input)) || this.locale.required
             ),
             this
           );
@@ -3079,13 +3558,13 @@
         Object.defineProperty(t, '__esModule', { value: !0 }), (t.loadYaml = t.writeYaml = void 0);
         const s = r(a(7147)),
           n = r(a(9793)),
-          i = a(4355),
-          o = a(2762);
+          o = a(4355),
+          i = a(2762);
         (t.writeYaml = (e, t) => {
-          const a = n.default.dump(t, { schema: i.schema, indent: 2, lineWidth: -1 });
-          return (0, o.createDirectories)(e), s.default.writeFileSync((0, o.asFullPath)(e), a, 'utf8'), a;
+          const a = n.default.dump(t, { schema: o.schema, indent: 2, lineWidth: -1 });
+          return (0, i.createDirectories)(e), s.default.writeFileSync((0, i.asFullPath)(e), a, 'utf8'), a;
         }),
-          (t.loadYaml = (e) => n.default.load(s.default.readFileSync((0, o.asFullPath)(e), 'utf8'), { schema: i.schema }));
+          (t.loadYaml = (e) => n.default.load(s.default.readFileSync((0, i.asFullPath)(e), 'utf8'), { schema: o.schema }));
       },
       6870: function (e, t, a) {
         var r =
@@ -3151,6 +3630,9 @@
       169: (e) => {
         e.exports = require('inquirer-autocomplete-prompt');
       },
+      9829: (e) => {
+        e.exports = require('inquirer-table-prompt');
+      },
       6237: (e) => {
         e.exports = require('isomorphic-git');
       },
@@ -3206,31 +3688,31 @@
         const { isColorSupported: r } = a(8387),
           s = a(7304),
           { Transform: n } = a(3248),
-          i = a(454),
-          o = a(7915),
+          o = a(454),
+          i = a(7915),
           l = a(903),
           { ERROR_LIKE_KEYS: u, MESSAGE_KEY: c, TIMESTAMP_KEY: d, LEVEL_KEY: p, LEVEL_NAMES: m } = a(7318),
           {
             isObject: f,
-            prettifyErrorLog: g,
-            prettifyLevel: h,
-            prettifyMessage: y,
+            prettifyErrorLog: y,
+            prettifyLevel: g,
+            prettifyMessage: h,
             prettifyMetadata: v,
-            prettifyObject: S,
-            prettifyTime: _,
-            buildSafeSonicBoom: $,
+            prettifyObject: $,
+            prettifyTime: S,
+            buildSafeSonicBoom: _,
             filterLog: b,
             handleCustomlevelsOpts: w,
-            handleCustomlevelNamesOpts: P,
+            handleCustomlevelNamesOpts: x,
           } = a(385),
-          E = (e) => {
+          P = (e) => {
             try {
-              return { value: o.parse(e, { protoAction: 'remove' }) };
+              return { value: i.parse(e, { protoAction: 'remove' }) };
             } catch (e) {
               return { err: e };
             }
           },
-          x = {
+          E = {
             colorize: r,
             colorizeObjects: !0,
             crlf: !1,
@@ -3252,79 +3734,79 @@
             include: void 0,
             singleLine: !1,
           };
-        function L(e) {
-          const t = Object.assign({}, x, e),
+        function N(e) {
+          const t = Object.assign({}, E, e),
             a = t.crlf ? '\r\n' : '\n',
             r = '    ',
             s = t.messageKey,
             n = t.levelKey,
-            i = t.levelLabel,
-            o = t.minimumLevel,
+            o = t.levelLabel,
+            i = t.minimumLevel,
             u = t.messageFormat,
             c = t.timestampKey,
             d = t.errorLikeObjectKeys,
-            $ = t.errorProps.split(','),
-            L = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
-            N = w(t.customLevels),
-            A = P(t.customLevels),
-            q = t.customColors
+            _ = t.errorProps.split(','),
+            N = 'boolean' == typeof t.useOnlyCustomProps ? t.useOnlyCustomProps : 'true' === t.useOnlyCustomProps,
+            A = w(t.customLevels),
+            q = x(t.customLevels),
+            L = t.customColors
               ? t.customColors.split(',').reduce((e, a) => {
                   const [r, s] = a.split(':'),
-                    n = (L ? t.customLevels : void 0 !== A[r]) ? A[r] : m[r],
-                    i = void 0 !== n ? n : r;
-                  return e.push([i, s]), e;
+                    n = (N ? t.customLevels : void 0 !== q[r]) ? q[r] : m[r],
+                    o = void 0 !== n ? n : r;
+                  return e.push([o, s]), e;
                 }, [])
               : void 0,
-            C = { customLevels: N, customLevelNames: A };
-          L && !t.customLevels && ((C.customLevels = void 0), (C.customLevelNames = void 0));
-          const k = t.customPrettifiers,
+            D = { customLevels: A, customLevelNames: q };
+          N && !t.customLevels && ((D.customLevels = void 0), (D.customLevelNames = void 0));
+          const C = t.customPrettifiers,
             O = void 0 !== t.include ? new Set(t.include.split(',')) : void 0,
-            R = !O && t.ignore ? new Set(t.ignore.split(',')) : void 0,
-            M = t.hideObject,
-            D = t.singleLine,
-            j = l(t.colorize, q, L),
-            T = t.colorizeObjects ? j : l(!1, [], !1);
+            k = !O && t.ignore ? new Set(t.ignore.split(',')) : void 0,
+            R = t.hideObject,
+            M = t.singleLine,
+            j = l(t.colorize, L, N),
+            I = t.colorizeObjects ? j : l(!1, [], !1);
           return function (e) {
             let l;
             if (f(e)) l = e;
             else {
-              const t = E(e);
+              const t = P(e);
               if (t.err || !f(t.value)) return e + a;
               l = t.value;
             }
-            if (o) {
-              const e = ((L ? t.customLevels : void 0 !== A[o]) ? A[o] : m[o]) || Number(o);
+            if (i) {
+              const e = ((N ? t.customLevels : void 0 !== q[i]) ? q[i] : m[i]) || Number(i);
               if (l[void 0 === n ? p : n] < e) return;
             }
-            const w = y({ log: l, messageKey: s, colorizer: j, messageFormat: u, levelLabel: i, ...C, useOnlyCustomProps: L });
-            (R || O) && (l = b({ log: l, ignoreKeys: R, includeKeys: O }));
-            const P = h({ log: l, colorizer: j, levelKey: n, prettifier: k.level, ...C }),
-              x = v({ log: l, prettifiers: k }),
-              N = _({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: k.time });
-            let q = '';
+            const w = h({ log: l, messageKey: s, colorizer: j, messageFormat: u, levelLabel: o, ...D, useOnlyCustomProps: N });
+            (k || O) && (l = b({ log: l, ignoreKeys: k, includeKeys: O }));
+            const x = g({ log: l, colorizer: j, levelKey: n, prettifier: C.level, ...D }),
+              E = v({ log: l, prettifiers: C }),
+              A = S({ log: l, translateFormat: t.translateTime, timestampKey: c, prettifier: C.time });
+            let L = '';
             if (
-              (t.levelFirst && P && (q = `${P}`),
-              N && '' === q ? (q = `${N}`) : N && (q = `${q} ${N}`),
-              !t.levelFirst && P && (q = q.length > 0 ? `${q} ${P}` : P),
-              x && (q = q.length > 0 ? `${q} ${x}:` : x),
-              !1 === q.endsWith(':') && '' !== q && (q += ':'),
-              w && (q = q.length > 0 ? `${q} ${w}` : w),
-              q.length > 0 && !D && (q += a),
+              (t.levelFirst && x && (L = `${x}`),
+              A && '' === L ? (L = `${A}`) : A && (L = `${L} ${A}`),
+              !t.levelFirst && x && (L = L.length > 0 ? `${L} ${x}` : x),
+              E && (L = L.length > 0 ? `${L} ${E}:` : E),
+              !1 === L.endsWith(':') && '' !== L && (L += ':'),
+              w && (L = L.length > 0 ? `${L} ${w}` : w),
+              L.length > 0 && !M && (L += a),
               'Error' === l.type && l.stack)
             ) {
-              const e = g({ log: l, errorLikeKeys: d, errorProperties: $, ident: r, eol: a });
-              D && (q += a), (q += e);
-            } else if (!M) {
+              const e = y({ log: l, errorLikeKeys: d, errorProperties: _, ident: r, eol: a });
+              M && (L += a), (L += e);
+            } else if (!R) {
               const e = [s, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = S({ input: l, skipKeys: e, customPrettifiers: k, errorLikeKeys: d, eol: a, ident: r, singleLine: D, colorizer: T });
-              D && !/^\s$/.test(t) && (q += ' '), (q += t);
+                t = $({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: d, eol: a, ident: r, singleLine: M, colorizer: I });
+              M && !/^\s$/.test(t) && (L += ' '), (L += t);
             }
-            return q;
+            return L;
           };
         }
-        function N(e = {}) {
-          const t = L(e);
-          return i(
+        function A(e = {}) {
+          const t = N(e);
+          return o(
             function (a) {
               const r = new n({
                 objectMode: !0,
@@ -3333,39 +3815,39 @@
                   r(null, t(e));
                 },
               });
-              let i;
+              let o;
               return (
-                (i =
+                (o =
                   'object' == typeof e.destination && 'function' == typeof e.destination.write
                     ? e.destination
-                    : $({ dest: e.destination || 1, append: e.append, mkdir: e.mkdir, sync: e.sync })),
+                    : _({ dest: e.destination || 1, append: e.append, mkdir: e.mkdir, sync: e.sync })),
                 a.on('unknown', function (e) {
-                  i.write(e + '\n');
+                  o.write(e + '\n');
                 }),
-                s(a, r, i),
+                s(a, r, o),
                 r
               );
             },
             { parse: 'lines' }
           );
         }
-        (e.exports = N), (e.exports.prettyFactory = L), (e.exports.colorizerFactory = l), (e.exports.default = N);
+        (e.exports = A), (e.exports.prettyFactory = N), (e.exports.colorizerFactory = l), (e.exports.default = A);
       },
       903: (e, t, a) => {
         const { LEVELS: r, LEVEL_NAMES: s } = a(7318),
           n = (e) => e,
-          i = { default: n, 60: n, 50: n, 40: n, 30: n, 20: n, 10: n, message: n, greyMessage: n },
-          { createColors: o } = a(8387),
-          l = o({ useColor: !0 }),
-          { white: u, bgRed: c, red: d, yellow: p, green: m, blue: f, gray: g, cyan: h } = l,
-          y = { default: u, 60: c, 50: d, 40: p, 30: m, 20: f, 10: g, message: h, greyMessage: g };
+          o = { default: n, 60: n, 50: n, 40: n, 30: n, 20: n, 10: n, message: n, greyMessage: n },
+          { createColors: i } = a(8387),
+          l = i({ useColor: !0 }),
+          { white: u, bgRed: c, red: d, yellow: p, green: m, blue: f, gray: y, cyan: g } = l,
+          h = { default: u, 60: c, 50: d, 40: p, 30: m, 20: f, 10: y, message: g, greyMessage: y };
         function v(e) {
-          return function (t, a, { customLevels: n, customLevelNames: i } = {}) {
-            const o = e ? n || r : Object.assign({}, r, n),
-              l = e ? i || s : Object.assign({}, s, i);
+          return function (t, a, { customLevels: n, customLevelNames: o } = {}) {
+            const i = e ? n || r : Object.assign({}, r, n),
+              l = e ? o || s : Object.assign({}, s, o);
             let u = 'default';
-            u = Number.isInteger(+t) ? (Object.prototype.hasOwnProperty.call(o, t) ? t : u) : Object.prototype.hasOwnProperty.call(l, t.toLowerCase()) ? l[t.toLowerCase()] : u;
-            const c = o[u];
+            u = Number.isInteger(+t) ? (Object.prototype.hasOwnProperty.call(i, t) ? t : u) : Object.prototype.hasOwnProperty.call(l, t.toLowerCase()) ? l[t.toLowerCase()] : u;
+            const c = i[u];
             return Object.prototype.hasOwnProperty.call(a, u) ? a[u](c) : a.default(c);
           };
         }
@@ -3377,10 +3859,10 @@
                       function (e, [t, a]) {
                         return (e[t] = 'function' == typeof l[a] ? l[a] : u), e;
                       },
-                      { default: u, message: h, greyMessage: g }
+                      { default: u, message: g, greyMessage: y }
                     );
                   })(e),
-                  r = t ? a : Object.assign({}, y, a),
+                  r = t ? a : Object.assign({}, h, a),
                   s = v(t),
                   n = function (e, t) {
                     return s(e, r, t);
@@ -3391,16 +3873,16 @@
             ? (function (e) {
                 const t = v(e),
                   a = function (e, a) {
-                    return t(e, y, a);
+                    return t(e, h, a);
                   };
-                return (a.message = y.message), (a.greyMessage = y.greyMessage), a;
+                return (a.message = h.message), (a.greyMessage = h.greyMessage), a;
               })(a)
             : (function (e) {
                 const t = v(e),
                   a = function (e, a) {
-                    return t(e, i, a);
+                    return t(e, o, a);
                   };
-                return (a.message = i.message), (a.greyMessage = i.greyMessage), a;
+                return (a.message = o.message), (a.greyMessage = o.greyMessage), a;
               })(a);
         };
       },
@@ -3422,26 +3904,26 @@
         const { createCopier: r } = a(4563),
           s = a(4612),
           n = a(5246),
-          i = a(5376),
-          { isMainThread: o } = a(1267),
+          o = a(5376),
+          { isMainThread: i } = a(1267),
           l = a(903)(),
-          { DATE_FORMAT: u, ERROR_LIKE_KEYS: c, MESSAGE_KEY: d, LEVEL_KEY: p, LEVEL_LABEL: m, TIMESTAMP_KEY: f, LOGGER_KEYS: g, LEVELS: h, DATE_FORMAT_SIMPLE: y } = a(7318),
+          { DATE_FORMAT: u, ERROR_LIKE_KEYS: c, MESSAGE_KEY: d, LEVEL_KEY: p, LEVEL_LABEL: m, TIMESTAMP_KEY: f, LOGGER_KEYS: y, LEVELS: g, DATE_FORMAT_SIMPLE: h } = a(7318),
           v = r({});
-        function S(e, t = !1) {
+        function $(e, t = !1) {
           if (!1 === t) return e;
-          const a = _(e);
-          if (!$(a)) return e;
-          if (!0 === t) return s(a, y);
+          const a = S(e);
+          if (!_(a)) return e;
+          if (!0 === t) return s(a, h);
           const r = t.toUpperCase();
           if ('SYS:STANDARD' === r) return s(a, u);
           const n = r.substr(0, 4);
           return s(a, 'SYS:' === n || 'UTC:' === n ? ('UTC:' === n ? t : t.slice(4)) : `UTC:${t}`);
         }
-        function _(e) {
+        function S(e) {
           let t = new Date(e);
-          return $(t) || (t = new Date(+e)), t;
+          return _(t) || (t = new Date(+e)), t;
         }
-        function $(e) {
+        function _(e) {
           return e instanceof Date && !Number.isNaN(e.getTime());
         }
         function b(e) {
@@ -3452,25 +3934,25 @@
           for (let e = 1; e < r.length; e += 1) r[e] = t + r[e];
           return r.join(a);
         }
-        function P({
+        function x({
           input: e,
           ident: t = '    ',
           eol: a = '\n',
           skipKeys: r = [],
           customPrettifiers: s = {},
           errorLikeKeys: n = c,
-          excludeLoggerKeys: o = !0,
+          excludeLoggerKeys: i = !0,
           singleLine: u = !1,
           colorizer: d = l,
         }) {
           const p = [].concat(r);
-          !0 === o && Array.prototype.push.apply(p, g);
+          !0 === i && Array.prototype.push.apply(p, y);
           let m = '';
-          const { plain: f, errors: h } = Object.entries(e).reduce(
-            ({ plain: t, errors: a }, [r, i]) => {
+          const { plain: f, errors: g } = Object.entries(e).reduce(
+            ({ plain: t, errors: a }, [r, o]) => {
               if (!1 === p.includes(r)) {
-                const o = 'function' == typeof s[r] ? s[r](i, r, e) : i;
-                n.includes(r) ? (a[r] = o) : (t[r] = o);
+                const i = 'function' == typeof s[r] ? s[r](o, r, e) : o;
+                n.includes(r) ? (a[r] = i) : (t[r] = i);
               }
               return { plain: t, errors: a };
             },
@@ -3478,22 +3960,22 @@
           );
           return (
             u
-              ? (Object.keys(f).length > 0 && (m += d.greyMessage(i(f))), (m += a), (m = m.replace(/\\\\/gi, '\\')))
+              ? (Object.keys(f).length > 0 && (m += d.greyMessage(o(f))), (m += a), (m = m.replace(/\\\\/gi, '\\')))
               : Object.entries(f).forEach(([e, r]) => {
-                  let n = 'function' == typeof s[e] ? r : i(r, null, 2);
+                  let n = 'function' == typeof s[e] ? r : o(r, null, 2);
                   if (void 0 === n) return;
                   n = n.replace(/\\\\/gi, '\\');
-                  const o = w({ input: n, ident: t, eol: a });
-                  m += `${t}${e}:${o.startsWith(a) ? '' : ' '}${o}${a}`;
+                  const i = w({ input: n, ident: t, eol: a });
+                  m += `${t}${e}:${i.startsWith(a) ? '' : ' '}${i}${a}`;
                 }),
-            Object.entries(h).forEach(([e, r]) => {
-              const n = 'function' == typeof s[e] ? r : i(r, null, 2);
-              void 0 !== n && (m += E({ keyName: e, lines: n, eol: a, ident: t }));
+            Object.entries(g).forEach(([e, r]) => {
+              const n = 'function' == typeof s[e] ? r : o(r, null, 2);
+              void 0 !== n && (m += P({ keyName: e, lines: n, eol: a, ident: t }));
             }),
             m
           );
         }
-        function E({ keyName: e, lines: t, eol: a, ident: r }) {
+        function P({ keyName: e, lines: t, eol: a, ident: r }) {
           let s = '';
           const n = `${r}${e}: ${w({ input: t, ident: r, eol: a })}${a}`.split(a);
           for (let e = 0; e < n.length; e += 1) {
@@ -3504,14 +3986,14 @@
               if (e && 3 === e.length) {
                 const r = /^\s*/.exec(t)[0].length + 4,
                   n = ' '.repeat(r),
-                  i = e[2];
-                s += e[1] + a + n + JSON.parse(i).replace(/\n/g, a + n);
+                  o = e[2];
+                s += e[1] + a + n + JSON.parse(o).replace(/\n/g, a + n);
               } else s += t;
             } else s += t;
           }
           return s;
         }
-        function x(e) {
+        function E(e) {
           const t = [];
           let a = !1,
             r = '';
@@ -3521,21 +4003,21 @@
           }
           return r.length && t.push(r), t;
         }
-        function L(e, t) {
-          const a = Array.isArray(t) ? t : x(t);
+        function N(e, t) {
+          const a = Array.isArray(t) ? t : E(t);
           for (const t of a) {
             if (!Object.prototype.hasOwnProperty.call(e, t)) return;
             e = e[t];
           }
           return e;
         }
-        function N(e, t) {
-          const a = x(t),
+        function A(e, t) {
+          const a = E(t),
             r = a.pop();
-          null !== (e = L(e, a)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, r) && delete e[r];
+          null !== (e = N(e, a)) && 'object' == typeof e && Object.prototype.hasOwnProperty.call(e, r) && delete e[r];
         }
-        function A() {}
-        function q(e, t) {
+        function q() {}
+        function L(e, t) {
           e.destroyed ||
             ('beforeExit' === t
               ? (e.flush(),
@@ -3547,22 +4029,22 @@
         (e.exports = {
           isObject: b,
           prettifyErrorLog: function ({ log: e, messageKey: t = d, ident: a = '    ', eol: r = '\n', errorLikeKeys: s = c, errorProperties: n = [] }) {
-            let i = `${a}${w({ input: e.stack, ident: a, eol: r })}${r}`;
+            let o = `${a}${w({ input: e.stack, ident: a, eol: r })}${r}`;
             if (n.length > 0) {
-              const o = g.concat(t, 'type', 'stack');
+              const i = y.concat(t, 'type', 'stack');
               let l;
-              l = '*' === n[0] ? Object.keys(e).filter((e) => !1 === o.includes(e)) : n.filter((e) => !1 === o.includes(e));
+              l = '*' === n[0] ? Object.keys(e).filter((e) => !1 === i.includes(e)) : n.filter((e) => !1 === i.includes(e));
               for (let t = 0; t < l.length; t += 1) {
                 const n = l[t];
                 n in e != 0 &&
-                  (i = b(e[n]) ? `${i}${a}${n}: {${r}${P({ input: e[n], errorLikeKeys: s, excludeLoggerKeys: !1, eol: r, ident: a + a })}${a}}${r}` : `${i}${a}${n}: ${e[n]}${r}`);
+                  (o = b(e[n]) ? `${o}${a}${n}: {${r}${x({ input: e[n], errorLikeKeys: s, excludeLoggerKeys: !1, eol: r, ident: a + a })}${a}}${r}` : `${o}${a}${n}: ${e[n]}${r}`);
               }
             }
-            return i;
+            return o;
           },
           prettifyLevel: function ({ log: e, colorizer: t = l, levelKey: a = p, prettifier: r, customLevels: s, customLevelNames: n }) {
-            const i = L(e, a);
-            return void 0 === i ? void 0 : r ? r(i) : t(i, { customLevels: s, customLevelNames: n });
+            const o = N(e, a);
+            return void 0 === o ? void 0 : r ? r(o) : t(o, { customLevels: s, customLevelNames: n });
           },
           prettifyMessage: function ({
             log: e,
@@ -3571,13 +4053,13 @@
             colorizer: r = l,
             levelLabel: s = m,
             levelKey: n = p,
-            customLevels: i,
-            useOnlyCustomProps: o,
+            customLevels: o,
+            useOnlyCustomProps: i,
           }) {
             if (t && 'string' == typeof t) {
               const a = String(t).replace(/{([^{}]+)}/g, function (t, a) {
                 let r;
-                return a === s && void 0 !== (r = L(e, n)) ? ((o ? void 0 === i : void 0 === i[r]) ? h[r] : i[r]) : L(e, a) || '';
+                return a === s && void 0 !== (r = N(e, n)) ? ((i ? void 0 === o : void 0 === o[r]) ? g[r] : o[r]) : N(e, a) || '';
               });
               return r.message(a);
             }
@@ -3598,26 +4080,26 @@
             }
             return e.caller && (a += `${'' === a ? '' : ' '}<${t.caller ? t.caller(e.caller) : e.caller}>`), '' === a ? void 0 : a;
           },
-          prettifyObject: P,
+          prettifyObject: x,
           prettifyTime: function ({ log: e, timestampKey: t = f, translateFormat: a, prettifier: r }) {
             let s = null;
             if ((t in e ? (s = e[t]) : 'timestamp' in e && (s = e.timestamp), null === s)) return;
-            const n = a ? S(s, a) : s;
+            const n = a ? $(s, a) : s;
             return r ? r(n) : `[${n}]`;
           },
           buildSafeSonicBoom: function (e) {
             const t = new n(e);
             return (
               t.on('error', function e(a) {
-                if ('EPIPE' === a.code) return (t.write = A), (t.end = A), (t.flushSync = A), void (t.destroy = A);
+                if ('EPIPE' === a.code) return (t.write = q), (t.end = q), (t.flushSync = q), void (t.destroy = q);
                 t.removeListener('error', e);
               }),
               !e.sync &&
-                o &&
+                i &&
                 (function (e) {
                   if (global.WeakRef && global.WeakMap && global.FinalizationRegistry) {
                     const t = a(2067);
-                    t.register(e, q),
+                    t.register(e, L),
                       e.on('close', function () {
                         t.unregister(e);
                       });
@@ -3639,7 +4121,7 @@
             }
             return (
               t.forEach((e) => {
-                N(r, e);
+                A(r, e);
               }),
               r
             );
@@ -3673,19 +4155,19 @@
           },
         }),
           (e.exports.internals = {
-            formatTime: S,
+            formatTime: $,
             joinLinesWithIndentation: w,
-            prettifyError: E,
-            getPropertyValue: L,
-            deleteLogProperty: N,
-            splitPropertyKey: x,
-            createDate: _,
-            isValidDate: $,
+            prettifyError: P,
+            getPropertyValue: N,
+            deleteLogProperty: A,
+            splitPropertyKey: E,
+            createDate: S,
+            isValidDate: _,
           });
       },
       4147: (e) => {
         e.exports = JSON.parse(
-          '{"name":"ragate-cli","version":"0.2.0","description":"Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.","engines":{"node":">=18.x"},"scripts":{"test":"echo \'Sorry, test code is in preparation.\\n\'","build:dev":"ENV=development webpack","build:prd":"ENV=production webpack","lint":"eslint . --fix","format":"prettier . --write","prepare":"husky install"},"eslintIgnore":["!/.github",".serverless","bin","tmp","webpack.config.js"],"main":"./lib/app.ts","bin":{"ragate":"./bin/app.js"},"repository":{"type":"git","url":"git+https://github.com/ragate-inc/ragate-cli.git"},"lint-staged":{"*.{ts,js}":["eslint"],"*.{css,html,js,json,md,yaml,yml,ts,js}":["prettier . --write"]},"keywords":["aws","serverless","ragate","cli","amplify","serverless","lambda","amazon"],"author":"Ragate inc.","license":"MIT","bugs":{"url":"https://github.com/ragate-inc/ragate-cli/issues"},"homepage":"https://github.com/ragate-inc/ragate-cli#readme","devDependencies":{"@tsconfig/node-lts":"^18.12.1","@types/figlet":"^1.5.6","@types/fs-extra":"^11.0.1","@types/inquirer":"^9.0.3","@types/inquirer-autocomplete-prompt":"^3.0.0","@types/js-yaml":"^4.0.5","@types/lodash":"^4.14.194","@types/node":"^18.16.3","@types/webpack":"^5.28.1","@types/webpack-node-externals":"^3.0.0","@types/yargs":"^17.0.24","@typescript-eslint/eslint-plugin":"^5.59.2","@typescript-eslint/parser":"^5.59.2","eslint":"^8.39.0","eslint-config-prettier":"^8.8.0","eslint-config-standard-with-typescript":"^34.0.1","husky":"^6.0.0","lint-staged":"^13.2.2","prettier":"2.8.8","ts-loader":"^9.4.2","ts-node":"^10.9.1","tsconfig-paths-webpack-plugin":"^4.0.1","typescript":"^5.0.4","webpack":"^5.81.0","webpack-cli":"^5.0.2","webpack-node-externals":"^3.0.0"},"dependencies":{"@aws-cdk/assert":"^2.68.0","@aws-cdk/aws-iam":"^1.201.0","@aws-cdk/aws-sns":"^1.201.0","@aws-cdk/aws-sns-subscriptions":"^1.201.0","@aws-cdk/aws-sqs":"^1.201.0","aws-cdk-lib":"^2.79.1","figlet":"^1.6.0","fs-extra":"^11.1.1","graphql":"^16.6.0","graphql-compose":"^9.0.10","graphql-tools":"^8.3.20","inquirer":"^8.0.0","inquirer-autocomplete-prompt":"^2.0.0","isomorphic-git":"^1.23.0","js-yaml":"^4.1.0","lodash":"^4.17.21","parent-require":"^1.0.0","pino":"^8.12.1","pino-pretty":"^10.0.0","yaml-cfn":"^0.3.2","yargonaut":"^1.1.4","yargs":"^17.1.1-candidate.0"}}'
+          '{"name":"ragate-cli","version":"0.2.0","description":"Anyone can immediately start a serverless project using the CLI, automatically generate source code, and start an infinitely extensible and maintainable serverless development project.","engines":{"node":">=18.x"},"scripts":{"test":"echo \'Sorry, test code is in preparation.\\n\'","build:dev":"ENV=development webpack","build:prd":"ENV=production webpack","lint":"eslint . --fix","format":"prettier . --write","prepare":"husky install"},"eslintIgnore":["!/.github",".serverless","bin","tmp","webpack.config.js"],"main":"./lib/app.ts","bin":{"ragate":"./bin/app.js"},"repository":{"type":"git","url":"git+https://github.com/ragate-inc/ragate-cli.git"},"lint-staged":{"*.{ts,js}":["eslint"],"*.{css,html,js,json,md,yaml,yml,ts,js}":["prettier . --write"]},"keywords":["aws","serverless","ragate","cli","amplify","serverless","lambda","amazon"],"author":"Ragate inc.","license":"MIT","bugs":{"url":"https://github.com/ragate-inc/ragate-cli/issues"},"homepage":"https://github.com/ragate-inc/ragate-cli#readme","devDependencies":{"@tsconfig/node-lts":"^18.12.1","@types/figlet":"^1.5.6","@types/fs-extra":"^11.0.1","@types/inquirer":"^9.0.3","@types/inquirer-autocomplete-prompt":"^3.0.0","@types/js-yaml":"^4.0.5","@types/lodash":"^4.14.194","@types/node":"^18.16.3","@types/webpack":"^5.28.1","@types/webpack-node-externals":"^3.0.0","@types/yargs":"^17.0.24","@typescript-eslint/eslint-plugin":"^5.59.2","@typescript-eslint/parser":"^5.59.2","eslint":"^8.39.0","eslint-config-prettier":"^8.8.0","eslint-config-standard-with-typescript":"^34.0.1","husky":"^6.0.0","lint-staged":"^13.2.2","prettier":"2.8.8","ts-loader":"^9.4.2","ts-node":"^10.9.1","tsconfig-paths-webpack-plugin":"^4.0.1","typescript":"^5.0.4","webpack":"^5.81.0","webpack-cli":"^5.0.2","webpack-node-externals":"^3.0.0"},"dependencies":{"@aws-cdk/assert":"^2.68.0","@aws-cdk/aws-iam":"^1.201.0","@aws-cdk/aws-sns":"^1.201.0","@aws-cdk/aws-sns-subscriptions":"^1.201.0","@aws-cdk/aws-sqs":"^1.201.0","aws-cdk-lib":"^2.79.1","figlet":"^1.6.0","fs-extra":"^11.1.1","graphql":"^16.6.0","graphql-compose":"^9.0.10","graphql-tools":"^8.3.20","inquirer":"^8.0.0","inquirer-autocomplete-prompt":"^2.0.0","inquirer-table-prompt":"^0.2.1","isomorphic-git":"^1.23.0","js-yaml":"^4.1.0","lodash":"^4.17.21","parent-require":"^1.0.0","pino":"^8.12.1","pino-pretty":"^10.0.0","prompt-choices":"^4.0.6","yaml-cfn":"^0.3.2","yargonaut":"^1.1.4","yargs":"^17.1.1-candidate.0"}}'
         );
       },
     },
