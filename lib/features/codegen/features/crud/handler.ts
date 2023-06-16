@@ -89,12 +89,12 @@ export default class extends FeatureHandlerAbstract {
       _.each(appSyncStackConfig.dataSources, (dataSource) => {
         if (!_.includes(dataSource, 'datasources.yml')) return;
         const filePath = Parser.parseSlsRecursivelyReference(dataSource) as string;
-        const yml = loadYaml<Record<string, Type.AppSyncV2.DataSource>>(filePath);
-        _.each(resolverMappings.lambda, (api) => {
-          const functionName = _.upperFirst(api.name);
+        const yml = loadYaml<Record<string, Type.AppSyncV2.DataSource>>(filePath) || {};
+        _.each(resolverMappings.lambda, (lambda) => {
+          const functionName = _.upperFirst(lambda.name);
           const lambdaFunctionName = `${functionName}LambdaFunction`;
           yml[lambdaFunctionName] = {
-            ...yml[lambdaFunctionName],
+            ...(yml[lambdaFunctionName] || {}),
             type: 'AWS_LAMBDA',
             description: lambdaFunctionName,
             config: {
@@ -115,7 +115,7 @@ export default class extends FeatureHandlerAbstract {
       _.each(appSyncStackConfig.pipelineFunctions, (pipelineFunction) => {
         if (!_.includes(pipelineFunction, 'pipelineFunctions.yml')) return;
         const filePath = Parser.parseSlsRecursivelyReference(pipelineFunction) as string;
-        const yml = loadYaml<Record<string, Type.AppSyncV2.PipelineFunction>>(filePath);
+        const yml = loadYaml<Record<string, Type.AppSyncV2.PipelineFunction>>(filePath) || {};
         // vtl
         _.each(resolverMappings.vtl, (vtl) => {
           const functionName = _.upperFirst(vtl.name);
@@ -135,7 +135,7 @@ export default class extends FeatureHandlerAbstract {
           })();
           new CodeService({ filePath, code, type: 'vtl' }).write();
           yml[functionName] = {
-            ...yml[functionName],
+            ...(yml[functionName] || {}),
             dataSource: dataSourceName,
             request: `${filePath}.vtl`,
             response: `appsync/resolvers/common/resolver.response.vtl`,
@@ -145,8 +145,9 @@ export default class extends FeatureHandlerAbstract {
         _.each(resolverMappings.lambda, (lambda) => {
           const functionName = _.upperFirst(lambda.name);
           const lambdaFunctionName = `${functionName}LambdaFunction`;
+          console.log(`Add Lambda Function: ${lambdaFunctionName}`);
           yml[functionName] = {
-            ...yml[functionName],
+            ...(yml[functionName] || {}),
             dataSource: lambdaFunctionName,
           };
         });
@@ -157,7 +158,7 @@ export default class extends FeatureHandlerAbstract {
       _.each(appSyncStackConfig.resolvers, (resolver) => {
         if (!_.includes(resolver, 'resolvers.yml')) return;
         const filePath = Parser.parseSlsRecursivelyReference(resolver) as string;
-        const yml = loadYaml<Record<string, Type.AppSyncV2.Resolver>>(filePath);
+        const yml = loadYaml<Record<string, Type.AppSyncV2.Resolver>>(filePath) || {};
         // vtl
         _.each(resolverMappings.vtl, (vtl) => {
           const keyName = `Query.${vtl.name}`;
@@ -166,7 +167,7 @@ export default class extends FeatureHandlerAbstract {
           const functionName = _.upperFirst(vtl.name);
           new CodeService({ filePath, code: CodeService.templates.vtl.pipelineBefore, type: 'vtl' }).write();
           yml[keyName] = {
-            ...yml[keyName],
+            ...(yml[keyName] || {}),
             request: `${filePath}.vtl`,
             response: responseVtlFilename,
             functions: [functionName],
@@ -177,7 +178,7 @@ export default class extends FeatureHandlerAbstract {
           const keyName = `Mutation.${lambda.name}`;
           const functionName = _.upperFirst(lambda.name);
           yml[keyName] = {
-            ...yml[keyName],
+            ...(yml[keyName] || {}),
             functions: [functionName],
           };
         });
@@ -194,7 +195,7 @@ export default class extends FeatureHandlerAbstract {
       throw new Error(`${locale.error.notFoundFunctionsConfig} : \${file(./serverless/ap-northeast-1/resources/functions.yml)}`);
     }
 
-    const functionsConfig = loadYaml<ServerlessFunctionsYaml>(functionsPath);
+    const functionsConfig = loadYaml<ServerlessFunctionsYaml>(functionsPath) || {};
     _.each(resolverMappings.lambda, (lambda) => {
       const functionName = _.upperFirst(lambda.name);
       const filePath = `src/functions/appsync/${lambda.name}`;
@@ -206,7 +207,7 @@ export default class extends FeatureHandlerAbstract {
       })();
       new CodeService({ filePath, code, type: 'typescript' }).write();
       functionsConfig[functionName] = {
-        ...functionsConfig[functionName],
+        ...(functionsConfig[functionName] || {}),
         handler,
         name,
       };
