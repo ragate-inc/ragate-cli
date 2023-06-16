@@ -11,6 +11,7 @@ import TablePrompt from 'utils/inquirer/tablePrompt';
 import CodeService from 'services/codeService';
 import questions from 'features/codegen/features/crud/utils/questions/';
 import buildSchemaGraphqlInfo from './utils/buildSchemaGraphqlInfo';
+import logger from 'utils/logger';
 
 export default class extends FeatureHandlerAbstract {
   constructor(argv: yargs.ArgumentsCamelCase<{ region: AWS_REGION }>) {
@@ -93,22 +94,23 @@ export default class extends FeatureHandlerAbstract {
         _.each(resolverMappings.lambda, (lambda) => {
           const functionName = _.upperFirst(lambda.name);
           const lambdaFunctionName = `${functionName}LambdaFunction`;
-          yml[lambdaFunctionName] = _.assign(
-            {
-              type: 'AWS_LAMBDA',
-              description: lambdaFunctionName,
-              config: {
-                functionName: functionName,
-                lambdaFunctionArn: {
-                  'Fn::GetAtt': ['UpdatePostLambdaFunction', 'Arn'],
-                },
-                serviceRoleArn: {
-                  'Fn::GetAtt': ['AppSyncLambdaServiceRole', 'Arn'],
-                },
+          if (yml[lambdaFunctionName]) {
+            logger.getLogger().warn('already exists *** ');
+            return;
+          }
+          yml[lambdaFunctionName] = {
+            type: 'AWS_LAMBDA',
+            description: lambdaFunctionName,
+            config: {
+              functionName: functionName,
+              lambdaFunctionArn: {
+                'Fn::GetAtt': ['UpdatePostLambdaFunction', 'Arn'],
+              },
+              serviceRoleArn: {
+                'Fn::GetAtt': ['AppSyncLambdaServiceRole', 'Arn'],
               },
             },
-            yml[lambdaFunctionName]
-          );
+          };
         });
         writeYaml(filePath, yml);
       });
@@ -121,6 +123,10 @@ export default class extends FeatureHandlerAbstract {
         // vtl
         _.each(resolverMappings.vtl, (vtl) => {
           const functionName = _.upperFirst(vtl.name);
+          if (yml[functionName]) {
+            logger.getLogger().warn('already exists *** ');
+            return;
+          }
           const dataSourceName = yml[functionName]?.dataSource || 'YourDataSourceName';
           const filePath = `appsync/resolvers/functions/Query.${functionName}.request`;
           const code = (() => {
@@ -136,26 +142,24 @@ export default class extends FeatureHandlerAbstract {
             }
           })();
           new CodeService({ filePath, code, type: 'vtl' }).write();
-          yml[functionName] = _.assign(
-            {
-              dataSource: dataSourceName,
-              request: `${filePath}.vtl`,
-              response: `appsync/resolvers/common/resolver.response.vtl`,
-            },
-            yml[functionName]
-          );
+          yml[functionName] = {
+            dataSource: dataSourceName,
+            request: `${filePath}.vtl`,
+            response: `appsync/resolvers/common/resolver.response.vtl`,
+          };
         });
         // lambda
         _.each(resolverMappings.lambda, (lambda) => {
           const functionName = _.upperFirst(lambda.name);
+          if (yml[functionName]) {
+            logger.getLogger().warn('already exists *** ');
+            return;
+          }
           const lambdaFunctionName = `${functionName}LambdaFunction`;
           console.log(`Add Lambda Function: ${lambdaFunctionName}`);
-          yml[functionName] = _.assign(
-            {
-              dataSource: lambdaFunctionName,
-            },
-            yml[functionName]
-          );
+          yml[functionName] = {
+            dataSource: lambdaFunctionName,
+          };
         });
         writeYaml(filePath, yml);
       });
@@ -168,29 +172,31 @@ export default class extends FeatureHandlerAbstract {
         // vtl
         _.each(resolverMappings.vtl, (vtl) => {
           const keyName = `Query.${vtl.name}`;
+          if (yml[keyName]) {
+            logger.getLogger().warn('already exists *** ');
+            return;
+          }
           const filePath = `appsync/resolvers/queries/${vtl.name}.request`;
           const responseVtlFilename = `appsync/resolvers/common/pipeline.after.vtl`;
           const functionName = _.upperFirst(vtl.name);
           new CodeService({ filePath, code: CodeService.templates.vtl.pipelineBefore, type: 'vtl' }).write();
-          yml[keyName] = _.assign(
-            {
-              request: `${filePath}.vtl`,
-              response: responseVtlFilename,
-              functions: [functionName],
-            },
-            yml[keyName]
-          );
+          yml[keyName] = {
+            request: `${filePath}.vtl`,
+            response: responseVtlFilename,
+            functions: [functionName],
+          };
         });
         // lambda
         _.each(resolverMappings.lambda, (lambda) => {
           const keyName = `Mutation.${lambda.name}`;
+          if (yml[keyName]) {
+            logger.getLogger().warn('already exists *** ');
+            return;
+          }
           const functionName = _.upperFirst(lambda.name);
-          yml[keyName] = _.assign(
-            {
-              functions: [functionName],
-            },
-            yml[keyName]
-          );
+          yml[keyName] = {
+            functions: [functionName],
+          };
         });
         writeYaml(filePath, yml);
       });
@@ -208,6 +214,10 @@ export default class extends FeatureHandlerAbstract {
     const functionsConfig = loadYaml<ServerlessFunctionsYaml>(functionsPath) || {};
     _.each(resolverMappings.lambda, (lambda) => {
       const functionName = _.upperFirst(lambda.name);
+      if (functionsConfig[functionName]) {
+        logger.getLogger().warn('already exists *** ');
+        return;
+      }
       const filePath = `src/functions/appsync/${lambda.name}`;
       const handler = `${filePath}.handler`;
       const name = `\${self:custom.awsResourcePrefix}${functionName}`;
@@ -216,13 +226,12 @@ export default class extends FeatureHandlerAbstract {
         else return CodeService.templates.typescript[lambda.type as 'create' | 'update' | 'delete'](`${functionName}MutationVariables`, lambda.returnValue as string);
       })();
       new CodeService({ filePath, code, type: 'typescript' }).write();
-      functionsConfig[functionName] = _.assign(
-        {
-          handler,
-          name,
-        },
-        functionsConfig[functionName]
-      );
+      functionsConfig[functionName] = {
+        handler,
+        name,
+        memorySize: 1024,
+        timeout: 30,
+      };
     });
     writeYaml(functionsPath, functionsConfig);
   }

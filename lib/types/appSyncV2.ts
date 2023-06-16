@@ -77,7 +77,7 @@ export type Resolver = {
   type?: string;
   field?: string;
   kind?: AppSyncResolverType;
-  dataSource: string;
+  dataSource?: string;
   functions?: string[];
   request?: string;
   response?: string;

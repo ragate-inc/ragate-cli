@@ -1592,8 +1592,9 @@
           d = r(a(5265)),
           p = r(a(2056)),
           m = r(a(2377)),
-          f = r(a(9415));
-        class y extends s.FeatureHandlerAbstract {
+          f = r(a(9415)),
+          y = r(a(6444));
+        class g extends s.FeatureHandlerAbstract {
           constructor(e) {
             super(e), n.default.registerPrompt('table', d.default);
           }
@@ -1611,15 +1612,15 @@
             if (i.default.isEmpty(s)) throw new Error(`${e.error.invalidServerlessCustomAppSync} : \${file(./appsync/stack.yml)}`);
             const d = (0, c.loadYaml)(s);
             if (i.default.isEmpty(d)) throw new Error(`${e.error.invalidServerlessCustomAppSync} : ${s}`);
-            const y = (0, f.default)(d.schema),
-              g = await n.default
-                .prompt([m.default.resolverInfo(this.lang, y)])
+            const g = (0, f.default)(d.schema),
+              h = await n.default
+                .prompt([m.default.resolverInfo(this.lang, g)])
                 .then((e) =>
                   i.default.reduce(
                     e.resolverInfo,
                     (e, t, a) => {
                       const [r, s] = i.default.split(t, ',');
-                      return e[r].push({ resolver: r, type: s, name: y[a].name, returnValue: y[a].returnValue }), e;
+                      return e[r].push({ resolver: r, type: s, name: g[a].name, returnValue: g[a].returnValue }), e;
                     },
                     { vtl: [], lambda: [] }
                   )
@@ -1638,21 +1639,20 @@
                   if (!i.default.includes(e, 'datasources.yml')) return;
                   const t = u.default.parseSlsRecursivelyReference(e),
                     a = (0, c.loadYaml)(t) || {};
-                  i.default.each(g.lambda, (e) => {
+                  i.default.each(h.lambda, (e) => {
                     const t = i.default.upperFirst(e.name),
                       r = `${t}LambdaFunction`;
-                    a[r] = i.default.assign(
-                      {
-                        type: 'AWS_LAMBDA',
-                        description: r,
-                        config: {
-                          functionName: t,
-                          lambdaFunctionArn: { 'Fn::GetAtt': ['UpdatePostLambdaFunction', 'Arn'] },
-                          serviceRoleArn: { 'Fn::GetAtt': ['AppSyncLambdaServiceRole', 'Arn'] },
-                        },
-                      },
-                      a[r]
-                    );
+                    a[r]
+                      ? y.default.getLogger().warn('already exists *** ')
+                      : (a[r] = {
+                          type: 'AWS_LAMBDA',
+                          description: r,
+                          config: {
+                            functionName: t,
+                            lambdaFunctionArn: { 'Fn::GetAtt': ['UpdatePostLambdaFunction', 'Arn'] },
+                            serviceRoleArn: { 'Fn::GetAtt': ['AppSyncLambdaServiceRole', 'Arn'] },
+                          },
+                        });
                   }),
                     (0, c.writeYaml)(t, a);
                 }),
@@ -1661,9 +1661,10 @@
                   if (!i.default.includes(e, 'pipelineFunctions.yml')) return;
                   const t = u.default.parseSlsRecursivelyReference(e),
                     a = (0, c.loadYaml)(t) || {};
-                  i.default.each(g.vtl, (e) => {
-                    const t = i.default.upperFirst(e.name),
-                      r = a[t]?.dataSource || 'YourDataSourceName',
+                  i.default.each(h.vtl, (e) => {
+                    const t = i.default.upperFirst(e.name);
+                    if (a[t]) return void y.default.getLogger().warn('already exists *** ');
+                    const r = a[t]?.dataSource || 'YourDataSourceName',
                       s = `appsync/resolvers/functions/Query.${t}.request`,
                       n = (() => {
                         switch (e.type) {
@@ -1678,12 +1679,13 @@
                         }
                       })();
                     new p.default({ filePath: s, code: n, type: 'vtl' }).write(),
-                      (a[t] = i.default.assign({ dataSource: r, request: `${s}.vtl`, response: 'appsync/resolvers/common/resolver.response.vtl' }, a[t]));
+                      (a[t] = { dataSource: r, request: `${s}.vtl`, response: 'appsync/resolvers/common/resolver.response.vtl' });
                   }),
-                    i.default.each(g.lambda, (e) => {
-                      const t = i.default.upperFirst(e.name),
-                        r = `${t}LambdaFunction`;
-                      console.log(`Add Lambda Function: ${r}`), (a[t] = i.default.assign({ dataSource: r }, a[t]));
+                    i.default.each(h.lambda, (e) => {
+                      const t = i.default.upperFirst(e.name);
+                      if (a[t]) return void y.default.getLogger().warn('already exists *** ');
+                      const r = `${t}LambdaFunction`;
+                      console.log(`Add Lambda Function: ${r}`), (a[t] = { dataSource: r });
                     }),
                     (0, c.writeYaml)(t, a);
                 }),
@@ -1692,40 +1694,43 @@
                   if (!i.default.includes(e, 'resolvers.yml')) return;
                   const t = u.default.parseSlsRecursivelyReference(e),
                     a = (0, c.loadYaml)(t) || {};
-                  i.default.each(g.vtl, (e) => {
-                    const t = `Query.${e.name}`,
-                      r = `appsync/resolvers/queries/${e.name}.request`,
+                  i.default.each(h.vtl, (e) => {
+                    const t = `Query.${e.name}`;
+                    if (a[t]) return void y.default.getLogger().warn('already exists *** ');
+                    const r = `appsync/resolvers/queries/${e.name}.request`,
                       s = i.default.upperFirst(e.name);
                     new p.default({ filePath: r, code: p.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
-                      (a[t] = i.default.assign({ request: `${r}.vtl`, response: 'appsync/resolvers/common/pipeline.after.vtl', functions: [s] }, a[t]));
+                      (a[t] = { request: `${r}.vtl`, response: 'appsync/resolvers/common/pipeline.after.vtl', functions: [s] });
                   }),
-                    i.default.each(g.lambda, (e) => {
-                      const t = `Mutation.${e.name}`,
-                        r = i.default.upperFirst(e.name);
-                      a[t] = i.default.assign({ functions: [r] }, a[t]);
+                    i.default.each(h.lambda, (e) => {
+                      const t = `Mutation.${e.name}`;
+                      if (a[t]) return void y.default.getLogger().warn('already exists *** ');
+                      const r = i.default.upperFirst(e.name);
+                      a[t] = { functions: [r] };
                     }),
                     (0, c.writeYaml)(t, a);
                 }),
               !i.default.isString(r.functions))
             )
               throw new Error(e.error.notFoundFunctionsConfig);
-            const h = u.default.parseSlsRecursivelyReference(r.functions);
-            if (i.default.isEmpty(h)) throw new Error(`${e.error.notFoundFunctionsConfig} : \${file(./serverless/ap-northeast-1/resources/functions.yml)}`);
-            const v = (0, c.loadYaml)(h) || {};
-            i.default.each(g.lambda, (e) => {
-              const t = i.default.upperFirst(e.name),
-                a = `src/functions/appsync/${e.name}`,
+            const v = u.default.parseSlsRecursivelyReference(r.functions);
+            if (i.default.isEmpty(v)) throw new Error(`${e.error.notFoundFunctionsConfig} : \${file(./serverless/ap-northeast-1/resources/functions.yml)}`);
+            const $ = (0, c.loadYaml)(v) || {};
+            i.default.each(h.lambda, (e) => {
+              const t = i.default.upperFirst(e.name);
+              if ($[t]) return void y.default.getLogger().warn('already exists *** ');
+              const a = `src/functions/appsync/${e.name}`,
                 r = `${a}.handler`,
                 s = `\${self:custom.awsResourcePrefix}${t}`,
                 n = i.default.includes(['create', 'update', 'delete'], e.type)
                   ? p.default.templates.typescript[e.type](`${t}MutationVariables`, e.returnValue)
                   : p.default.templates.typescript.skeleton;
-              new p.default({ filePath: a, code: n, type: 'typescript' }).write(), (v[t] = i.default.assign({ handler: r, name: s }, v[t]));
+              new p.default({ filePath: a, code: n, type: 'typescript' }).write(), ($[t] = { handler: r, name: s, memorySize: 1024, timeout: 30 });
             }),
-              (0, c.writeYaml)(h, v);
+              (0, c.writeYaml)(v, $);
           }
         }
-        t.default = y;
+        t.default = g;
       },
       5237: function (e, t, a) {
         var r =
