@@ -159,7 +159,7 @@
             help: 'Show help',
             version: 'Show version',
             yourInput: 'your input',
-            command: { description: { create: 'Create a new project', add: 'Add aws resouces', codegen: 'Auto generate source code' } },
+            command: { description: { create: 'Create a new project', add: 'Add aws resouces', codegen: 'Auto generate graphql api source code' } },
             options: { describe: { verbose: 'Show verbose logs', region: 'Aws region', lang: 'Display language' } },
             unProcessed: {
               required: 'please input a command. Run "ragate help" for a list of all available commands.',
@@ -173,7 +173,7 @@
             help: 'ヘルプを表示',
             version: 'バージョンを表示',
             yourInput: '入力されたコマンド',
-            command: { description: { create: 'プロジェクトを作成', add: 'AWSリソースの追加', codegen: 'ソースコード自動生成' } },
+            command: { description: { create: 'プロジェクトを作成', add: 'AWSリソースの追加', codegen: 'GraphqlAPI ソースコード自動生成' } },
             options: { describe: { verbose: '詳細なログを出力', region: 'AWSリージョン', lang: '表示言語' } },
             unProcessed: {
               required: '指定のコマンドは存在しません。「ragate help」を実行すると、利用可能なすべてのコマンドのリストが表示されます。',
