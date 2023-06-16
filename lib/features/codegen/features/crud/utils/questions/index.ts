@@ -1,9 +1,9 @@
 import serverlessConfigPath from './serverlessConfigPath';
 import resolverInfo from './resolverInfo';
-import typeQuestion from './type';
+import selectResolverType from './selectResolverType';
 
 export default {
   serverlessConfigPath,
   resolverInfo,
-  type: typeQuestion,
+  selectResolverType,
 };

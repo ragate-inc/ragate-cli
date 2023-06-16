@@ -3,16 +3,14 @@ import yargs from 'yargs';
 import inquirer from 'inquirer';
 import * as Type from 'features/codegen/features/crud/types/';
 import { getLocaleLang } from 'features/codegen/features/crud/utils/getLocale';
-import fs from 'fs';
-import * as graphql from 'graphql';
 import _ from 'lodash';
 import ServerlessConfigService from 'services/serverlessConfigService';
 import Parser from 'utils/parser';
 import { loadYaml, writeYaml } from 'utils/yaml';
 import TablePrompt from 'utils/inquirer/tablePrompt';
-import { isFileExists } from 'utils/cli';
 import CodeService from 'services/codeService';
 import questions from 'features/codegen/features/crud/utils/questions/';
+import buildSchemaGraphqlInfo from './utils/buildSchemaGraphqlInfo';
 
 export default class extends FeatureHandlerAbstract {
   constructor(argv: yargs.ArgumentsCamelCase<{ region: AWS_REGION }>) {
@@ -22,47 +20,6 @@ export default class extends FeatureHandlerAbstract {
 
   private get defaultServerlessConfigPath(): string {
     return `serverless/${this.argv.region}/serverless.yml`;
-  }
-
-  private getSchemaGraphql(schema: string | string[]): string {
-    return _.chain(schema)
-      .thru((schema) => {
-        if (_.isString(schema)) {
-          return [schema];
-        }
-        return schema;
-      })
-      .map((schema) => {
-        return fs.readFileSync(schema).toString();
-      })
-      .join('\n')
-      .value();
-  }
-
-  private buildSchemaGraphqlInfo(schemaGraphql: string): Type.SchemaGraphqlInfo {
-    const schemaGraphqlInfo: Type.SchemaGraphqlInfo = [];
-    const parsedData = graphql.parse(schemaGraphql);
-    graphql.visit(parsedData, {
-      enter(node) {
-        if (node.kind === 'ObjectTypeDefinition' && (node.name.value === 'Query' || node.name.value === 'Mutation')) {
-          _.each(node.fields, (field) => {
-            schemaGraphqlInfo.push({
-              type: node.name.value,
-              name: field.name.value,
-              arguments: _.map(field.arguments, (argument) => {
-                return {
-                  name: argument.name.value,
-                  type: _.get(argument, 'type.type.name.value', _.get(argument, 'type.name.value', 'other')),
-                  nonnull: argument.type.kind === graphql.Kind.NON_NULL_TYPE,
-                };
-              }),
-              returnValue: _.get(field, 'type.type.name.value', _.get(field, 'type.name.value', 'other')),
-            });
-          });
-        }
-      },
-    });
-    return schemaGraphqlInfo;
   }
 
   public async run(): Promise<void> {
@@ -98,8 +55,7 @@ export default class extends FeatureHandlerAbstract {
       throw new Error(`${locale.error.invalidServerlessCustomAppSync} : ${appSyncStackPath}`);
     }
 
-    const schemaGraphql = this.getSchemaGraphql(appSyncStackConfig.schema);
-    const schemaGraphqlInfo = this.buildSchemaGraphqlInfo(schemaGraphql);
+    const schemaGraphqlInfo = buildSchemaGraphqlInfo(appSyncStackConfig.schema);
 
     const resolverMappings = await inquirer
       .prompt([questions.resolverInfo(this.lang, schemaGraphqlInfo)])
@@ -123,8 +79,8 @@ export default class extends FeatureHandlerAbstract {
         const vtlGetters = _.filter(resolverMappings.vtl, (vtl) => vtl.type === 'get');
         // 一つずつ質問するのでfor文を使う
         for (let i = 0; i < vtlGetters.length; i++) {
-          const answer = (await inquirer.prompt([questions.type])) as { type: string };
-          vtlGetters[i].type = answer.type;
+          const answer = (await inquirer.prompt([questions.selectResolverType(this.lang)])) as { selectResolverType: string };
+          vtlGetters[i].type = answer.selectResolverType;
         }
         return resolverMappings;
       });
@@ -165,21 +121,19 @@ export default class extends FeatureHandlerAbstract {
           const functionName = _.upperFirst(vtl.name);
           const dataSourceName = yml[functionName]?.dataSource || 'YourDataSourceName';
           const filePath = `appsync/resolvers/functions/Query.${functionName}.request`;
-          if (!isFileExists(`${filePath}.vtl`)) {
-            const code = (() => {
-              switch (vtl.type) {
-                case 'get':
-                  return CodeService.templates.vtl.codegenDynamoGetItemRequest;
-                case 'none':
-                  return CodeService.templates.vtl.localResolverRequest;
-                case 'query':
-                  return CodeService.templates.vtl.codegenDynamoQueryRequest;
-                default:
-                  return '';
-              }
-            })();
-            new CodeService({ filePath, code, type: 'vtl' }).write();
-          }
+          const code = (() => {
+            switch (vtl.type) {
+              case 'get':
+                return CodeService.templates.vtl.codegenDynamoGetItemRequest;
+              case 'none':
+                return CodeService.templates.vtl.localResolverRequest;
+              case 'query':
+                return CodeService.templates.vtl.codegenDynamoQueryRequest;
+              default:
+                return '';
+            }
+          })();
+          new CodeService({ filePath, code, type: 'vtl' }).write();
           yml[functionName] = {
             ...yml[functionName],
             dataSource: dataSourceName,

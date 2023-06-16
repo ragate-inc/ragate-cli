@@ -2,7 +2,7 @@ import { getLocaleLang } from 'features/codegen/features/crud/utils/getLocale';
 
 export default (lang: string) => ({
   type: 'list',
-  name: 'type',
+  name: 'selectResolverType',
   message: getLocaleLang(lang).inquirer.selectResolverType,
   default: () => 'get',
   choices: [
