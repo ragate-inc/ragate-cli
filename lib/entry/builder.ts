@@ -7,6 +7,7 @@ import { getLocaleLang } from 'entry/utils/getLocale';
 import { Locale } from 'entry/types';
 import createFeature from 'features/create/index';
 import addFeature from 'features/add/index';
+import codegenFeature from 'features/codegen/index';
 import { FeatureBuilderAbstractArgs, FeatureHandlerAbstractArgs, awsRegions } from 'types/index';
 import _ from 'lodash';
 import { cleanUpTmpDirectory } from 'utils/cli';
@@ -131,6 +132,10 @@ export default class {
       .command('add', chalk.grey(locale.command.description.add), (_yargs) => {
         const args: FeatureBuilderAbstractArgs = { lang: this.lang, region: this.region };
         return new addFeature.builder(args).build(_yargs);
+      })
+      .command('codegen', chalk.grey(locale.command.description.codegen), (_yargs) => {
+        const args: FeatureBuilderAbstractArgs = { lang: this.lang, region: this.region };
+        return new codegenFeature.builder(args).build(_yargs);
       })
       .command(
         '*',

@@ -6,6 +6,7 @@ export type Locale = {
     description: {
       create: string;
       add: string;
+      codegen: string;
     };
   };
   options: {

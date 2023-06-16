@@ -8,6 +8,7 @@ const locale: Locale = {
     description: {
       create: 'Create a new project',
       add: 'Add aws resouces',
+      codegen: 'Auto generate graphql api source code',
     },
   },
   options: {

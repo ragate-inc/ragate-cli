@@ -71,8 +71,8 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
       ])) as { template: 'query' | 'queryWithGsi' | 'scan'; primaryKeyName: string; sortKeyName: string };
       if (template === 'query') {
         return {
-          before: CodeService.templates.vtl.dynamoQueryRequest({ primaryKeyName, sortKeyName }),
-          after: CodeService.templates.vtl.dynamoGetItemResponse,
+          before: CodeService.templates.vtl.addDynamoQueryRequest({ primaryKeyName, sortKeyName }),
+          after: CodeService.templates.vtl.addDynamoGetItemResponse,
         };
       }
       if (template === 'queryWithGsi') {
@@ -88,8 +88,8 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
           },
         ])) as { gsiName: string };
         return {
-          before: CodeService.templates.vtl.dynamoQueryRequest({ gsiName, primaryKeyName, sortKeyName }),
-          after: CodeService.templates.vtl.dynamoGetItemResponse,
+          before: CodeService.templates.vtl.addDynamoQueryRequest({ gsiName, primaryKeyName, sortKeyName }),
+          after: CodeService.templates.vtl.addDynamoGetItemResponse,
         };
       }
       if (template === 'scan') {

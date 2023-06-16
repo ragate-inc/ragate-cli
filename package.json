@@ -94,6 +94,7 @@
     "graphql-tools": "^8.3.20",
     "inquirer": "^8.0.0",
     "inquirer-autocomplete-prompt": "^2.0.0",
+    "inquirer-table-prompt": "^0.2.1",
     "isomorphic-git": "^1.23.0",
     "js-yaml": "^4.1.0",
     "lodash": "^4.17.21",

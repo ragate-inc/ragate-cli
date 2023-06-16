@@ -1,0 +1,32 @@
+export default (mutationVariable: string, returnValue: string) => `import { AppSyncResolverEvent } from 'aws-lambda';
+import moment from 'moment';
+import DynamoService from 'services/dynamoService';
+import { ${mutationVariable}, ${returnValue} } from 'types/API';
+import { DYNAMO_TABLES } from 'types/index';
+import { v4 as uuid } from 'uuid';
+import middy from 'utils/middy';
+
+export const handler = middy.handler(async (event: AppSyncResolverEvent<${mutationVariable}>): Promise<${returnValue}> => {
+  const input = event.arguments.input;
+  const now = moment.tz('Asia/Tokyo').format();
+  const dynamoService = new DynamoService();
+  const Id = uuid();
+  const itemId = uuid();
+  const item: ${returnValue} = {
+    ...input,
+    Id: Id,
+    Sk: \`${returnValue}#\${itemId}\`,
+    CreatedAt: now,
+    UpdatedAt: now,
+  };
+  await dynamoService.putItem({
+    putItemCommandInput: {
+      TableName: DYNAMO_TABLES.TableName,
+      Item: item,
+      ConditionExpression: 'attribute_not_exists(Id) and attribute_not_exists(Sk)',
+    },
+  });
+
+  return item;
+});
+`;

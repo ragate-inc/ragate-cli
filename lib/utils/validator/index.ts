@@ -3,13 +3,13 @@ import { getLocaleLang } from 'utils/validator/utils/getLocale';
 import { Locale } from './types';
 
 export default class Validator {
-  constructor(input: string | number, lang: string) {
+  constructor(input: string | number | string[], lang: string) {
     this._input = input;
     this._lang = lang;
     this._locale = getLocaleLang(this._lang);
   }
 
-  private readonly _input: string | number;
+  private readonly _input: string | number | string[];
   private readonly _lang: string;
   private _locale: Locale;
   private validations: (() => string | boolean)[] = [];
@@ -18,7 +18,7 @@ export default class Validator {
     return this._locale;
   }
 
-  private get input(): string | number {
+  private get input(): string | number | string[] {
     return this._input;
   }
 
@@ -26,6 +26,7 @@ export default class Validator {
     this.validations.push((): string | boolean => {
       if (_.isUndefined(this.input) || _.isNull(this.input)) return this.locale.required;
       if (_.isString(this.input) && _.isEmpty(this.input)) return this.locale.required;
+      if (_.isArray(this.input) && !_.every(this.input)) return this.locale.required;
       return true;
     });
     return this;

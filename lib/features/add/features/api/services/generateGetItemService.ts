@@ -71,14 +71,14 @@ export default async (args: { appSyncStackService: AppSyncStackService; lang: st
       ])) as { template: 'getItem' | 'getItemConsistentRead' | 'localResolver'; primaryKeyName: string; sortKeyName: string };
       if (template === 'getItem') {
         return {
-          before: CodeService.templates.vtl.dynamoGetItemRequest({ consistentRead: false, primaryKeyName, sortKeyName }),
-          after: CodeService.templates.vtl.dynamoGetItemResponse,
+          before: CodeService.templates.vtl.addDynamoGetItemRequest({ consistentRead: false, primaryKeyName, sortKeyName }),
+          after: CodeService.templates.vtl.addDynamoGetItemResponse,
         };
       }
       if (template === 'getItemConsistentRead') {
         return {
-          before: CodeService.templates.vtl.dynamoGetItemRequest({ consistentRead: true, primaryKeyName, sortKeyName }),
-          after: CodeService.templates.vtl.dynamoGetItemResponse,
+          before: CodeService.templates.vtl.addDynamoGetItemRequest({ consistentRead: true, primaryKeyName, sortKeyName }),
+          after: CodeService.templates.vtl.addDynamoGetItemResponse,
         };
       }
       if (template === 'localResolver') {
