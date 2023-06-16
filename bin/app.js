@@ -2574,7 +2574,7 @@
       2139: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = (e, t) =>
-            `import { AppSyncResolverEvent } from 'aws-lambda';\nimport moment from 'moment';\nimport DynamoService from 'services/dynamoService';\nimport { ${e}, ${t} } from 'types/API';\nimport { DYNAMO_TABLES } from 'types/index';\nimport { v4 as uuid } from 'uuid';\nimport middy from 'utils/middy';\n\nexport const handler = middy.handler(async (event: AppSyncResolverEvent<${e}>): Promise<${t}> => {\n  const input = event.arguments.input;\n  const now = moment.tz('Asia/Tokyo').format();\n  const dynamoService = new DynamoService();\n  const Id = uuid();\n  const itemId = uuid();\n  const item: ${t} = {\n    Id: Id,\n    Sk: \`${t}#\${itemId}\`,\n    ItemId: itemId,\n    ...input,\n    CreatedAt: now,\n    UpdatedAt: now,\n  };\n  await dynamoService.putItem({\n    putItemCommandInput: {\n      TableName: DYNAMO_TABLES.TableName,\n      Item: item,\n      ConditionExpression: 'attribute_not_exists(Id) and attribute_not_exists(Sk)',\n    },\n  });\n\n  return item;\n});\n`);
+            `import { AppSyncResolverEvent } from 'aws-lambda';\nimport moment from 'moment';\nimport DynamoService from 'services/dynamoService';\nimport { ${e}, ${t} } from 'types/API';\nimport { DYNAMO_TABLES } from 'types/index';\nimport { v4 as uuid } from 'uuid';\nimport middy from 'utils/middy';\n\nexport const handler = middy.handler(async (event: AppSyncResolverEvent<${e}>): Promise<${t}> => {\n  const input = event.arguments.input;\n  const now = moment.tz('Asia/Tokyo').format();\n  const dynamoService = new DynamoService();\n  const Id = uuid();\n  const itemId = uuid();\n  const item: ${t} = {\n    ...input,\n    Id: Id,\n    Sk: \`${t}#\${itemId}\`,\n    CreatedAt: now,\n    UpdatedAt: now,\n  };\n  await dynamoService.putItem({\n    putItemCommandInput: {\n      TableName: DYNAMO_TABLES.TableName,\n      Item: item,\n      ConditionExpression: 'attribute_not_exists(Id) and attribute_not_exists(Sk)',\n    },\n  });\n\n  return item;\n});\n`);
       },
       8967: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
@@ -2603,7 +2603,7 @@
       9652: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
           (t.default = (e, t) =>
-            `import { AppSyncResolverEvent } from 'aws-lambda';\nimport moment from 'moment';\nimport DynamoService from 'services/dynamoService';\nimport { ${e}, ${t} } from 'types/API';\nimport { DYNAMO_TABLES } from 'types/index';\nimport { NotFoundError } from 'exceptions/index';\nimport middy from 'utils/middy';\n\nexport const handler = middy.handler(async (event: AppSyncResolverEvent<${e}>): Promise<${t}> => {\n  const input = event.arguments.input;\n  const now = moment.tz('Asia/Tokyo').format();\n  const dynamoService = new DynamoService();\n  const beforeItem = await dynamoService\n    .getItem({\n      getItemCommandInput: {\n        TableName: DYNAMO_TABLES.TableName,\n        Key: {\n          Id: input.Id,\n          Sk: \`${t}#\${input.ItemId}\`,\n        },\n      },\n    })\n    .then(({ Item }) => Item as ${t});\n  if (!beforeItem) {\n    throw new NotFoundError('Item is not found');\n  }\n  const item: ${t} = {\n    Id: input.Id,\n    Sk: \`${t}#\${input.ItemId}\`,\n    ItemId: input.ItemId,\n    ...input,\n    CreatedAt: beforeItem.CreatedAt,\n    UpdatedAt: now,\n  };\n\n  await dynamoService.updateAttributes({\n    tableName: DYNAMO_TABLES.TableName,\n    keyNames: ['Id', 'Sk'],\n    attributes: item,\n    returnValues: 'NONE',\n  });\n\n  return item;\n});\n`);
+            `import { AppSyncResolverEvent } from 'aws-lambda';\nimport moment from 'moment';\nimport DynamoService from 'services/dynamoService';\nimport { ${e}, ${t} } from 'types/API';\nimport { DYNAMO_TABLES } from 'types/index';\nimport middy from 'utils/middy';\n\nexport const handler = middy.handler(async (event: AppSyncResolverEvent<${e}>): Promise<${t}> => {\n  const input = event.arguments.input;\n  const now = moment.tz('Asia/Tokyo').format();\n  const dynamoService = new DynamoService();\n  const item = {\n    Id: input.Id,\n    Sk: \`${t}#\${input.ItemId}\`,\n    ...input,\n    UpdatedAt: now,\n  } as ${t};\n\n  await dynamoService.updateAttributes({\n    tableName: DYNAMO_TABLES.TableName,\n    keyNames: ['Id', 'Sk'],\n    attributes: item,\n    returnValues: 'NONE',\n  });\n\n  return item;\n});\n`);
       },
       7022: (e, t) => {
         Object.defineProperty(t, '__esModule', { value: !0 }),
@@ -3767,7 +3767,7 @@
             k = t.hideObject,
             M = t.singleLine,
             j = l(t.colorize, L, N),
-            I = t.colorizeObjects ? j : l(!1, [], !1);
+            T = t.colorizeObjects ? j : l(!1, [], !1);
           return function (e) {
             let l;
             if (f(e)) l = e;
@@ -3800,7 +3800,7 @@
               M && (L += a), (L += e);
             } else if (!k) {
               const e = [s, n, c].filter((e) => 'string' == typeof l[e] || 'number' == typeof l[e]),
-                t = $({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: d, eol: a, ident: r, singleLine: M, colorizer: I });
+                t = $({ input: l, skipKeys: e, customPrettifiers: C, errorLikeKeys: d, eol: a, ident: r, singleLine: M, colorizer: T });
               M && !/^\s$/.test(t) && (L += ' '), (L += t);
             }
             return L;

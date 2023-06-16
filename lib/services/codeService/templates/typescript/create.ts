@@ -13,10 +13,9 @@ export const handler = middy.handler(async (event: AppSyncResolverEvent<${mutati
   const Id = uuid();
   const itemId = uuid();
   const item: ${returnValue} = {
+    ...input,
     Id: Id,
     Sk: \`${returnValue}#\${itemId}\`,
-    ItemId: itemId,
-    ...input,
     CreatedAt: now,
     UpdatedAt: now,
   };
