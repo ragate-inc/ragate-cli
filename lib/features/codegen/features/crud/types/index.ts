@@ -4,6 +4,7 @@ export type Locale = {
   error: {
     notFoundServerlessConfig: string;
     notInstalledAppSyncPlugin: string;
+    notFoundFunctionsConfig: string;
     invalidServerlessCustomAppSync: string;
     alreadyExistsMappingTemplate: string;
     alreadyExistsResolver: string;
@@ -13,11 +14,13 @@ export type Locale = {
   inquirer: {
     apiName: string;
     apiType: string;
-    apiInfo: string;
+    resolverInfo: string;
     resolverType: string;
     serverlessConfigPath: string;
     schemaGraphqlFilePath: string;
     queryOperation: string;
+    dataSource: string;
+    selectResolverType: string;
   };
   services: {
     common: {
@@ -45,9 +48,18 @@ export type Locale = {
 
 export type Argument = { name: string; type: string; nonnull: boolean };
 export type ApiInfo = { type: string; name: string; arguments: Argument[]; returnValue: string };
-export type SchemaGraphqlInfo = { apiInfo: ApiInfo[] };
-export type TablePromptAnswer = { apiInfo: string[] };
-export type ApiTypeMapping = { [key: string]: string };
+export type SchemaGraphqlInfo = ApiInfo[];
+export type TablePromptAnswer = { resolverInfo: string[] };
+export type ResolverMapping = {
+  resolver: string;
+  type: string;
+  name: string;
+  returnValue?: string;
+};
+export type ResolverMappings = {
+  vtl: ResolverMapping[];
+  lambda: ResolverMapping[];
+};
 
 export type ServerlessConfigPathPromptAnswer = {
   serverlessConfigPath: string;

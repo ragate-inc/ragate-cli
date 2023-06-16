@@ -1,12 +1,12 @@
-export default (mutationVariable: string, returnValue: string) => `
-import { AppSyncResolverEvent } from 'aws-lambda';
+export default (mutationVariable: string, returnValue: string) => `import { AppSyncResolverEvent } from 'aws-lambda';
 import moment from 'moment';
 import DynamoService from 'services/dynamoService';
 import { ${mutationVariable}, ${returnValue} } from 'types/API';
 import { DYNAMO_TABLES } from 'types/index';
 import { NotFoundError } from 'exceptions/index';
+import middy from 'utils/middy';
 
-export const handler = async (event: AppSyncResolverEvent<${mutationVariable}>): Promise<${returnValue}> => {
+export const handler = middy.handler(async (event: AppSyncResolverEvent<${mutationVariable}>): Promise<${returnValue}> => {
   const input = event.arguments.input;
   const now = moment.tz('Asia/Tokyo').format();
   const dynamoService = new DynamoService();
@@ -41,5 +41,5 @@ export const handler = async (event: AppSyncResolverEvent<${mutationVariable}>):
   });
 
   return item;
-};
+});
 `;

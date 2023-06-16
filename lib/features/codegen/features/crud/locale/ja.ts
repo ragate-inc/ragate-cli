@@ -4,6 +4,7 @@ const locale: Locale = {
   error: {
     notFoundServerlessConfig: 'serverless.ymlが存在しません',
     notInstalledAppSyncPlugin: 'serverless-appsync-pluginがインストールされていません',
+    notFoundFunctionsConfig: 'functionsの設定が存在しません',
     invalidServerlessCustomAppSync: 'serverless.ymlのcustom.appsyncが不正です、custom.appsyncには、以下のような文字列が設定されている必要があります',
     alreadyExistsMappingTemplate: '既にマッピングテンプレートに定義が存在します',
     alreadyExistsResolver: '既にリゾルバーに定義が存在します',
@@ -13,11 +14,13 @@ const locale: Locale = {
   inquirer: {
     apiName: 'API名を入力',
     apiType: 'APIタイプを選択',
-    apiInfo: 'API情報を入力',
+    resolverInfo: 'リゾルバー情報を入力',
     resolverType: 'リゾルバータイプを選択',
     serverlessConfigPath: 'serverless.ymlのパスを入力',
     schemaGraphqlFilePath: 'schema.graphqlのパスを入力',
     queryOperation: 'Queryのタイプを選択',
+    dataSource: 'データソースを選択',
+    selectResolverType: 'リゾルバータイプを選択',
   },
   services: {
     common: {

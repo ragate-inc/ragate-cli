@@ -1,12 +1,16 @@
-export default `
-## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html
+export default `## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html
 
 ## [Start] 手動設定
 ##set( $indexName = "gsi index name" )
-#set( $primaryValue = "your primary key value" )
-#set( $sortKeyValue = "your sort key value" )
 #set( $primaryKey = "primary key name" )
 #set( $sortKeyName = "sort key name" )
+#set( $primaryValue = "your primary key value" )
+#set( $sortKeyValue = "your sort key value" )
+#if( $util.isNullOrEmpty($sortKeyValue) )
+    #set( $sortKeyValue = {
+    "beginsWith" : "FacetsName#"
+  } )
+#end
 ## [End] 手動設定
 
 ## [Start] 自動設定

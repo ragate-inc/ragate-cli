@@ -1328,9 +1328,9 @@ concat-map@0.0.1:
   integrity sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==
 
 constructs@^3.3.69:
-  version "3.4.307"
-  resolved "https://registry.npmjs.org/constructs/-/constructs-3.4.307.tgz"
-  integrity sha512-WzfD9fxkDgozP3iS3k+iXtIHYftE7QB+u0K7T4WNIflkE7UAobcWDWFlJ3SVkRsqrO7HsXIOQFifDGDSod4JwQ==
+  version "3.4.326"
+  resolved "https://registry.npmjs.org/constructs/-/constructs-3.4.326.tgz"
+  integrity sha512-noGarETDJE2NO56Qc4bCo4eClwdBdOp5kcwKJue8ZrNUQkJksFFIA9ca5fPbPZdwCt7vpwxbn+wJWolLCsrf9w==
 
 crc-32@^1.2.0:
   version "1.2.2"

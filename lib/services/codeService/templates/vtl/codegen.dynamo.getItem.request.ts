@@ -1,11 +1,10 @@
-export default `
-## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html
+export default `## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html
 
 ## [Start] 共通設定
-#set( $primaryValue = "your primary key value" )
-#set( $sortKeyValue = "your sort key value" )
 #set( $primaryKey = "primary key name" )
 #set( $sortKeyName = "sort key name" )
+#set( $primaryValue = "your primary key value" )
+#set( $sortKeyValue = "your sort key value" )
 #set( $consistentRead = false )
 ## [End] 共通設定
 

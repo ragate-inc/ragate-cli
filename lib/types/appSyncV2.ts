@@ -69,6 +69,8 @@ export type Logging = {
 
 export type PipelineFunction = {
   dataSource: string;
+  request?: string;
+  response?: string;
 };
 
 export type Resolver = {
