@@ -172,12 +172,14 @@ export default class extends FeatureHandlerAbstract {
           const responseVtlFilename = `appsync/resolvers/common/pipeline.after.vtl`;
           const functionName = _.upperFirst(vtl.name);
           new CodeService({ filePath, code: CodeService.templates.vtl.pipelineBefore, type: 'vtl' }).write();
-          yml[keyName] = {
-            ...(yml[keyName] || {}),
-            request: `${filePath}.vtl`,
-            response: responseVtlFilename,
-            functions: [functionName],
-          };
+          yml[keyName] = _.assign(
+            {
+              request: `${filePath}.vtl`,
+              response: responseVtlFilename,
+              functions: [functionName],
+            },
+            yml[keyName]
+          );
         });
         // lambda
         _.each(resolverMappings.lambda, (lambda) => {

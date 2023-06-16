@@ -1697,7 +1697,7 @@
                       r = `appsync/resolvers/queries/${e.name}.request`,
                       s = i.default.upperFirst(e.name);
                     new p.default({ filePath: r, code: p.default.templates.vtl.pipelineBefore, type: 'vtl' }).write(),
-                      (a[t] = { ...(a[t] || {}), request: `${r}.vtl`, response: 'appsync/resolvers/common/pipeline.after.vtl', functions: [s] });
+                      (a[t] = i.default.assign({ request: `${r}.vtl`, response: 'appsync/resolvers/common/pipeline.after.vtl', functions: [s] }, a[t]));
                   }),
                     i.default.each(g.lambda, (e) => {
                       const t = `Mutation.${e.name}`,
