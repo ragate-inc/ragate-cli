@@ -15,12 +15,12 @@ export type Locale = {
     apiName: string;
     apiType: string;
     resolverInfo: string;
+    relationInfo: string;
     resolverType: string;
     serverlessConfigPath: string;
     schemaGraphqlFilePath: string;
     queryOperation: string;
     dataSource: string;
-    selectResolverType: string;
   };
   services: {
     common: {
@@ -48,8 +48,12 @@ export type Locale = {
 
 export type Argument = { name: string; type: string; nonnull: boolean };
 export type ApiInfo = { type: string; name: string; arguments: Argument[]; returnValue: string };
-export type SchemaGraphqlInfo = ApiInfo[];
-export type TablePromptAnswer = { resolverInfo: string[] };
+export type RelationInfo = { type: string; field: string; resolver: string };
+export type SchemaGraphqlInfo = {
+  apiInfo: ApiInfo[];
+  relationInfo: RelationInfo[];
+};
+export type TablePromptAnswer = { resolverInfo: string[]; relationInfo: string[] };
 export type ResolverMapping = {
   resolver: string;
   type: string;
@@ -60,6 +64,7 @@ export type ResolverMappings = {
   vtl: ResolverMapping[];
   lambda: ResolverMapping[];
 };
+export type RelationMappings = RelationInfo[];
 
 export type ServerlessConfigPathPromptAnswer = {
   serverlessConfigPath: string;

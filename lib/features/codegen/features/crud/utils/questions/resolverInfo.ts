@@ -1,15 +1,16 @@
 import { getLocaleLang } from 'features/codegen/features/crud/utils/getLocale';
-import { SchemaGraphqlInfo } from 'features/codegen/features/crud/types/';
+import { ApiInfo } from 'features/codegen/features/crud/types/';
 import Validator from 'utils/validator';
 import { map, chain } from 'lodash';
 
-export default (lang: string, schemaGraphqlInfo: SchemaGraphqlInfo) => ({
+export default (lang: string, schemaGraphqlInfo: ApiInfo[]) => ({
   type: 'table',
   name: 'resolverInfo',
   message: getLocaleLang(lang).inquirer.resolverInfo,
   columns: [
-    { name: 'VTL(Get)', value: 'vtl,get' },
-    { name: 'VTL(Query)', value: 'vtl,query' },
+    { name: 'VTL(Local)', value: 'vtl,LocalResolver' },
+    { name: 'VTL(Get)', value: 'vtl,GetItem' },
+    { name: 'VTL(Query)', value: 'vtl,Query' },
     { name: 'Lambda(Create)', value: 'lambda,create' },
     { name: 'Lambda(Update)', value: 'lambda,update' },
     { name: 'Lambda(Delete)', value: 'lambda,delete' },
@@ -20,8 +21,9 @@ export default (lang: string, schemaGraphqlInfo: SchemaGraphqlInfo) => ({
       value: chain(api.name)
         .thru((name) => {
           const type = [
-            { name: 'get', value: 'vtl,get' },
-            { name: 'list', value: 'vtl,query' },
+            { name: 'local', value: 'vtl,LocalResolver' },
+            { name: 'get', value: 'vtl,GetItem' },
+            { name: 'list', value: 'vtl,Query' },
             { name: 'create', value: 'lambda,create' },
             { name: 'update', value: 'lambda,update' },
             { name: 'delete', value: 'lambda,delete' },
