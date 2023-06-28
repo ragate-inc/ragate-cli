@@ -8,6 +8,7 @@ export default (lang: string, relationInfo: RelationInfo[]) => ({
   name: 'relationInfo',
   message: getLocaleLang(lang).inquirer.resolverInfo,
   columns: [
+    { name: 'None', value: 'None' },
     { name: 'VTL(Local)', value: 'LocalResolver' },
     { name: 'VTL(Get)', value: 'GetItem' },
     { name: 'VTL(Query)', value: 'Query' },
@@ -18,6 +19,7 @@ export default (lang: string, relationInfo: RelationInfo[]) => ({
       value: chain(relation)
         .thru((relation) => {
           const type = [
+            { name: 'none', value: 'None' },
             { name: 'local', value: 'LocalResolver' },
             { name: 'get', value: 'GetItem' },
             { name: 'list', value: 'Query' },

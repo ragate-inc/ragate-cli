@@ -211,6 +211,7 @@ export default class extends FeatureHandlerAbstract {
 
         // relation
         _.each(relationMappings, (relation) => {
+          if (relation.resolver === 'None') return;
           const keyName = `${relation.type}.${relation.field}`;
           if (yml[keyName]) {
             logger.getLogger().warn('already exists *** ');
