@@ -1,17 +1,14 @@
 export default `## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html
 
-## [Start] 共通設定
+## [Start] User Input
 #set( $primaryKey = "primary key name" )
 #set( $sortKeyName = "sort key name" )
 #set( $primaryValue = "your primary key value" )
 #set( $sortKeyValue = "your sort key value" )
 #set( $consistentRead = false )
-## [End] 共通設定
+## [End] UserInput
 
-## [Start] 自動設定
-## [End] 自動設定
-
-## [Start] バリデーション
+## [Start] validation
 #set( $modelExpression = {
     "version" : "2017-02-28",
     "operation" : "GetItem",
@@ -28,7 +25,7 @@ export default `## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/
 #elseif( !$util.isNullOrEmpty($sortKeyName) && !$util.isNullOrEmpty($sortKeyValue) )
   $util.qr($modelExpression.key.put($sortKeyName, $util.dynamodb.toDynamoDB($sortKeyValue)))
 #end
-## [End] バリデーション
+## [End] validation
 
 $util.toJson($modelExpression)
 `;

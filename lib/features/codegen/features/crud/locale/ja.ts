@@ -15,12 +15,12 @@ const locale: Locale = {
     apiName: 'API名を入力',
     apiType: 'APIタイプを選択',
     resolverInfo: 'リゾルバー情報を入力',
+    relationInfo: 'リレーション情報を入力',
     resolverType: 'リゾルバータイプを選択',
     serverlessConfigPath: 'serverless.ymlのパスを入力',
     schemaGraphqlFilePath: 'schema.graphqlのパスを入力',
     queryOperation: 'Queryのタイプを選択',
     dataSource: 'データソースを選択',
-    selectResolverType: 'リゾルバータイプを選択',
   },
   services: {
     common: {

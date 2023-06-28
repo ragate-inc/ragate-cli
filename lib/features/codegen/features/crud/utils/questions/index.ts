@@ -1,9 +1,9 @@
 import serverlessConfigPath from './serverlessConfigPath';
 import resolverInfo from './resolverInfo';
-import selectResolverType from './selectResolverType';
+import relationInfo from './relationInfo';
 
 export default {
   serverlessConfigPath,
   resolverInfo,
-  selectResolverType,
+  relationInfo,
 };

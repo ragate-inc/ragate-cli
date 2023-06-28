@@ -58,33 +58,37 @@ export default class extends FeatureHandlerAbstract {
 
     const schemaGraphqlInfo = buildSchemaGraphqlInfo(appSyncStackConfig.schema);
 
-    const resolverMappings = await inquirer
-      .prompt([questions.resolverInfo(this.lang, schemaGraphqlInfo)])
-      .then((tablePromptAnswer: Type.TablePromptAnswer) => {
-        return _.reduce(
-          tablePromptAnswer.resolverInfo,
-          (acc, cur, idx) => {
-            const [resolver, type] = _.split(cur, ',');
-            acc[resolver as 'vtl' | 'lambda'].push({
-              resolver,
-              type,
-              name: schemaGraphqlInfo[idx].name,
-              returnValue: schemaGraphqlInfo[idx].returnValue,
-            });
-            return acc;
-          },
-          { vtl: [], lambda: [] } as Type.ResolverMappings
-        );
-      })
-      .then(async (resolverMappings: Type.ResolverMappings) => {
-        const vtlGetters = _.filter(resolverMappings.vtl, (vtl) => vtl.type === 'get');
-        // 一つずつ質問するのでfor文を使う
-        for (let i = 0; i < vtlGetters.length; i++) {
-          const answer = (await inquirer.prompt([questions.selectResolverType(this.lang, vtlGetters[i].name)])) as { selectResolverType: string };
-          vtlGetters[i].type = answer.selectResolverType;
-        }
-        return resolverMappings;
-      });
+    const resolverMappings = await inquirer.prompt([questions.resolverInfo(this.lang, schemaGraphqlInfo.apiInfo)]).then((tablePromptAnswer: Type.TablePromptAnswer) => {
+      return _.reduce(
+        tablePromptAnswer.resolverInfo,
+        (acc, cur, idx) => {
+          const [resolver, type] = _.split(cur, ',');
+          acc[resolver as 'vtl' | 'lambda'].push({
+            resolver,
+            type,
+            name: schemaGraphqlInfo.apiInfo[idx].name,
+            returnValue: schemaGraphqlInfo.apiInfo[idx].returnValue,
+          });
+          return acc;
+        },
+        { vtl: [], lambda: [] } as Type.ResolverMappings
+      );
+    });
+
+    const relationMappings = await inquirer.prompt([questions.relationInfo(this.lang, schemaGraphqlInfo.relationInfo)]).then((tablePromptAnswer: Type.TablePromptAnswer) => {
+      return _.reduce(
+        tablePromptAnswer.relationInfo,
+        (acc, cur, idx) => {
+          acc.push({
+            type: schemaGraphqlInfo.relationInfo[idx].type,
+            field: schemaGraphqlInfo.relationInfo[idx].field,
+            resolver: cur,
+          });
+          return acc;
+        },
+        [] as Type.RelationMappings
+      );
+    });
 
     if (_.isArray(appSyncStackConfig.dataSources))
       _.each(appSyncStackConfig.dataSources, (dataSource) => {
@@ -135,7 +139,7 @@ export default class extends FeatureHandlerAbstract {
                 return CodeService.templates.vtl.codegenDynamoGetItemRequest;
               case 'LocalResolver':
                 return CodeService.templates.vtl.localResolverRequest;
-              case 'query':
+              case 'Query':
                 return CodeService.templates.vtl.codegenDynamoQueryRequest;
               default:
                 return '';
@@ -186,6 +190,7 @@ export default class extends FeatureHandlerAbstract {
             functions: [functionName],
           };
         });
+
         // lambda
         _.each(resolverMappings.lambda, (lambda) => {
           const keyName = `Mutation.${lambda.name}`;
@@ -194,8 +199,44 @@ export default class extends FeatureHandlerAbstract {
             return;
           }
           const functionName = _.upperFirst(lambda.name);
+          const filePath = `appsync/resolvers/mutations/${lambda.name}.request`;
+          const responseVtlFilename = `appsync/resolvers/common/pipeline.after.vtl`;
+          new CodeService({ filePath, code: CodeService.templates.vtl.pipelineBefore, type: 'vtl' }).write();
           yml[keyName] = {
+            request: `${filePath}.vtl`,
+            response: responseVtlFilename,
             functions: [functionName],
+          };
+        });
+
+        // relation
+        _.each(relationMappings, (relation) => {
+          if (relation.resolver === 'None') return;
+          const keyName = `${relation.type}.${relation.field}`;
+          if (yml[keyName]) {
+            logger.getLogger().warn('already exists *** ');
+            return;
+          }
+          const filePath = `appsync/resolvers/relations/${relation.type}.${relation.field}.request`;
+          const responseVtlFilename = `appsync/resolvers/common/resolver.response.vtl`;
+          const code = (() => {
+            switch (relation.resolver) {
+              case 'GetItem':
+                return CodeService.templates.vtl.codegenDynamoGetItemRequest;
+              case 'LocalResolver':
+                return CodeService.templates.vtl.localResolverRequest;
+              case 'Query':
+                return CodeService.templates.vtl.codegenDynamoQueryRequest;
+              default:
+                return '';
+            }
+          })();
+          new CodeService({ filePath, code, type: 'vtl' }).write();
+          yml[keyName] = {
+            kind: 'UNIT',
+            dataSource: 'YourDataSourceName',
+            request: `${filePath}.vtl`,
+            response: responseVtlFilename,
           };
         });
         writeYaml(filePath, yml);

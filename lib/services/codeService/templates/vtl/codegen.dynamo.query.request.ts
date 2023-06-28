@@ -1,6 +1,6 @@
 export default `## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/devguide/resolver-mapping-template-reference-dynamodb.html
 
-## [Start] 手動設定
+## [Start] User Input
 ##set( $indexName = "gsi index name" )
 #set( $primaryKey = "primary key name" )
 #set( $sortKeyName = "sort key name" )
@@ -11,13 +11,13 @@ export default `## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/
     "beginsWith" : "FacetsName#"
   } )
 #end
-## [End] 手動設定
+## [End] UserInput
 
-## [Start] 自動設定
+## [Start] Auto Set
 #set( $args = $ctx.args )
-## [End] 自動設定
+## [End] Auto Set
 
-## [Start] バリデーション
+## [Start] validation
 #set( $modelQueryExpression = {} )
 #if( $util.isNullOrEmpty($primaryValue) )
   $util.error("PrimaryValue is null.", "InvalidIndexValueError")
@@ -30,9 +30,9 @@ export default `## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/
     ":$primaryKey": $util.dynamodb.toDynamoDB($primaryValue)
   })
 #end
-## [End] バリデーション
+## [End] validation
 
-## [Start] ソートキー用クエリー生成
+## [Start] Query generation for sort key
 #if( !$util.isNullOrEmpty($sortKeyName) && !$util.isNullOrEmpty($sortKeyValue) )
   #if( !$util.isNull($sortKeyValue.beginsWith) )
     #set( $modelQueryExpression.expression = "$modelQueryExpression.expression AND begins_with(#sortKey, :sortKey)" )
@@ -74,9 +74,9 @@ export default `## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/
   #else
   #end
 #end
-## [End] ソートキー用クエリー生成
+## [End] Query generation for sort key
 
-## [Start] VTL文字列出力
+## [Start] VTL string output
 #set( $limit = $util.defaultIfNull($args.limit, 100) )
 #set( $request = {
   "version": "2018-05-29",
@@ -105,4 +105,4 @@ export default `## Reference : https://docs.aws.amazon.com/ja_jp/appsync/latest/
     $util.qr($request.put("index", $indexName))
 #end
 $util.toJson($request)
-## [End] VTL文字列出力`;
+## [End] VTL string output`;
